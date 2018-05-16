@@ -47,6 +47,9 @@ custom_gocast = {}
 # List of names for which not to generate wrappers.
 blacklist = frozenset()
 
+# These words are ignored when they occur in a type
+ignored_type_elements = frozenset()
+
 # Directory of doxygen xml output files.
 doxyxml = "./xml"
 
@@ -70,12 +73,16 @@ SDL_TYPE_MAPPING = {
     "Sint16": "int16",
     "Sint32": "int32",
     "Uint32": "uint32",
+    "Sint64": "int64",
+    "Uint64": "uint64",
+    "size_t": "uint64",
     "int": "int",
     "char": "int8",
     "char*": "string",
     "const char*": "string",
     "void*": "uintptr",
     "float": "float32",
+    "const Uint8*": "*[999999]byte"
 }
 
 SDL_GOCAST = {"SDL_bool": "C.SDL_TRUE=="}
@@ -88,7 +95,7 @@ SDL_GOCAST = {"SDL_bool": "C.SDL_TRUE=="}
 #                         as receiver in Go.
 # This map maps a C type name to another map that describes how pointers to this
 # type that are used as function arguments are to be handled.
-#  "default": May be "out" or "receiver" and specifies the default treatment,
+#  "default": May be "in", "out" or "receiver" and specifies the default treatment,
 #  "receiver": An iterable of function names of functions for which the
 #              pointers should be treated as "receiver" arguments instead of
 #              the default.
@@ -104,14 +111,36 @@ SDL_POINTER_ARG = {
     },
     "SDL_Joystick": {
         "default": "receiver"
-    }
+    },
+    "SDL_Window": {
+        "default": "receiver"
+    },
+    "SDL_RWops": {
+        "default": "receiver"
+    },
+    "SDL_Rect": {
+        "by-value": True,
+        "default": "in",  # not as receiver to keep option open to write native Go methods
+        "out": ["SDL_IntersectRect.result", "SDL_UnionRect.result"]
+    },
+    "SDL_Point": {
+        "by-value": True,
+        "default": "in",  # not as receiver to keep option open to write native Go methods
+    },
+    "SDL_Finger": {
+        "by-value": True,
+    },
 }
 
 SDL_BLACKLIST = frozenset(
     ("SDL_SetError", "SDL_OutOfMemory", "SDL_Unsupported", "SDL_InvalidParamError",
-     "SDL_GetEventState", "SDL_SysWMEvent", "SDL_Event.syswm", "Event.SetDrop", "SDL_PeepEvents",
-     "SDL_bool", "SDL_SetEventFilter", "SDL_GetEventFilter", "SDL_AddEventWatch",
-     "SDL_DelEventWatch", "SDL_FilterEvents", "SDL_JoystickGetGUIDString"))
+     "SDL_GetEventState", "SDL_SysWMEvent", "SDL_Event.syswm", "Event.SetDrop", "toCFromDropEvent",
+     "SDL_PeepEvents", "SDL_bool", "SDL_SetEventFilter", "SDL_GetEventFilter", "SDL_AddEventWatch",
+     "SDL_DelEventWatch", "SDL_FilterEvents", "SDL_JoystickGetGUIDString",
+     "SDL_IntersectRectAndLine", "SDL_EnclosePoints", "SDL_RWops", "SDL_RWFromFP", "SDL_RWFromMem",
+     "SDL_RWFromConstMem", "SDL_AllocRW", "SDL_FreeRW"))
+
+SDL_IGNORED_TYPE_ELEMENTS = frozenset(("SDL_FORCE_INLINE", ))
 
 
 class BaseTypeinfo(object):
@@ -149,20 +178,16 @@ class BaseTypeinfo(object):
             argtype_stars += "*"
             argtype = argtype[:-1]
 
+        result["struct"] = False
         const = ""
         at = argtype.split()
         if "const" in at:
             at.remove("const")
             const = "const "
+        if "struct" in at:
+            at.remove("struct")
+            result["struct"] = True
         argtype = "".join(at)
-
-        try:
-            gotype = self.mapping[const + argtype + argtype_stars]
-        except:
-            try:
-                gotype = argtype_stars + self.mapping[argtype]
-            except:
-                gotype = argtype_stars + fix(argtype)
 
         result["array"] = []
         if argtypeargs != "":
@@ -173,7 +198,20 @@ class BaseTypeinfo(object):
                 else:
                     result["array"].append(a)
 
+        arr = ""
+        if len(result["array"]) > 0:
+            arr = "[" + "][".join(result["array"]) + "]"
+
+        try:
+            gotype = self.mapping[const + argtype + argtype_stars + arr]
+        except:
+            try:
+                gotype = argtype_stars + arr + self.mapping[argtype]
+            except:
+                gotype = argtype_stars + arr + fix(argtype)
+
         result["gotype"] = gotype
+        result["gocastend"] = ""
 
         if argtype in custom_gocast:
             result["gocast"] = custom_gocast[argtype]
@@ -181,19 +219,42 @@ class BaseTypeinfo(object):
             result["gocast"] = "C.GoString"
             if argidx != 0:
                 result["allocarg"] = "tmp_" + result["allocarg"]
-                result["alloc"] = "%s := C.CString(%s); defer C.free(%s)" % (result["allocarg"],
-                                                                             result["name"],
-                                                                             result["allocarg"])
+                result["alloc"] = "%s := C.CString(%s); defer C.free(unsafe.Pointer(%s))" % (
+                    result["allocarg"], result["name"], result["allocarg"])
         else:
             result["gocast"] = gotype
-            if "*" in result["gocast"] or "[" in result["gocast"]:
-                result["gocast"] = "(" + result["gocast"] + ")"
+            if result["struct"]:
+                if argtype in pointer_arg_treatment and "by-value" in pointer_arg_treatment[argtype] and pointer_arg_treatment[argtype]["by-value"]:
+                    gotype = gotype.lstrip("*")
+                    result["gotype"] = gotype
+                    result["gocast"] = gotype
+                result["gocast"] = "fromC2" + result["gocast"].lstrip("*")
+                if argtype_stars != "":
+                    result["gocast"] = result["gocast"] + "(*"
+                    result["gocastend"] = ")"
+            elif "*" in result["gocast"]:
+                result["gocast"] = "(%s)(unsafe.Pointer" % result["gocast"]
+                result["gocastend"] = ")"
+            elif "[" in result["gocast"]:
+                result["gocast"] = "*(*%s)(unsafe.Pointer(&" % result["gocast"]
+                result["gocastend"] = "))"
 
-        result["ctype"] = "%sC.%s" % (argtype_stars, fix(argtype, True))
-        if "*" in result["ctype"] or "[" in result["ctype"]:
-            result["ccast"] = "(" + result["ctype"] + ")"
-        else:
-            result["ccast"] = result["ctype"]
+        result["ccastend"] = ""
+        result["ctype"] = "%s%sC.%s" % (argtype_stars, arr, fix(argtype, True))
+        if result["ctype"] == "*C.void":
+            result["ctype"] = "unsafe.Pointer"
+
+        result["ccast"] = result["ctype"]
+        if "*" in result["ccast"] or "[" in result["ccast"]:
+            result["ccast"] = "(" + result["ccast"] + ")"
+
+        # if result["ctype"] == "*C.void":
+        #     result["ccast"] += "(unsafe.Pointer"
+        #     result["ccastend"] += ")"
+
+        if len(result["array"]) > 0:
+            result["ccast"] = "*(*%s)(unsafe.Pointer(&" % (result["ctype"], )
+            result["ccastend"] = "))"
 
         result["cidx"] = argidx
         if argidx == 0:
@@ -201,7 +262,7 @@ class BaseTypeinfo(object):
             result["goidx"] = 100  # +100 to make sure that out args have higher index than in args
             treat = "out"
         else:
-            if argtype_stars == "" or const != "" or "*" not in result["gotype"]:
+            if argtype_stars == "" or const != "":
                 result["retval"] = False
                 result["goidx"] = argidx
                 treat = "in"
@@ -218,23 +279,45 @@ class BaseTypeinfo(object):
                     treat = "out"
                 if "receiver" in pointer_arg_treatment[argtype] and funcname in pointer_arg_treatment[argtype]["receiver"]:
                     treat = "receiver"
+                if "out" in pointer_arg_treatment[argtype] and (
+                        funcname + "." + argname) in pointer_arg_treatment[argtype]["out"]:
+                    treat = "out"
+                if "receiver" in pointer_arg_treatment[argtype] and (
+                        funcname + "." + argname) in pointer_arg_treatment[argtype]["receiver"]:
+                    treat = "receiver"
 
         if treat == "receiver":
             result["goidx"] = 0
         elif treat == "out" and argtype_stars != "" and argidx != 0:
             result["allocarg"] = "tmp_" + result["allocarg"]
             result["alloc"] = result["allocarg"] + " := new(" + result["ctype"][1:] + ")"
-            result["dealloc"] = "%s = %s(%s)" % (result["name"], result["gocast"],
-                                                 result["allocarg"])
+            result["dealloc"] = "%s = %s(%s)%s" % (result["name"], result["gocast"],
+                                                   result["allocarg"], result["gocastend"])
+            if need_temp_to_get_pointer(result):
+                result["dealloc"] = "tmp2_%s; %s = &tmp2_%s" % (result["dealloc"], result["name"],
+                                                                result["name"])
+                result["dealloc"] = result["dealloc"].replace("=", ":=", 1)
+
+        elif treat == "in" and result["struct"]:
+            result["allocarg"] = "tmp_" + result["allocarg"]
+            getptr = ""
+            result["alloc"] = result["allocarg"] + " := toCFrom%s(%s)" % (gotype.lstrip("*"),
+                                                                          result["name"])
+            if argtype_stars != "":
+                result["allocarg"] = "&" + result["allocarg"]
 
         # Special case for pointer to primitive data type as out parameter
         if treat == "out" and result["gotype"][0] == "*" and result["gotype"][1].islower():
             result["gotype"] = result["gotype"][1:]
             new_go_cast = "deref_" + result["gotype"] + "_ptr"
             result["dealloc"] = result["dealloc"].replace(result["gocast"], new_go_cast)
+            if result["gocastend"] != "":
+                result["dealloc"] = result["dealloc"][0:-len(result["gocastend"])]
             result["gocast"] = new_go_cast
+            result["gocastend"] = ""
 
-        if "unsafe." in result["gotype"]:
+        if "unsafe." in result["gotype"] or "unsafe" in result["alloc"] or (
+                treat == "out" and "unsafe" in result["gocast"]):
             boilerplate.add('import "unsafe"')
 
 
@@ -253,20 +336,26 @@ def typeinfo(funcname, argidx, argname, argtype, argtypeargs):
     Out: A dictionary containing the following data
       name: (str) Name to use for the argument in the generated Go code.
             Usually the same as argname, unless argname == "".
+      struct: (bool) True if the type is a struct with known fields (i.e. not
+                     a library-internal struct).
       alloc: (str) If not "", this is a statement that needs to be output
                    before the function call to allocate a variable.
       allocarg: (str) If alloc=="" this is the same as name, otherwise it is
-                the name of the allocated variable.
+                the name of the allocated variable, potentially prefixed with "&".
                 Should be used as the function call argument in the C function call.
       dealloc: (str) If not "", this is a statement to execute after the function
                call. It will usually correspond to alloc in some way.
       gotype: (str) Go type to use for the argument.
       gocast: (str) Cast to use for converting C to Go. Often the same as gotype,
                     but might be something like "C.GoString"
+      gocastend: (str) A string with additional closing ")" required after
+                 the closing ")" that every cast has.
       ctype: (str) C type of the argument within Go, e.g. "C.char".
       ccast: (str) Cast to use for converting Go to C. Often the same as gotype,
                    but could include parentheses, e.g. "(*C.char)". Code using
                    ccast never has to add parentheses around ccast.
+      ccastend: (str) A string with additional closing ")" required after
+                   the closing ")" that every cast has.
       array: (list of str) If the argument type is an array, this
                    is a list containing the array dimensions
                    (e.g. "char[2][3]" => ["2","3"])
@@ -345,6 +434,7 @@ def sdl():
     global doxyxml
     global custom_gocast
     global pointer_arg_treatment
+    global ignored_type_elements
 
     if len(sys.argv) != 3:
         sys.stderr.write("USAGE: headername.h doxygen-xml-dir\n")
@@ -370,6 +460,7 @@ def sdl():
     blacklist = SDL_BLACKLIST
     custom_gocast = SDL_GOCAST
     pointer_arg_treatment = SDL_POINTER_ARG
+    ignored_type_elements = SDL_IGNORED_TYPE_ELEMENTS
 
 
 def additional_boilerplate(idx):
@@ -425,7 +516,7 @@ def describe(tag):
                 # We do this before the loop below so that the line wrapping in the
                 # NavigableString case works properly.
                 for x in para.children:
-                    if x.name in ("ref", "computeroutput", "bold"):
+                    if x.name in ("ref", "computeroutput", "bold", "ulink", "emphasis"):
                         x.unwrap()
 
                 # Now merge adjacent NavigableStrings
@@ -494,7 +585,7 @@ def describe(tag):
                                 for i in range(0, len(wrapped)):
                                     wrapped[i] = "  " + wrapped[i]
                                 txt = "\n".join(wrapped)
-                                item.replace_with(pnamelist + "\n" + txt)
+                                item.replace_with(pnamelist + "\n" + txt + "\n")
 
                         # translate programlisting into verbatim
                         # <para>Code:<programlisting>
@@ -508,7 +599,7 @@ def describe(tag):
                                 for sp in item("sp"):  # replace non-breaking space tag with space
                                     sp.replace_with(" ")
                                 txt = "".join(item.strings)
-                                item.replace_with(txt)
+                                item.replace_with(txt + "\n")
 
                         if x.name == "verbatim":
                             prevline = ""
@@ -593,6 +684,8 @@ def structs():
         if name in blacklist:
             continue
 
+        refid = str(struct["id"])
+
         out.append("")  # empty line to separate entries
         describe(struct)
         goname = fix(name)
@@ -611,15 +704,33 @@ def structs():
             if member.argsstring is not None:
                 typargs = str("".join(member.argsstring.stripped_strings))
             ti = typeinfo(name, 0, "", typ, typargs)
-            arr = ""
-            if len(ti["array"]) > 0:
-                arr = "[" + "][".join(ti["array"]) + "]"
             membname = str(member.find("name").string)
             describe(member)
-            out.append("%s%s %s%s" % (indentation(), fix(membname), arr, ti["gotype"]))
+            out.append("%s%s %s" % (indentation(), fix(membname), ti["gotype"]))
 
         pop_indent()
         out.append(indentation() + "}")
+
+        # Now output a function that converts from the C struct to the Go struct
+        out.append("")
+        out.append("%sfunc fromC2%s(s C.%s) %s {" % (indentation(), goname, name, goname))
+        push_indent()
+        ti = typeinfo(name, 0, "", name, "")
+        out.append("%sreturn %s" % (indentation(), go_copy_of(refid, "compound", ti, "s")))
+        pop_indent()
+        out.append(indentation() + "}")
+
+        # Now output a function that converts from the Go struct to the C struct
+        toCFromName = "toCFrom" + goname
+        if not toCFromName in blacklist:
+            out.append("")
+            out.append("%sfunc %s(s %s) (d C.%s) {" % (indentation(), toCFromName, goname, name))
+            push_indent()
+            ti = typeinfo(name, 0, "", name, "")
+            recursive_copy(refid, "compound", ti, "d", "s")
+            out.append(indentation() + "return")
+            pop_indent()
+            out.append(indentation() + "}")
 
 
 def unions():
@@ -645,9 +756,6 @@ def unions():
             if member.argsstring is not None:
                 typargs = str("".join(member.argsstring.stripped_strings))
             ti = typeinfo(name, 0, "", typ, typargs)
-            arr = ""
-            if len(ti["array"]) > 0:
-                arr = "[" + "][".join(ti["array"]) + "]"
             membname = str(member.find("name").string)
             if name + "." + membname in blacklist:
                 continue
@@ -664,8 +772,8 @@ def unions():
 
             # Getter
             describe(member)
-            out.append("%sfunc (u *%s) %s() %s%s {" % (indentation(), goname, fix(membname), arr,
-                                                       ti["gotype"]))
+            out.append("%sfunc (u *%s) %s() %s {" % (indentation(), goname, fix(membname),
+                                                     ti["gotype"]))
             push_indent()
             out.append("%sp := (*%s)(unsafe.Pointer(u))" % (indentation(), ti["ctype"]))
             out.append("%sreturn %s" % (indentation(), go_copy_of(refid, kindref, ti, "*p")))
@@ -676,8 +784,8 @@ def unions():
             settername = "Set" + fix(membname)
             if goname + "." + settername not in blacklist:
                 describe(member)
-                out.append("%sfunc (u *%s) %s(x %s%s) {" % (indentation(), goname, settername, arr,
-                                                            ti["gotype"]))
+                out.append("%sfunc (u *%s) %s(x %s) {" % (indentation(), goname, settername,
+                                                          ti["gotype"]))
                 push_indent()
                 out.append("%sp := (*%s)(unsafe.Pointer(u))" % (indentation(), ti["ctype"]))
                 recursive_copy(refid, kindref, ti, "*p", "x")
@@ -697,7 +805,7 @@ def recursive_copy(refid, kindref, ti, dest, source):
     a pointer to the C object in question that is defined in the respective context.
     '''
     if kindref != "compound":
-        out.append("%s%s = %s(%s)" % (indentation(), dest, ti["ccast"], source))
+        out.append("%s%s = %s(%s)%s" % (indentation(), dest, ti["ccast"], source, ti["ccastend"]))
     else:
         # If dest is a pointer deref expression, remove the star, because it is
         # not necessary when using "."
@@ -742,7 +850,7 @@ def go_copy_of(refid, kindref, ti, value):
     a pointer to the C object in question that is defined in the respective context.
     '''
     if kindref != "compound":
-        return "%s(%s)" % (ti["gocast"], value)
+        return "%s(%s)%s" % (ti["gocast"], value, ti["gocastend"])
     else:
         # If value is a pointer deref expression, remove the star, because it is
         # not necessary when using "."
@@ -884,8 +992,14 @@ def get_ctype(tag):
     '''
     Extracts a C type name from tag's contents.
     '''
-    typ = "".join(str(s) for s in tag.stripped_strings)
+    for t in list(tag.children):
+        if str(t.string) in ignored_type_elements:
+            t.extract()
+    typ = " ".join(str(s) for s in tag.stripped_strings)
     typ = typ.replace(" *", "*").strip()
+    if typ.rstrip("*") not in blacklist and tag.ref is not None and tag.ref["refid"].startswith(
+            "struct"):
+        typ = "struct " + typ
     return typ
 
 
@@ -961,8 +1075,13 @@ def wrapfunctions(section):
                 out.append(indentation() + params[i]["alloc"])
 
         s = ""
+        copy_retval = ""
         if c_ret_idx >= 0:
-            s += "%s = %s(" % (params[c_ret_idx]["name"], params[c_ret_idx]["gocast"])
+            ret_name = params[c_ret_idx]["name"] + " "
+            if need_temp_to_get_pointer(params[c_ret_idx]):
+                copy_retval = "%s = &tmp_%s" % (ret_name, ret_name)
+                ret_name = "tmp_" + ret_name + " :"
+            s += "%s= %s(" % (ret_name, params[c_ret_idx]["gocast"])
 
         s += "C." + name + "("
 
@@ -971,15 +1090,18 @@ def wrapfunctions(section):
         c_args.sort(key=lambda i: params[i]["cidx"])
         comma = ""
         for i in c_args:
-            s += "%s%s(%s)" % (comma, params[i]["ccast"], params[i]["allocarg"])
+            s += "%s%s(%s)%s" % (comma, params[i]["ccast"], params[i]["allocarg"],
+                                 params[i]["ccastend"])
             comma = ", "
 
         s += ")"
 
         if c_ret_idx >= 0:
-            s += ")"
+            s += ")" + params[c_ret_idx]["gocastend"]
 
         out.append(indentation() + s)
+        if copy_retval != "":
+            out.append(indentation() + copy_retval)
 
         for i in range(1, len(params)):
             if params[i]["dealloc"] != "":
@@ -1018,6 +1140,13 @@ DOXYGEN_MAPPING = {
     '\\': "_0C",
     '@': "_0D"
 }
+
+
+def need_temp_to_get_pointer(ti):
+    '''Returns true if the typeinfo ti describes a type that needs
+    a temporary because gocast does not produce a pointer but gotype needs one
+    and we can't take the address of gocast.'''
+    return ti["gotype"].startswith("*") and ti["gocast"][0].islower()
 
 
 def get_doxyname(name):

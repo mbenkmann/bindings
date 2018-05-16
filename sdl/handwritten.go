@@ -34,7 +34,10 @@ package sdl
 import "C"
 import "unsafe"
 
-func deref_int_ptr(i *C.int) int { return *i }
+func deref_int_ptr(i *C.int) int           { return int(*i) }
+func deref_float32_ptr(i *C.float) float32 { return float32(*i) }
+
+type RWops C.SDL_RWops
 
 // SDL_SetError supports extra parameters. At present these are not supported.
 // If you have a use case, file an issue.
@@ -75,4 +78,37 @@ func PeepEvents(events []Event, numevents int, action Eventaction, minType uint3
         return 0
     }
     return int(C.SDL_PeepEvents((*C.SDL_Event)(&(events[0])), C.int(numevents), C.SDL_eventaction(action), C.Uint32(minType), C.Uint32(maxType)))
+}
+
+// Calculate a minimal rectangle enclosing a set of points.
+//
+// Returns: SDL_TRUE if any points were within the clipping rect
+//
+func EnclosePoints(points []Point, clip Rect) (retval bool, result Rect) {
+    pts := make([]C.SDL_Point, len(points)+1) // +1 to make sure pts[0] does not trip bounds checking
+    for i := range points {
+        pts[i] = toCFromPoint(points[i])
+    }
+    tmp_clip := toCFromRect(clip)
+    tmp_result := toCFromRect(result)
+    retval = C.SDL_TRUE == C.SDL_EnclosePoints(&(pts[0]), C.int(len(points)), &tmp_clip, &tmp_result)
+    return
+}
+
+// Calculate the intersection of a rectangle and line segment.
+//
+// Returns: SDL_TRUE if there is an intersection, SDL_FALSE otherwise.
+//
+func IntersectRectAndLine(rect Rect, lineX1 int, lineY1 int, lineX2 int, lineY2 int) (retval bool, X1 int, Y1 int, X2 int, Y2 int) {
+    tmp_rect := toCFromRect(rect)
+    tmp_X1 := C.int(lineX1)
+    tmp_Y1 := C.int(lineY1)
+    tmp_X2 := C.int(lineX2)
+    tmp_Y2 := C.int(lineY2)
+    retval = C.SDL_TRUE == C.SDL_IntersectRectAndLine(&tmp_rect, &tmp_X1, &tmp_Y1, &tmp_X2, &tmp_Y2)
+    X1 = int(tmp_X1)
+    Y1 = int(tmp_Y1)
+    X2 = int(tmp_X2)
+    Y2 = int(tmp_Y2)
+    return
 }
