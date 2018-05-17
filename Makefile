@@ -1,7 +1,7 @@
 DOXYXML:=output/xml
 SDLOUT:=sdl
 SDLHEADERS:=SDL.h SDL_error.h SDL_events.h SDL_joystick.h SDL_keyboard.h SDL_keycode.h SDL_scancode.h \
-            SDL_rect.h SDL_touch.h SDL_gesture.h SDL_rwops.h SDL_video.h
+            SDL_rect.h SDL_touch.h SDL_gesture.h SDL_rwops.h SDL_video.h SDL_surface.h
 SDLSRC:=SDL2-*
 
 .PHONY: doxygen clean $(SDLHEADERS) all

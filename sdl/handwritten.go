@@ -34,10 +34,26 @@ package sdl
 import "C"
 import "unsafe"
 
-func deref_int_ptr(i *C.int) int           { return int(*i) }
-func deref_float32_ptr(i *C.float) float32 { return float32(*i) }
+func deref_int_ptr(i *C.int) int            { return int(*i) }
+func deref_float32_ptr(i *C.float) float32  { return float32(*i) }
+func deref_uint16_ptr(i *C.uint16_t) uint16 { return uint16(*i) }
+func deref_uint8_ptr(i *C.uint8_t) uint8    { return uint8(*i) }
+func deref_uint32_ptr(i *C.uint32_t) uint32 { return uint32(*i) }
+func bool2bool(b bool) C.SDL_bool {
+    if b { return C.SDL_TRUE } else { return C.SDL_FALSE }
+}
 
 type RWops C.SDL_RWops
+type Surface C.SDL_Surface
+type PixelFormat C.SDL_PixelFormat
+
+func BlitScaled(src *Surface, srcrect Rect, dst *Surface, dstrect Rect) (retval int) {
+    return UpperBlitScaled(src, srcrect, dst, dstrect)
+}
+
+func BlitSurface(src *Surface, srcrect Rect, dst *Surface, dstrect Rect) (retval int) {
+    return UpperBlit(src, srcrect, dst, dstrect)
+}
 
 // SDL_SetError supports extra parameters. At present these are not supported.
 // If you have a use case, file an issue.
@@ -95,6 +111,23 @@ func EnclosePoints(points []Point, clip Rect) (retval bool, result Rect) {
     return
 }
 
+// Copy a number of rectangles on the window surface to the screen.
+//
+// Returns: 0 on success, or -1 on error.
+//
+// See also: SDL_GetWindowSurface()
+//
+// See also: SDL_UpdateWindowSurfaceRect()
+//
+func (window *Window) UpdateSurfaceRects(rects []Rect) (retval int) {
+    rcts := make([]C.SDL_Rect, len(rects)+1) // +1 to make sure rcts[0] does not trip bounds checking
+    for i := range rects {
+        rcts[i] = toCFromRect(rects[i])
+    }
+    retval = int(C.SDL_UpdateWindowSurfaceRects((*C.SDL_Window)(window), (*C.SDL_Rect)(&(rcts[0])), C.int(len(rects))))
+    return
+}
+
 // Calculate the intersection of a rectangle and line segment.
 //
 // Returns: SDL_TRUE if there is an intersection, SDL_FALSE otherwise.
@@ -110,5 +143,61 @@ func IntersectRectAndLine(rect Rect, lineX1 int, lineY1 int, lineX2 int, lineY2 
     Y1 = int(tmp_Y1)
     X2 = int(tmp_X2)
     Y2 = int(tmp_Y2)
+    return
+}
+
+// Set the gamma ramp for a window.
+//
+// Returns: 0 on success, or -1 if gamma ramps are unsupported.
+//
+//   window
+//     The window for which the gamma ramp should be set.
+//
+//   red
+//     The translation table for the red channel, or NULL.
+//
+//   green
+//     The translation table for the green channel, or NULL.
+//
+//   blue
+//     The translation table for the blue channel, or NULL.
+//
+// Set the gamma translation table for the red, green, and blue channels
+// of the video hardware. Each table is an array of 256 16-bit
+// quantities, representing a mapping between the input and output for
+// that channel. The input is the index into the array, and the output is
+// the 16-bit gamma value at that index, scaled to the output color
+// precision.
+//
+// See also: SDL_GetWindowGammaRamp()
+//
+func (window *Window) SetGammaRamp(red *[256]uint16, green *[256]uint16, blue *[256]uint16) (retval int) {
+    retval = int(C.SDL_SetWindowGammaRamp((*C.SDL_Window)(window), (*C.Uint16)(unsafe.Pointer(red)), (*C.Uint16)(unsafe.Pointer(green)), (*C.Uint16)(unsafe.Pointer(blue))))
+    return
+}
+
+// Get the gamma ramp for a window.
+//
+// Returns: 0 on success, or -1 if gamma ramps are unsupported.
+//
+// See also: SDL_SetWindowGammaRamp()
+//
+//   window
+//     The window from which the gamma ramp should be queried.
+//
+//   red
+//     A pointer to a 256 element array of 16-bit quantities to hold the
+//     translation table for the red channel, or NULL.
+//
+//   green
+//     A pointer to a 256 element array of 16-bit quantities to hold the
+//     translation table for the green channel, or NULL.
+//
+//   blue
+//     A pointer to a 256 element array of 16-bit quantities to hold the
+//     translation table for the blue channel, or NULL.
+//
+func (window *Window) GetGammaRamp(red *[256]uint16, green *[256]uint16, blue *[256]uint16) (retval int) {
+    retval = int(C.SDL_SetWindowGammaRamp((*C.SDL_Window)(window), (*C.Uint16)(unsafe.Pointer(red)), (*C.Uint16)(unsafe.Pointer(green)), (*C.Uint16)(unsafe.Pointer(blue))))
     return
 }
