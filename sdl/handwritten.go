@@ -111,6 +111,11 @@ func BlitScaled(src *Surface, srcrect Rect, dst *Surface, dstrect Rect) (retval 
     return UpperBlitScaled(src, srcrect, dst, dstrect)
 }
 
+// Convenience shortcut for RWFromFile(fpath, "rb").LoadBMP_RW(1)
+func LoadBMP(fpath string) (retval *Surface) {
+    return RWFromFile(fpath, "rb").LoadBMP_RW(1)
+}
+
 // SDL_SetError supports extra parameters. At present these are not supported.
 // If you have a use case, file an issue.
 func SetError(fo string) int {
@@ -164,6 +169,83 @@ func EnclosePoints(points []Point, clip Rect) (retval bool, result Rect) {
     tmp_clip := toCFromRect(clip)
     tmp_result := toCFromRect(result)
     retval = C.SDL_TRUE == C.SDL_EnclosePoints(&(pts[0]), C.int(len(points)), &tmp_clip, &tmp_result)
+    return
+}
+
+// Draw multiple points on the current rendering target.
+//
+// Returns: 0 on success, or -1 on error
+//
+//   renderer
+//     The renderer which should draw multiple points.
+//
+//   points
+//     The points to draw
+//
+func (renderer *Renderer) DrawPoints(points []Point) (retval int) {
+    pts := make([]C.SDL_Point, len(points)+1) // +1 to make sure pts[0] does not trip bounds checking
+    for i := range points {
+        pts[i] = toCFromPoint(points[i])
+    }
+    retval = int(C.SDL_RenderDrawPoints((*C.SDL_Renderer)(renderer), &(pts[0]), C.int(len(points))))
+    return
+}
+
+// Draw a series of connected lines on the current rendering target.
+//
+// Returns: 0 on success, or -1 on error
+//
+//   renderer
+//     The renderer which should draw multiple lines.
+//
+//   points
+//     The points along the lines
+//
+func (renderer *Renderer) DrawLines(points []Point) (retval int) {
+    pts := make([]C.SDL_Point, len(points)+1) // +1 to make sure pts[0] does not trip bounds checking
+    for i := range points {
+        pts[i] = toCFromPoint(points[i])
+    }
+    retval = int(C.SDL_RenderDrawLines((*C.SDL_Renderer)(renderer), &(pts[0]), C.int(len(points))))
+    return
+}
+
+// Draw some number of rectangles on the current rendering target.
+//
+// Returns: 0 on success, or -1 on error
+//
+//   renderer
+//     The renderer which should draw multiple rectangles.
+//
+//   rects
+//     A pointer to an array of destination rectangles.
+//
+func (renderer *Renderer) DrawRects(rects []Rect) (retval int) {
+    rcts := make([]C.SDL_Rect, len(rects)+1) // +1 to make sure rcts[0] does not trip bounds checking
+    for i := range rects {
+        rcts[i] = toCFromRect(rects[i])
+    }
+    retval = int(C.SDL_RenderDrawRects((*C.SDL_Renderer)(renderer), &(rcts[0]), C.int(len(rects))))
+    return
+}
+
+// Fill some number of rectangles on the current rendering target with
+// the drawing color.
+//
+// Returns: 0 on success, or -1 on error
+//
+//   renderer
+//     The renderer which should fill multiple rectangles.
+//
+//   rects
+//     A pointer to an array of destination rectangles.
+//
+func (renderer *Renderer) FillRects(rects []Rect) (retval int) {
+    rcts := make([]C.SDL_Rect, len(rects)+1) // +1 to make sure rcts[0] does not trip bounds checking
+    for i := range rects {
+        rcts[i] = toCFromRect(rects[i])
+    }
+    retval = int(C.SDL_RenderFillRects((*C.SDL_Renderer)(renderer), &(rcts[0]), C.int(len(rects))))
     return
 }
 
@@ -345,5 +427,143 @@ func ConvertPixels(width int, height int, src_format uint32, src []byte, src_pit
 // Calculate a 256 entry gamma ramp for a gamma value.
 func CalculateGammaRamp(gamma float32, ramp *[256]uint16) {
     C.SDL_CalculateGammaRamp(C.float(gamma), (*C.Uint16)(unsafe.Pointer(ramp)))
+    return
+}
+
+// Create a window and default renderer.
+//
+// Returns: 0 on success, or -1 on error
+//
+//   width
+//     The width of the window
+//
+//   height
+//     The height of the window
+//
+//   window_flags
+//     The flags used to create the window
+//
+//   window
+//     A pointer filled with the window, or NULL on error
+//
+//   renderer
+//     A pointer filled with the renderer, or NULL on error
+//
+func CreateWindowAndRenderer(width int, height int, window_flags uint32) (retval int, window *Window, renderer *Renderer) {
+    var tmp_window *C.SDL_Window
+    var tmp_renderer *C.SDL_Renderer
+    retval = int(C.SDL_CreateWindowAndRenderer(C.int(width), C.int(height), C.Uint32(window_flags), &tmp_window, &tmp_renderer))
+    window = (*Window)(unsafe.Pointer(tmp_window))
+    renderer = (*Renderer)(unsafe.Pointer(tmp_renderer))
+    return
+}
+
+// Update the given texture rectangle with new pixel data.
+//
+// Returns: 0 on success, or -1 if the texture is not valid.
+//
+// Note: This is a fairly slow function.
+//
+//   texture
+//     The texture to update
+//
+//   rect
+//     A pointer to the rectangle of pixels to update, or NULL to update the
+//     entire texture.
+//
+//   pixels
+//     The raw pixel data.
+//
+//   pitch
+//     The number of bytes in a row of pixel data, including padding between
+//     lines.
+//
+func (texture *Texture) Update(rect *Rect, pixels []byte, pitch int) (retval int) {
+    var tmp_rect *C.SDL_Rect
+    if rect != nil {
+        tmp_rect2 := toCFromRect(*rect)
+        tmp_rect = &tmp_rect2
+    }
+    retval = int(C.SDL_UpdateTexture((*C.SDL_Texture)(texture), tmp_rect, unsafe.Pointer(&(pixels[0])), C.int(pitch)))
+    return
+}
+
+// Update a rectangle within a planar YV12 or IYUV texture with new pixel
+// data.
+//
+// Returns: 0 on success, or -1 if the texture is not valid.
+//
+// Note: You can use SDL_UpdateTexture() as long as your pixel data is a
+// contiguous block of Y and U/V planes in the proper order, but this
+// function is available if your pixel data is not contiguous.
+//
+//   texture
+//     The texture to update
+//
+//   rect
+//     A pointer to the rectangle of pixels to update, or NULL to update the
+//     entire texture.
+//
+//   Yplane
+//     The raw pixel data for the Y plane.
+//
+//   Ypitch
+//     The number of bytes between rows of pixel data for the Y plane.
+//
+//   Uplane
+//     The raw pixel data for the U plane.
+//
+//   Upitch
+//     The number of bytes between rows of pixel data for the U plane.
+//
+//   Vplane
+//     The raw pixel data for the V plane.
+//
+//   Vpitch
+//     The number of bytes between rows of pixel data for the V plane.
+//
+func (texture *Texture) UpdateYUV(rect *Rect, Yplane []byte, Ypitch int, Uplane []byte, Upitch int, Vplane []byte, Vpitch int) (retval int) {
+    var tmp_rect *C.SDL_Rect
+    if rect != nil {
+        tmp_rect2 := toCFromRect(*rect)
+        tmp_rect = &tmp_rect2
+    }
+    retval = int(C.SDL_UpdateYUVTexture((*C.SDL_Texture)(texture), tmp_rect, (*C.Uint8)(unsafe.Pointer(&(Yplane[0]))), C.int(Ypitch), (*C.Uint8)(unsafe.Pointer(&(Uplane[0]))), C.int(Upitch), (*C.Uint8)(unsafe.Pointer(&(Vplane[0]))), C.int(Vpitch)))
+    return
+}
+
+// Lock a portion of the texture for write-only pixel access.
+//
+// Returns: 0 on success, or -1 if the texture is not valid or was not
+// created with SDL_TEXTUREACCESS_STREAMING.
+//
+// See also: SDL_UnlockTexture()
+//
+//   texture
+//     The texture to lock for access, which was created with
+//     SDL_TEXTUREACCESS_STREAMING.
+//
+//   rect
+//     A pointer to the rectangle to lock for access. If the rect is NULL,
+//     the entire texture will be locked.
+//
+//   pixels
+//     This is filled in with a pointer to the locked pixels, appropriately
+//     offset by the locked area.
+//
+//   pitch
+//     This is filled in with the pitch of the locked pixels.
+//
+func (texture *Texture) Lock(rect *Rect) (retval int, pixels *[999999999]byte, pitch int) {
+    var tmp_rect *C.SDL_Rect
+    if rect != nil {
+        tmp_rect2 := toCFromRect(*rect)
+        tmp_rect = &tmp_rect2
+    }
+    tmp_pitch := new(C.int)
+    var pix unsafe.Pointer
+    retval = int(C.SDL_LockTexture((*C.SDL_Texture)(texture), tmp_rect, &pix, (*C.int)(tmp_pitch)))
+    pitch = deref_int_ptr(tmp_pitch)
+    pixels = (*[999999999]byte)(pix)
     return
 }

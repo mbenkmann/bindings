@@ -65,9 +65,9 @@ func GetKeyboardFocus() (retval *Window) {
  //   
  //   }
  //   
-func GetKeyboardState() (retval *[999999]byte, numkeys int) {
+func GetKeyboardState() (retval *[999999999]byte, numkeys int) {
     tmp_numkeys := new(C.int)
-    retval = (*[999999]byte)(unsafe.Pointer(C.SDL_GetKeyboardState((*C.int)(tmp_numkeys))))
+    retval = (*[999999999]byte)(unsafe.Pointer(C.SDL_GetKeyboardState((*C.int)(tmp_numkeys))))
     numkeys = deref_int_ptr(tmp_numkeys)
     return
 }

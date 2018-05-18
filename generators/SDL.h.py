@@ -31,7 +31,8 @@ SDL_TYPE_MAPPING = {
     "const char*": "string",
     "void*": "uintptr",
     "float": "float32",
-    "const Uint8*": "*[999999]byte"
+    "double": "float64",
+    "const Uint8*": "*[999999999]byte"
 }
 
 SDL_GOCAST = {"SDL_bool": "C.SDL_TRUE=="}
@@ -40,7 +41,7 @@ SDL_CCAST = {"SDL_bool": "bool2bool"}
 SDL_POINTER_ARG = {
     "SDL_Event": {
         "default": "out",
-        "receiver": ["SDL_PushEvent"]
+        "receiver": {"SDL_PushEvent"}
     },
     "SDL_Joystick": {
         "default": "receiver"
@@ -61,17 +62,27 @@ SDL_POINTER_ARG = {
             "SDL_LowerBlit",
             "SDL_LowerBlitScaled",
             "SDL_SoftStretch",
+            "SDL_CreateTextureFromSurface",
+        }
+    },
+    "SDL_Renderer": {
+        "default": "receiver",
+    },
+    "SDL_Texture": {
+        "default": "receiver",
+        "in": {
+            "SDL_SetRenderTarget",
+            "SDL_RenderCopy",
+            "SDL_RenderCopyEx",
         }
     },
     "SDL_Rect": {
-        "by-value":
-        True,
-        "default":
-        "in",  # not as receiver to keep option open to write native Go methods
-        "out": [
+        "by-value": True,
+        "default": "in",  # not as receiver to keep option open to write native Go methods
+        "out": {
             "SDL_IntersectRect.result", "SDL_UnionRect.result", "SDL_GetDisplayBounds",
-            "SDL_GetClipRect"
-        ]
+            "SDL_GetClipRect", "SDL_RenderGetViewport", "SDL_RenderGetClipRect"
+        }
     },
     "SDL_Point": {
         "by-value": True,
@@ -99,10 +110,14 @@ SDL_BLACKLIST = frozenset(
      "SDL_RWFromConstMem", "SDL_AllocRW", "SDL_FreeRW", "SDL_UpdateWindowSurfaceRects",
      "SDL_SetWindowGammaRamp", "SDL_GetWindowGammaRamp", "SDL_PixelFormat", "SDL_Surface",
      "SDL_BlitSurface", "SDL_BlitScaled", "SDL_ConvertPixels", "SDL_CreateRGBSurfaceFrom",
-     "SDL_FillRects", "SDL_Palette", "SDL_Colour", "SDL_SetPaletteColors",
-     "SDL_CalculateGammaRamp"))
+     "SDL_FillRects", "SDL_Palette", "SDL_Colour", "SDL_SetPaletteColors", "SDL_CalculateGammaRamp",
+     "toCFromRendererInfo", "SDL_CreateWindowAndRenderer", "SDL_UpdateTexture",
+     "SDL_UpdateYUVTexture", "SDL_LockTexture", "SDL_RenderDrawPoints", "SDL_RenderDrawLines",
+     "SDL_RenderDrawRects", "SDL_RenderFillRects", "SDL_RenderReadPixels"))
 
 SDL_IGNORED_TYPE_ELEMENTS = frozenset(("SDL_FORCE_INLINE", ))
+
+SDL_RECEIVER_ALIASES = {"Renderer": ["Renderer", "Render"]}
 
 
 def sdl():
@@ -138,6 +153,7 @@ def sdl():
     lib.custom_ccast = SDL_CCAST
     lib.pointer_arg_treatment = SDL_POINTER_ARG
     lib.ignored_type_elements = SDL_IGNORED_TYPE_ELEMENTS
+    lib.receiver_aliases = SDL_RECEIVER_ALIASES
 
 
 sdl()

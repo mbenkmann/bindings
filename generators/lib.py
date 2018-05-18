@@ -51,6 +51,14 @@ blacklist = frozenset()
 # These words are ignored when they occur in a type
 ignored_type_elements = frozenset()
 
+# Maps a Go type name to a list of name components that will be removed from
+# generated function names that use this type as a receiver.
+# All lists must be sorted from longest to shortest name and must include
+# the Go type name (if it is to be considered).
+# Types whose names are not in this map default to a list consisting of just
+# their name.
+receiver_aliases = {}
+
 # Directory of doxygen xml output files.
 doxyxml = "./xml"
 
@@ -947,7 +955,11 @@ def wrapfunctions(section):
             # if the function has a receiver whose type name is a part
             # of the function name, remove that part
             recvpart = params[0]["gotype"].lstrip("*")
-            goname = goname.replace(recvpart, "", 1)
+            if recvpart in receiver_aliases:
+                for a in receiver_aliases[recvpart]:
+                    goname = goname.replace(a, "", 1)
+            else:
+                goname = goname.replace(recvpart, "", 1)
 
         s += goname + "("
         for i in range(1, num_args + 1):
