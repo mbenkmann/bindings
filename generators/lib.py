@@ -21,14 +21,12 @@
 # SOFTWARE.
 
 from bs4 import BeautifulSoup
-import sys
-import os.path
 import textwrap
 
 # Set of prefixes that are removed from C names to produce Go names.
 prefixes = []
 
-# After calling lib.sdl(), this is the parsed input file data.
+# The parsed input file data everything operates on.
 soup = BeautifulSoup("", "xml")
 
 # List of strings that will be "\n".join()ed to form the output Go file.
@@ -59,38 +57,6 @@ doxyxml = "./xml"
 # additional boilerplate lines
 boilerplate = set()
 
-SDL_COMMON_FILE_HEADER = '''// Machine-generated file.
-// See http://winterdrache.de/bindings for details.
-
-// Bindings for Simple DirectMedia Layer (www.libsdl.org)
-package sdl
-
-// #cgo linux freebsd darwin pkg-config: sdl2
-// #include <SDL.h>
-import "C"'''
-
-SDL_TYPE_MAPPING = {
-    "SDL_bool": "bool",
-    "Uint8": "uint8",
-    "Uint16": "uint16",
-    "Sint16": "int16",
-    "Sint32": "int32",
-    "Uint32": "uint32",
-    "Sint64": "int64",
-    "Uint64": "uint64",
-    "size_t": "uint64",
-    "int": "int",
-    "char": "int8",
-    "char*": "string",
-    "const char*": "string",
-    "void*": "uintptr",
-    "float": "float32",
-    "const Uint8*": "*[999999]byte"
-}
-
-SDL_GOCAST = {"SDL_bool": "C.SDL_TRUE=="}
-SDL_CCAST = {"SDL_bool": "bool2bool"}
-
 # Pointer arguments to C functions can be used for different things:
 #  "out" Parameters: The storage pointed to is not read by the function and
 #                    only used to transfer results to the caller.
@@ -106,50 +72,8 @@ SDL_CCAST = {"SDL_bool": "bool2bool"}
 #  "out": An iterable of function names of functions for which the
 #         pointers should be treated as "out" arguments instead of
 #         the default.
+#  "in": Like "out", but for "in"
 pointer_arg_treatment = {}
-
-SDL_POINTER_ARG = {
-    "SDL_Event": {
-        "default": "out",
-        "receiver": ["SDL_PushEvent"]
-    },
-    "SDL_Joystick": {
-        "default": "receiver"
-    },
-    "SDL_Window": {
-        "default": "receiver"
-    },
-    "SDL_RWops": {
-        "default": "receiver"
-    },
-    "SDL_Surface": {
-        "default": "in"
-    },
-    "SDL_Rect": {
-        "by-value": True,
-        "default": "in",  # not as receiver to keep option open to write native Go methods
-        "out": ["SDL_IntersectRect.result", "SDL_UnionRect.result", "SDL_GetDisplayBounds"]
-    },
-    "SDL_Point": {
-        "by-value": True,
-        "default": "in",  # not as receiver to keep option open to write native Go methods
-    },
-    "SDL_Finger": {
-        "by-value": True,
-    },
-}
-
-SDL_BLACKLIST = frozenset(
-    ("SDL_SetError", "SDL_OutOfMemory", "SDL_Unsupported", "SDL_InvalidParamError",
-     "SDL_GetEventState", "SDL_SysWMEvent", "SDL_Event.syswm", "Event.SetDrop", "toCFromDropEvent",
-     "SDL_PeepEvents", "SDL_bool", "SDL_SetEventFilter", "SDL_GetEventFilter", "SDL_AddEventWatch",
-     "SDL_DelEventWatch", "SDL_FilterEvents", "SDL_JoystickGetGUIDString",
-     "SDL_IntersectRectAndLine", "SDL_EnclosePoints", "SDL_RWops", "SDL_RWFromFP", "SDL_RWFromMem",
-     "SDL_RWFromConstMem", "SDL_AllocRW", "SDL_FreeRW", "SDL_UpdateWindowSurfaceRects",
-     "SDL_SetWindowGammaRamp", "SDL_GetWindowGammaRamp", "SDL_PixelFormat", "SDL_Surface",
-     "SDL_BlitSurface", "SDL_BlitScaled"))
-
-SDL_IGNORED_TYPE_ELEMENTS = frozenset(("SDL_FORCE_INLINE", ))
 
 
 class BaseTypeinfo(object):
@@ -273,20 +197,24 @@ class BaseTypeinfo(object):
         else:
             treat = "out"
 
-        if treat == "out" and argidx != 0:
-            if argtype in pointer_arg_treatment:
-                if "default" in pointer_arg_treatment[argtype]:
-                    treat = pointer_arg_treatment[argtype]["default"]
-                if "out" in pointer_arg_treatment[argtype] and funcname in pointer_arg_treatment[argtype]["out"]:
-                    treat = "out"
-                if "receiver" in pointer_arg_treatment[argtype] and funcname in pointer_arg_treatment[argtype]["receiver"]:
-                    treat = "receiver"
-                if "out" in pointer_arg_treatment[argtype] and (
-                        funcname + "." + argname) in pointer_arg_treatment[argtype]["out"]:
-                    treat = "out"
-                if "receiver" in pointer_arg_treatment[argtype] and (
-                        funcname + "." + argname) in pointer_arg_treatment[argtype]["receiver"]:
-                    treat = "receiver"
+        if argidx != 0 and argtype in pointer_arg_treatment:
+            if "default" in pointer_arg_treatment[argtype]:
+                treat = pointer_arg_treatment[argtype]["default"]
+            if "out" in pointer_arg_treatment[argtype] and funcname in pointer_arg_treatment[argtype]["out"]:
+                treat = "out"
+            if "in" in pointer_arg_treatment[argtype] and funcname in pointer_arg_treatment[argtype]["in"]:
+                treat = "in"
+            if "receiver" in pointer_arg_treatment[argtype] and funcname in pointer_arg_treatment[argtype]["receiver"]:
+                treat = "receiver"
+            if "out" in pointer_arg_treatment[argtype] and (
+                    funcname + "." + argname) in pointer_arg_treatment[argtype]["out"]:
+                treat = "out"
+            if "in" in pointer_arg_treatment[argtype] and (
+                    funcname + "." + argname) in pointer_arg_treatment[argtype]["in"]:
+                treat = "in"
+            if "receiver" in pointer_arg_treatment[argtype] and (
+                    funcname + "." + argname) in pointer_arg_treatment[argtype]["receiver"]:
+                treat = "receiver"
 
         result["retval"] = (treat != "in")
 
@@ -432,50 +360,6 @@ def fixup_params(params):
                     num_args += 1
 
     return num_recv, num_args, num_ret
-
-
-def sdl():
-    '''
-    Called at the very beginning of processing an SDL* header.
-    Checks sys.argv and exits the program on error.
-    Loads the data for the header into the variable soup.
-    '''
-    global prefixes
-    global soup
-    global typeinfo_heuristics
-    global blacklist
-    global doxyxml
-    global custom_gocast
-    global custom_ccast
-    global pointer_arg_treatment
-    global ignored_type_elements
-
-    if len(sys.argv) != 3:
-        sys.stderr.write("USAGE: headername.h doxygen-xml-dir\n")
-        sys.exit(1)
-
-    headername = sys.argv[1]
-    doxyxml = sys.argv[2]
-
-    if not os.path.isdir(doxyxml):
-        sys.stderr.write("Not a directory: %s\n" % (doxyxml, ))
-        sys.exit(1)
-
-    with open("%s/%s.xml" % (doxyxml, get_doxyname(headername))) as f:
-        soup = BeautifulSoup(f, "xml")
-
-    for cls in soup("innerclass", prot="public"):
-        with open("%s/%s.xml" % (doxyxml, cls["refid"])) as f:
-            clssoup = BeautifulSoup(f, "xml")
-            soup.doxygen.append(clssoup.doxygen.compounddef)
-
-    prefixes = ["SDL_"]
-    typeinfo_heuristics.append(BaseTypeinfo(SDL_TYPE_MAPPING))
-    blacklist = SDL_BLACKLIST
-    custom_gocast = SDL_GOCAST
-    custom_ccast = SDL_CCAST
-    pointer_arg_treatment = SDL_POINTER_ARG
-    ignored_type_elements = SDL_IGNORED_TYPE_ELEMENTS
 
 
 def additional_boilerplate(idx):
@@ -1015,8 +899,9 @@ def get_ctype(tag):
             t.extract()
     typ = " ".join(str(s) for s in tag.stripped_strings)
     typ = typ.replace(" *", "*").strip()
-    if typ.rstrip("*").replace("const ","") not in blacklist and tag.ref is not None and tag.ref["refid"].startswith(
-            "struct"):
+    if typ.rstrip("*").replace(
+            "const ",
+            "") not in blacklist and tag.ref is not None and tag.ref["refid"].startswith("struct"):
         typ = "struct " + typ
     return typ
 
@@ -1051,7 +936,8 @@ def wrapfunctions(section):
 
         num_recv, num_args, num_ret = fixup_params(params)
         if num_recv > 1:
-            raise ValueError("Cannot have more than 1 receiver")
+            raise ValueError(
+                "wrapfunctions(): Function '%s' tries to have more than 1 receiver" % name)
 
         describe(fun)
         goname = fix(name)
