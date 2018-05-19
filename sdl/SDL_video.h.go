@@ -707,9 +707,9 @@ func GetCurrentDisplayMode(displayIndex int) (retval int, mode *DisplayMode) {
  // See also: SDL_GetDisplayMode()
  // 
 func GetClosestDisplayMode(displayIndex int, mode *DisplayMode) (retval *DisplayMode, closest *DisplayMode) {
-    tmp_mode := toCFromDisplayMode(*mode)
+    var tmp_mode *C.SDL_DisplayMode; if mode != nil { x := toCFromDisplayMode(*mode); tmp_mode = &x }
     tmp_closest := new(C.SDL_DisplayMode)
-    tmp_retval  := fromC2DisplayMode(*(C.SDL_GetClosestDisplayMode(C.int(displayIndex), (*C.SDL_DisplayMode)(&tmp_mode), (*C.SDL_DisplayMode)(tmp_closest))))
+    tmp_retval  := fromC2DisplayMode(*(C.SDL_GetClosestDisplayMode(C.int(displayIndex), (*C.SDL_DisplayMode)(tmp_mode), (*C.SDL_DisplayMode)(tmp_closest))))
     retval  = &tmp_retval 
     tmp2_closest := fromC2DisplayMode(*(tmp_closest)); closest = &tmp2_closest
     return
@@ -743,8 +743,8 @@ func (window *Window) GetDisplayIndex() (retval int) {
  //     The mode to use, or NULL for the default mode.
  //   
 func (window *Window) SetDisplayMode(mode *DisplayMode) (retval int) {
-    tmp_mode := toCFromDisplayMode(*mode)
-    retval = int(C.SDL_SetWindowDisplayMode((*C.SDL_Window)(window), (*C.SDL_DisplayMode)(&tmp_mode)))
+    var tmp_mode *C.SDL_DisplayMode; if mode != nil { x := toCFromDisplayMode(*mode); tmp_mode = &x }
+    retval = int(C.SDL_SetWindowDisplayMode((*C.SDL_Window)(window), (*C.SDL_DisplayMode)(tmp_mode)))
     return
 }
 

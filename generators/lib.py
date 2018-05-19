@@ -263,14 +263,17 @@ class BaseTypeinfo(object):
         elif treat == "in":
             result["goidx"] = argidx
             if result["struct"]:
-                result["allocarg"] = "tmp_" + result["allocarg"]
-                deref = ""
                 if result["gotype"].startswith("*"):
-                    deref = "*"
-                result["alloc"] = result["allocarg"] + " := toCFrom%s(%s%s)" % (
-                    gotype.lstrip("*"), deref, result["name"])
-                if argtype_stars != "":
-                    result["allocarg"] = "&" + result["allocarg"]
+                    result["allocarg"] = "tmp_" + result["allocarg"]
+                    result["alloc"] = "var %s %s; if %s != nil { x := toCFrom%s(*%s); %s = &x }" % (
+                        result["allocarg"], result["ctype"], result["name"], gotype.lstrip("*"),
+                        result["name"], result["allocarg"])
+                else:
+                    result["allocarg"] = "tmp_" + result["allocarg"]
+                    result["alloc"] = result["allocarg"] + " := toCFrom%s(%s)" % (
+                        gotype.lstrip("*"), result["name"])
+                    if argtype_stars != "":
+                        result["allocarg"] = "&" + result["allocarg"]
 
         # Special case for pointer to primitive data type as out parameter
         if treat == "out" and result["gotype"][0] == "*" and result["gotype"][1].islower():

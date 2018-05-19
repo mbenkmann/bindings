@@ -886,9 +886,9 @@ func (renderer *Renderer) FillRect(rect Rect) (retval int) {
  //     rendering target.
  //   
 func (renderer *Renderer) Copy(texture *Texture, srcrect *Rect, dstrect *Rect) (retval int) {
-    tmp_srcrect := toCFromRect(*srcrect)
-    tmp_dstrect := toCFromRect(*dstrect)
-    retval = int(C.SDL_RenderCopy((*C.SDL_Renderer)(renderer), (*C.SDL_Texture)(texture), (*C.SDL_Rect)(&tmp_srcrect), (*C.SDL_Rect)(&tmp_dstrect)))
+    var tmp_srcrect *C.SDL_Rect; if srcrect != nil { x := toCFromRect(*srcrect); tmp_srcrect = &x }
+    var tmp_dstrect *C.SDL_Rect; if dstrect != nil { x := toCFromRect(*dstrect); tmp_dstrect = &x }
+    retval = int(C.SDL_RenderCopy((*C.SDL_Renderer)(renderer), (*C.SDL_Texture)(texture), (*C.SDL_Rect)(tmp_srcrect), (*C.SDL_Rect)(tmp_dstrect)))
     return
 }
 
