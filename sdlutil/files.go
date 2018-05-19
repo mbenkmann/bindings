@@ -24,10 +24,15 @@ package sdlutil
 import "path"
 import "winterdrache.de/bindings/sdl"
 
+var base_path string
+
 // Returns the concatenation $BASE/path/compo/nents where
 // $BASE is sdl.GetBasePath() (which is usually the location of the binary).
 func GetResourcePath(pathcomponents ...string) string {
-    pth := []string{sdl.GetBasePath()}
+    if base_path == "" { // cache GetBasePath() because it may be slow
+        base_path = sdl.GetBasePath()
+    }
+    pth := []string{base_path}
     pth = append(pth, pathcomponents...)
     return path.Join(pth...)
 }
