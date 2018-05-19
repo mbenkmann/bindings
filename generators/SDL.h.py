@@ -8,7 +8,6 @@ import os.path
 SDL_COMMON_FILE_HEADER = '''// Machine-generated file.
 // See http://winterdrache.de/bindings for details.
 
-// Bindings for Simple DirectMedia Layer (www.libsdl.org)
 package sdl
 
 // #cgo linux freebsd darwin pkg-config: sdl2
