@@ -8,7 +8,7 @@
       "program": "${workspaceFolder}/generators/SDL.h.py",
       "cwd": "${workspaceFolder}",
       "args": [
-        "SDL_render.h",
+        "SDL_timer.h",
         "SDL2-2.0.4/output/xml"
       ],
       "console": "integratedTerminal"

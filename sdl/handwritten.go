@@ -42,6 +42,10 @@ func deref_uint32_ptr(i *C.uint32_t) uint32 { return uint32(*i) }
 func bool2bool(b bool) C.SDL_bool {
     if b { return C.SDL_TRUE } else { return C.SDL_FALSE }
 }
+func freeGoString(s *C.char) string {
+    defer C.free(unsafe.Pointer(s))
+    return C.GoString(s)
+}
 
 type RWops C.SDL_RWops
 type Surface C.SDL_Surface

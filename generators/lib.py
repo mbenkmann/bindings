@@ -81,7 +81,16 @@ boilerplate = set()
 #         pointers should be treated as "out" arguments instead of
 #         the default.
 #  "in": Like "out", but for "in"
+#  "by-value": True => Pass arg by value in Go func even if C signature has it by pointer.
+#  "by-ptr": iterable of C function names for which by-value:True is ignored.
 pointer_arg_treatment = {}
+
+# Names of functions whose returned C strings need to be freed by the caller.
+free_strings = frozenset()
+
+# Mapping for individual function parameter types, e.g.
+# { "SDL_CreateWindow.flags": "WindowFlags" }
+gotype_override = {}
 
 
 class BaseTypeinfo(object):
@@ -154,13 +163,18 @@ class BaseTypeinfo(object):
                 except:
                     gotype = argtype_stars + arr + fix(argtype)
 
+        if funcname + "." + argname in gotype_override:
+            gotype = gotype_override[funcname + "." + argname]
         result["gotype"] = gotype
         result["gocastend"] = ""
 
         if argtype in custom_gocast:
             result["gocast"] = custom_gocast[argtype]
         elif gotype == "string":
-            result["gocast"] = "C.GoString"
+            if funcname in free_strings:
+                result["gocast"] = "freeGoString"
+            else:
+                result["gocast"] = "C.GoString"
             if argidx != 0:
                 result["allocarg"] = "tmp_" + result["allocarg"]
                 result["alloc"] = "%s := C.CString(%s); defer C.free(unsafe.Pointer(%s))" % (
@@ -169,8 +183,11 @@ class BaseTypeinfo(object):
             result["gocast"] = gotype
             if result["struct"]:
                 if argtype in pointer_arg_treatment and "by-value" in pointer_arg_treatment[argtype] and pointer_arg_treatment[argtype]["by-value"]:
-                    gotype = gotype.lstrip("*")
-                    result["gotype"] = gotype
+                    if "by-ptr" in pointer_arg_treatment[argtype] and funcname in pointer_arg_treatment[argtype]["by-ptr"]:
+                        pass  # by-ptr is an exception to by-value:True
+                    else:
+                        gotype = gotype.lstrip("*")
+                        result["gotype"] = gotype
 
                 result["gocast"] = "fromC2" + result["gocast"].lstrip("*")
                 if argtype_stars != "":
@@ -265,7 +282,7 @@ class BaseTypeinfo(object):
             result["gocast"] = new_go_cast
             result["gocastend"] = ""
 
-        if "unsafe." in result["gotype"] or "unsafe" in result["alloc"] or (
+        if "unsafe." in result["gotype"] or "unsafe" in result["alloc"] or "unsafe" in result["ccast"] or (
                 treat == "out" and "unsafe" in result["gocast"]):
             boilerplate.add('import "unsafe"')
 

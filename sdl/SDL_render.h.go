@@ -171,7 +171,7 @@ func GetRenderDriverInfo(index int) (retval int, info *RendererInfo) {
  //   flags
  //     SDL_RendererFlags.
  //   
-func (window *Window) CreateRenderer(index int, flags uint32) (retval *Renderer) {
+func (window *Window) CreateRenderer(index int, flags RendererFlags) (retval *Renderer) {
     retval = (*Renderer)(unsafe.Pointer(C.SDL_CreateRenderer((*C.SDL_Window)(window), C.int(index), C.Uint32(flags))))
     return
 }
@@ -885,9 +885,9 @@ func (renderer *Renderer) FillRect(rect Rect) (retval int) {
  //     A pointer to the destination rectangle, or NULL for the entire
  //     rendering target.
  //   
-func (renderer *Renderer) Copy(texture *Texture, srcrect Rect, dstrect Rect) (retval int) {
-    tmp_srcrect := toCFromRect(srcrect)
-    tmp_dstrect := toCFromRect(dstrect)
+func (renderer *Renderer) Copy(texture *Texture, srcrect *Rect, dstrect *Rect) (retval int) {
+    tmp_srcrect := toCFromRect(*srcrect)
+    tmp_dstrect := toCFromRect(*dstrect)
     retval = int(C.SDL_RenderCopy((*C.SDL_Renderer)(renderer), (*C.SDL_Texture)(texture), (*C.SDL_Rect)(&tmp_srcrect), (*C.SDL_Rect)(&tmp_dstrect)))
     return
 }

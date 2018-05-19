@@ -806,7 +806,7 @@ func (window *Window) GetPixelFormat() (retval uint32) {
  // 
  // See also: SDL_DestroyWindow()
  // 
-func CreateWindow(title string, x int, y int, w int, h int, flags uint32) (retval *Window) {
+func CreateWindow(title string, x int, y int, w int, h int, flags WindowFlags) (retval *Window) {
     tmp_title := C.CString(title); defer C.free(unsafe.Pointer(tmp_title))
     retval = (*Window)(unsafe.Pointer(C.SDL_CreateWindow((*C.char)(tmp_title), C.int(x), C.int(y), C.int(w), C.int(h), C.Uint32(flags))))
     return

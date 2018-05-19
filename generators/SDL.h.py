@@ -78,6 +78,7 @@ SDL_POINTER_ARG = {
     },
     "SDL_Rect": {
         "by-value": True,
+        "by-ptr": {"SDL_RenderCopy"},
         "default": "in",  # not as receiver to keep option open to write native Go methods
         "out": {
             "SDL_IntersectRect.result", "SDL_UnionRect.result", "SDL_GetDisplayBounds",
@@ -119,6 +120,13 @@ SDL_IGNORED_TYPE_ELEMENTS = frozenset(("SDL_FORCE_INLINE", ))
 
 SDL_RECEIVER_ALIASES = {"Renderer": ["Renderer", "Render"]}
 
+SDL_FREE_STRINGS = frozenset(("SDL_GetBasePath", "SDL_GetPrefPath"))
+
+SDL_GOTYPE_OVERRIDE = {
+    "SDL_CreateWindow.flags": "WindowFlags",
+    "SDL_CreateRenderer.flags": "RendererFlags"
+}
+
 
 def sdl():
     '''
@@ -154,6 +162,8 @@ def sdl():
     lib.pointer_arg_treatment = SDL_POINTER_ARG
     lib.ignored_type_elements = SDL_IGNORED_TYPE_ELEMENTS
     lib.receiver_aliases = SDL_RECEIVER_ALIASES
+    lib.free_strings = SDL_FREE_STRINGS
+    lib.gotype_override = SDL_GOTYPE_OVERRIDE
 
 
 sdl()
