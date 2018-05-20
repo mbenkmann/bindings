@@ -894,11 +894,15 @@ def enum2const(section):
     '''Converts all enums in section (part of a BeautifulSoup) into const blocks.'''
     global out
     global indent
-    first = True
+    firstE = True
     for enu in section.find_all("memberdef", kind="enum", prot="public"):
         name = str(enu.find("name").string)
         if name in blacklist:
             continue
+
+        if not firstE:
+            out.append("")
+        firstE = False
 
         describe(enu)
         ti = typeinfo(name, 0, "", name, "")

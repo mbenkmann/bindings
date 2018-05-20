@@ -299,6 +299,7 @@ const (
      // window has mouse captured (unrelated to INPUT_GRABBED)
     WINDOW_MOUSE_CAPTURE WindowFlags = C.SDL_WINDOW_MOUSE_CAPTURE
 )
+
  // Event subtype for window events.
 type WindowEventID int
 const (
@@ -348,6 +349,7 @@ const (
      // The window manager requests that the window be closed
     WINDOWEVENT_CLOSE WindowEventID = C.SDL_WINDOWEVENT_CLOSE
 )
+
  // OpenGL configuration attributes.
 type GLattr int
 const (
@@ -401,6 +403,7 @@ const (
 
     GL_CONTEXT_RELEASE_BEHAVIOR GLattr = C.SDL_GL_CONTEXT_RELEASE_BEHAVIOR
 )
+
 type GLprofile int
 const (
     GL_CONTEXT_PROFILE_CORE GLprofile = C.SDL_GL_CONTEXT_PROFILE_CORE
@@ -409,6 +412,7 @@ const (
 
     GL_CONTEXT_PROFILE_ES GLprofile = C.SDL_GL_CONTEXT_PROFILE_ES
 )
+
 type GLcontextFlag int
 const (
     GL_CONTEXT_DEBUG_FLAG GLcontextFlag = C.SDL_GL_CONTEXT_DEBUG_FLAG
@@ -419,12 +423,14 @@ const (
 
     GL_CONTEXT_RESET_ISOLATION_FLAG GLcontextFlag = C.SDL_GL_CONTEXT_RESET_ISOLATION_FLAG
 )
+
 type GLcontextReleaseFlag int
 const (
     GL_CONTEXT_RELEASE_BEHAVIOR_NONE GLcontextReleaseFlag = C.SDL_GL_CONTEXT_RELEASE_BEHAVIOR_NONE
 
     GL_CONTEXT_RELEASE_BEHAVIOR_FLUSH GLcontextReleaseFlag = C.SDL_GL_CONTEXT_RELEASE_BEHAVIOR_FLUSH
 )
+
  // Possible return values from the SDL_HitTest callback.
  // 
  // See also: SDL_HitTest

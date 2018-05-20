@@ -62,6 +62,7 @@ type RWops C.SDL_RWops
 type Surface C.SDL_Surface
 type PixelFormat C.SDL_PixelFormat
 type Palette C.SDL_Palette
+type GameControllerButtonBind C.SDL_GameControllerButtonBind
 
 // Performs a fast blit from the source surface to the destination surface.
 //

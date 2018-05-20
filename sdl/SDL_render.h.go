@@ -72,6 +72,7 @@ const (
      // The renderer supports rendering to texture
     RENDERER_TARGETTEXTURE RendererFlags = C.SDL_RENDERER_TARGETTEXTURE
 )
+
  // The access pattern allowed for a texture.
 type TextureAccess int
 const (
@@ -84,6 +85,7 @@ const (
      // Texture can be used as a render target
     TEXTUREACCESS_TARGET TextureAccess = C.SDL_TEXTUREACCESS_TARGET
 )
+
  // The texture channel modulation used in SDL_RenderCopy().
 type TextureModulate int
 const (
@@ -96,6 +98,7 @@ const (
      // srcA = srcA * alpha
     TEXTUREMODULATE_ALPHA TextureModulate = C.SDL_TEXTUREMODULATE_ALPHA
 )
+
  // Flip constants for SDL_RenderCopyEx.
 type RendererFlip int
 const (

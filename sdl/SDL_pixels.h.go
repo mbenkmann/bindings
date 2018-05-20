@@ -69,6 +69,7 @@ const (
 
     PIXELTYPE_ARRAYF32  = C.SDL_PIXELTYPE_ARRAYF32
 )
+
  // Bitmap pixel order, high bit -> low bit.
 const (
     BITMAPORDER_NONE  = C.SDL_BITMAPORDER_NONE
@@ -77,6 +78,7 @@ const (
 
     BITMAPORDER_1234  = C.SDL_BITMAPORDER_1234
 )
+
  // Packed component order, high bit -> low bit.
 const (
     PACKEDORDER_NONE  = C.SDL_PACKEDORDER_NONE
@@ -97,6 +99,7 @@ const (
 
     PACKEDORDER_BGRA  = C.SDL_PACKEDORDER_BGRA
 )
+
  // Array component order, low byte -> high byte.
 const (
     ARRAYORDER_NONE  = C.SDL_ARRAYORDER_NONE
@@ -113,6 +116,7 @@ const (
 
     ARRAYORDER_ABGR  = C.SDL_ARRAYORDER_ABGR
 )
+
  // Packed component layout.
 const (
     PACKEDLAYOUT_NONE  = C.SDL_PACKEDLAYOUT_NONE
@@ -133,6 +137,7 @@ const (
 
     PACKEDLAYOUT_1010102  = C.SDL_PACKEDLAYOUT_1010102
 )
+
 const (
     PIXELFORMAT_UNKNOWN  = C.SDL_PIXELFORMAT_UNKNOWN
 

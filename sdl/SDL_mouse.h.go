@@ -74,6 +74,7 @@ const (
 
     NUM_SYSTEM_CURSORS SystemCursor = C.SDL_NUM_SYSTEM_CURSORS
 )
+
  // Scroll direction types for the Scroll event.
 type MouseWheelDirection int
 const (

@@ -495,6 +495,7 @@ const (
 
     SDLK_SLEEP  = C.SDLK_SLEEP
 )
+
  // Enumeration of valid key mods (possibly OR'd together).
 type Keymod int
 const (

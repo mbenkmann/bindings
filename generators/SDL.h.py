@@ -48,19 +48,23 @@ SDL_POINTER_ARG = {
     "SDL_Joystick": {
         "default": "receiver"
     },
+    "SDL_GameController": {
+        "default": "receiver"
+    },
     "SDL_Window": {
         "default": "receiver",
         "in": {"SDL_WarpMouseInWindow"}
     },
     "SDL_RWops": {
-        "default": "receiver"
+        "default": "receiver",
+        "in": {"SDL_GameControllerAddMappingsFromRW"}
     },
     "SDL_Surface": {
         "default": "receiver",
         "in": {
             "SDL_SetWindowIcon", "SDL_SaveBMP_RW", "SDL_UpperBlit", "SDL_UpperBlitScaled",
             "SDL_LowerBlit", "SDL_LowerBlitScaled", "SDL_SoftStretch",
-            "SDL_CreateTextureFromSurface", "SDL_SetWindowShape","SDL_CreateColorCursor"
+            "SDL_CreateTextureFromSurface", "SDL_SetWindowShape", "SDL_CreateColorCursor"
         }
     },
     "SDL_Renderer": {
@@ -102,9 +106,9 @@ SDL_POINTER_ARG = {
         "default": "in",
         "out": {"SDL_GetShapedWindowMode"}
     },
-    "SDL_Cursor":{
-        "default":"receiver",
-        "in":{"SDL_SetCursor"},
+    "SDL_Cursor": {
+        "default": "receiver",
+        "in": {"SDL_SetCursor"},
     }
 }
 
@@ -121,13 +125,14 @@ SDL_BLACKLIST = frozenset(
      "toCFromRendererInfo", "SDL_CreateWindowAndRenderer", "SDL_UpdateTexture",
      "SDL_UpdateYUVTexture", "SDL_LockTexture", "SDL_RenderDrawPoints", "SDL_RenderDrawLines",
      "SDL_RenderDrawRects", "SDL_RenderFillRects", "SDL_RenderReadPixels", "fromC2WindowShapeMode",
-     "toCFromWindowShapeMode"))
+     "toCFromWindowShapeMode", "SDL_GameControllerButtonBind"))
 
 SDL_IGNORED_TYPE_ELEMENTS = frozenset(("SDL_FORCE_INLINE", ))
 
 SDL_RECEIVER_ALIASES = {"Renderer": ["Renderer", "Render"]}
 
-SDL_FREE_STRINGS = frozenset(("SDL_GetBasePath", "SDL_GetPrefPath", "SDL_GetClipboardText"))
+SDL_FREE_STRINGS = frozenset(("SDL_GetBasePath", "SDL_GetPrefPath", "SDL_GetClipboardText",
+                              "SDL_GameControllerMapping"))
 
 SDL_GOTYPE_OVERRIDE = {
     "SDL_CreateWindow.flags": "WindowFlags",
