@@ -49,7 +49,8 @@ SDL_POINTER_ARG = {
         "default": "receiver"
     },
     "SDL_Window": {
-        "default": "receiver"
+        "default": "receiver",
+        "in": {"SDL_WarpMouseInWindow"}
     },
     "SDL_RWops": {
         "default": "receiver"
@@ -59,7 +60,7 @@ SDL_POINTER_ARG = {
         "in": {
             "SDL_SetWindowIcon", "SDL_SaveBMP_RW", "SDL_UpperBlit", "SDL_UpperBlitScaled",
             "SDL_LowerBlit", "SDL_LowerBlitScaled", "SDL_SoftStretch",
-            "SDL_CreateTextureFromSurface", "SDL_SetWindowShape"
+            "SDL_CreateTextureFromSurface", "SDL_SetWindowShape","SDL_CreateColorCursor"
         }
     },
     "SDL_Renderer": {
@@ -101,6 +102,10 @@ SDL_POINTER_ARG = {
         "default": "in",
         "out": {"SDL_GetShapedWindowMode"}
     },
+    "SDL_Cursor":{
+        "default":"receiver",
+        "in":{"SDL_SetCursor"},
+    }
 }
 
 SDL_BLACKLIST = frozenset(

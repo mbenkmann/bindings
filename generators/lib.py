@@ -212,8 +212,14 @@ class BaseTypeinfo(object):
             result["ccast"] = custom_ccast[argtype]
         else:
             result["ccast"] = result["ctype"]
-            if "*" in result["ccast"] or "[" in result["ccast"]:
+            if "[" in result["ccast"]:
                 result["ccast"] = "(" + result["ccast"] + ")"
+            elif "*" in result["ccast"]:
+                if "[" in result["gotype"]:
+                    result["ccast"] = "(%s)(unsafe.Pointer" % result["ctype"]
+                    result["ccastend"] = ")"
+                else:
+                    result["ccast"] = "(" + result["ccast"] + ")"
 
         if len(result["array"]) > 0:
             result["ccast"] = "*(*%s)(unsafe.Pointer(&" % (result["ctype"], )
@@ -529,6 +535,41 @@ def describe(tag):
                                     sp.replace_with(" ")
                                 txt = "".join(item.strings)
                                 item.replace_with(txt + "\n")
+
+                        # translate table into verbatim
+                        # <table rows="5" cols="3">
+                        # <row><entry thead="no"><para>...</para></entry><entry thead="no"><para>...</para></entry><entry thead="no"><para>...</para></entry></row>
+                        # <row><entry thead="no"><para>...</para></entry><entry thead="no"><para>...</para></entry><entry thead="no"><para>...</para></entry></row>
+                        # <row><entry thead="no"><para>...</para></entry><entry thead="no"><para>...</para></entry><entry thead="no"><para>...</para></entry></row>
+                        # <row><entry thead="no"><para>...</para></entry><entry thead="no"><para>...</para></entry><entry thead="no"><para>...</para></entry></row>
+                        # <row><entry thead="no"><para>...</para></entry><entry thead="no"><para>...</para></entry><entry thead="no"><para>...</para></entry></row>
+                        # </table>
+                        if x.name == "table":
+                            x.name = "verbatim"
+
+                            tab = []
+                            width = []
+                            for row in x("row"):
+                                tab.append([])
+                                i = 0
+                                for entry in row("entry"):
+                                    txt = "".join(entry.strings)
+                                    txt = " ".join(txt.split())  # reduce ws sequences to 1 space
+                                    tab[-1].append(txt)
+                                    if i >= len(width):
+                                        width.append(0)
+                                    width[i] = max(width[i], len(txt))
+                                    i += 1
+
+                            k = 0
+                            for row in x("row"):
+                                line = tab[k]
+                                k += 1
+                                s = []
+                                for i in range(len(line)):
+                                    s.append(line[i].ljust(width[i]))
+                                    i += 1
+                                row.replace_with(" | ".join(s))
 
                         if x.name == "verbatim":
                             prevline = ""
