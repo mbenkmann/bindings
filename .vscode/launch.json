@@ -46,5 +46,16 @@
       "showLog": false,
       "output": "${workspaceRoot}/bin/debug-temp"
     },
+    {
+      "name": "Go: Shaped Window",
+      "type": "go",
+      "request": "launch",
+      "mode": "debug",
+      "program": "${workspaceRoot}/examples/sdl-shaped-window/shaped.go",
+      "args": [],
+      "internalConsoleOptions": "openOnSessionStart",
+      "showLog": false,
+      "output": "${workspaceRoot}/bin/debug-temp"
+    },
   ]
 }

@@ -26,6 +26,7 @@ package sdl
 
 // #cgo linux freebsd darwin pkg-config: sdl2
 // #include <SDL.h>
+// #include <SDL_shape.h>
 //
 // void GoSetError(const char *fmt) {
 //     SDL_SetError("%s", fmt);
@@ -45,6 +46,16 @@ func bool2bool(b bool) C.SDL_bool {
 func freeGoString(s *C.char) string {
     defer C.free(unsafe.Pointer(s))
     return C.GoString(s)
+}
+
+func fromC2WindowShapeMode(s C.SDL_WindowShapeMode) WindowShapeMode {
+    return WindowShapeMode{ShapeMode(s.mode), WindowShapeParams(s.parameters)}
+}
+
+func toCFromWindowShapeMode(s WindowShapeMode) (d C.SDL_WindowShapeMode) {
+    d.mode = C.WindowShapeMode(s.Mode)
+    d.parameters = C.SDL_WindowShapeParams(s.Parameters)
+    return
 }
 
 type RWops C.SDL_RWops

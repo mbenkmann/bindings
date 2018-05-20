@@ -139,6 +139,9 @@ class BaseTypeinfo(object):
             result["struct"] = True
         argtype = "".join(at)
 
+        if argtype == "unsignedint":
+            argtype = "uint"
+
         result["array"] = []
         if argtypeargs != "":
             argtypeargs = argtypeargs.replace("[", "").replace("]", " ")
@@ -638,13 +641,15 @@ def structs():
         out.append(indentation() + "}")
 
         # Now output a function that converts from the C struct to the Go struct
-        out.append("")
-        out.append("%sfunc fromC2%s(s C.%s) %s {" % (indentation(), goname, name, goname))
-        push_indent()
-        ti = typeinfo(name, 0, "", name, "")
-        out.append("%sreturn %s" % (indentation(), go_copy_of(refid, "compound", ti, "s")))
-        pop_indent()
-        out.append(indentation() + "}")
+        fromCName = "fromC2" + goname
+        if not fromCName in blacklist:
+            out.append("")
+            out.append("%sfunc %s(s C.%s) %s {" % (indentation(), fromCName, name, goname))
+            push_indent()
+            ti = typeinfo(name, 0, "", name, "")
+            out.append("%sreturn %s" % (indentation(), go_copy_of(refid, "compound", ti, "s")))
+            pop_indent()
+            out.append(indentation() + "}")
 
         # Now output a function that converts from the Go struct to the C struct
         toCFromName = "toCFrom" + goname
@@ -855,7 +860,8 @@ def enum2const(section):
             continue
 
         describe(enu)
-        goname = fix(name)
+        ti = typeinfo(name, 0, "", name, "")
+        goname = ti["gotype"]
         if goname.isidentifier():
             out.append("%stype %s int" % (indentation(), goname))
         else:

@@ -12,10 +12,12 @@ package sdl
 
 // #cgo linux freebsd darwin pkg-config: sdl2
 // #include <SDL.h>
+// #include <SDL_shape.h>
 import "C"'''
 
 SDL_TYPE_MAPPING = {
     "SDL_bool": "bool",
+    "uint": "uint",
     "Uint8": "uint8",
     "Uint16": "uint16",
     "Sint16": "int16",
@@ -31,7 +33,8 @@ SDL_TYPE_MAPPING = {
     "void*": "uintptr",
     "float": "float32",
     "double": "float64",
-    "const Uint8*": "*[999999999]byte"
+    "const Uint8*": "*[999999999]byte",
+    "WindowShapeMode": "ShapeMode"
 }
 
 SDL_GOCAST = {"SDL_bool": "C.SDL_TRUE=="}
@@ -54,14 +57,9 @@ SDL_POINTER_ARG = {
     "SDL_Surface": {
         "default": "receiver",
         "in": {
-            "SDL_SetWindowIcon",
-            "SDL_SaveBMP_RW",
-            "SDL_UpperBlit",
-            "SDL_UpperBlitScaled",
-            "SDL_LowerBlit",
-            "SDL_LowerBlitScaled",
-            "SDL_SoftStretch",
-            "SDL_CreateTextureFromSurface",
+            "SDL_SetWindowIcon", "SDL_SaveBMP_RW", "SDL_UpperBlit", "SDL_UpperBlitScaled",
+            "SDL_LowerBlit", "SDL_LowerBlitScaled", "SDL_SoftStretch",
+            "SDL_CreateTextureFromSurface", "SDL_SetWindowShape"
         }
     },
     "SDL_Renderer": {
@@ -99,6 +97,10 @@ SDL_POINTER_ARG = {
         "default": "receiver",
         "in": {"SDL_ConvertSurface"}
     },
+    "SDL_WindowShapeMode": {
+        "default": "in",
+        "out": {"SDL_GetShapedWindowMode"}
+    },
 }
 
 SDL_BLACKLIST = frozenset(
@@ -113,7 +115,8 @@ SDL_BLACKLIST = frozenset(
      "SDL_FillRects", "SDL_Palette", "SDL_Colour", "SDL_SetPaletteColors", "SDL_CalculateGammaRamp",
      "toCFromRendererInfo", "SDL_CreateWindowAndRenderer", "SDL_UpdateTexture",
      "SDL_UpdateYUVTexture", "SDL_LockTexture", "SDL_RenderDrawPoints", "SDL_RenderDrawLines",
-     "SDL_RenderDrawRects", "SDL_RenderFillRects", "SDL_RenderReadPixels"))
+     "SDL_RenderDrawRects", "SDL_RenderFillRects", "SDL_RenderReadPixels", "fromC2WindowShapeMode",
+     "toCFromWindowShapeMode"))
 
 SDL_IGNORED_TYPE_ELEMENTS = frozenset(("SDL_FORCE_INLINE", ))
 
@@ -123,6 +126,7 @@ SDL_FREE_STRINGS = frozenset(("SDL_GetBasePath", "SDL_GetPrefPath"))
 
 SDL_GOTYPE_OVERRIDE = {
     "SDL_CreateWindow.flags": "WindowFlags",
+    "SDL_CreateShapedWindow.flags": "WindowFlags",
     "SDL_CreateRenderer.flags": "RendererFlags"
 }
 

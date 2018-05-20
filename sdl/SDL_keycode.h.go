@@ -5,6 +5,7 @@ package sdl
 
 // #cgo linux freebsd darwin pkg-config: sdl2
 // #include <SDL.h>
+// #include <SDL_shape.h>
 import "C"
 
  // Defines constants which identify keyboard keys and modifiers.
