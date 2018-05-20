@@ -122,7 +122,7 @@ SDL_IGNORED_TYPE_ELEMENTS = frozenset(("SDL_FORCE_INLINE", ))
 
 SDL_RECEIVER_ALIASES = {"Renderer": ["Renderer", "Render"]}
 
-SDL_FREE_STRINGS = frozenset(("SDL_GetBasePath", "SDL_GetPrefPath"))
+SDL_FREE_STRINGS = frozenset(("SDL_GetBasePath", "SDL_GetPrefPath", "SDL_GetClipboardText"))
 
 SDL_GOTYPE_OVERRIDE = {
     "SDL_CreateWindow.flags": "WindowFlags",
