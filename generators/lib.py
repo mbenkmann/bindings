@@ -502,6 +502,28 @@ def describe(tag):
                                 txt = "\n".join(wrapped)
                                 item.replace_with(txt + "\n")
 
+                        # translate orderedlist into verbatim
+                        # <para>List:<orderedlist>
+                        # <listitem><para>Item 1</para></listitem>
+                        # <listitem><para>Item 2</para></listitem>
+                        # </orderedlist></para>
+                        # NOTE: Each <listitem> may contain <ref>, <computeroutput> and stuff like that.
+                        if x.name == "orderedlist":
+                            x.name = "verbatim"
+
+                            idx = 0
+                            for item in x("listitem"):
+                                idx += 1
+                                txt = "".join(item.strings)
+                                txt = " ".join(txt.split())  # reduce ws sequences to 1 space
+                                wrapped = textwrap.wrap(txt, 65)
+                                if len(wrapped) > 0:
+                                    wrapped[0] = "%s. %s" % (str(idx).rjust(2), wrapped[0])
+                                for i in range(1, len(wrapped)):
+                                    wrapped[i] = "    " + wrapped[i]
+                                txt = "\n".join(wrapped)
+                                item.replace_with(txt + "\n\n")
+
                         # translate parameterlist into verbatim
                         # <para>Params:<parameterlist>
                         # <parameteritem>

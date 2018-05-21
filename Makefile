@@ -3,7 +3,8 @@ SDLOUT:=sdl
 SDLHEADERS:=SDL.h SDL_error.h SDL_events.h SDL_joystick.h SDL_keyboard.h SDL_keycode.h SDL_scancode.h \
             SDL_rect.h SDL_touch.h SDL_gesture.h SDL_rwops.h SDL_video.h SDL_surface.h SDL_blendmode.h \
             SDL_pixels.h SDL_render.h SDL_filesystem.h SDL_timer.h SDL_version.h SDL_shape.h \
-            SDL_power.h SDL_clipboard.h SDL_cpuinfo.h SDL_mouse.h SDL_gamecontroller.h SDL_messagebox.h
+            SDL_power.h SDL_clipboard.h SDL_cpuinfo.h SDL_mouse.h SDL_gamecontroller.h SDL_messagebox.h \
+            SDL_hints.h
 SDLSRC:=SDL2-*
 INC:=$(SDLSRC)/include
 
