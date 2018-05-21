@@ -583,3 +583,73 @@ func (texture *Texture) Lock(rect *Rect) (retval int, pixels *[999999999]byte, p
     pixels = (*[999999999]byte)(pix)
     return
 }
+
+// MessageBox structure containing title, text, window, etc.
+type MessageBoxData struct {
+    // SDL_MessageBoxFlags
+    Flags uint32
+
+    // Parent window, can be NULL
+    Window *Window
+
+    // UTF-8 title
+    Title string
+
+    // UTF-8 message text
+    Message string
+
+    Buttons []MessageBoxButtonData
+
+    // SDL_MessageBoxColorScheme, can be NULL to use system settings
+    ColorScheme *MessageBoxColorScheme
+}
+
+// Create a modal message box.
+//
+// Returns: -1 on error, otherwise 0 and buttonid contains user id of
+// button hit or -1 if dialog was closed.
+//
+// Note: This function should be called on the thread that created the
+// parent window, or on the main thread if the messagebox has no parent.
+// It will block execution of that thread until the user clicks a button
+// or closes the messagebox.
+//
+//   messageboxdata
+//     The SDL_MessageBoxData structure with title, text, etc.
+//
+//   buttonid
+//     The pointer to which user id of hit button should be copied.
+//
+func ShowMessageBox(messageboxdata *MessageBoxData) (retval int, buttonid int) {
+    if messageboxdata == nil { return -1, -1 }
+    mbox := new(C.SDL_MessageBoxData)
+    mbox.flags = C.Uint32(messageboxdata.Flags)
+    mbox.window = (*C.SDL_Window)(messageboxdata.Window)
+    tmp_title := C.CString(messageboxdata.Title)
+    defer C.free(unsafe.Pointer(tmp_title))
+    tmp_message := C.CString(messageboxdata.Message)
+    defer C.free(unsafe.Pointer(tmp_message))
+    mbox.title = tmp_title
+    mbox.message = tmp_message
+    tmp_buttonid := new(C.int)
+    if messageboxdata.ColorScheme != nil {
+        mbox.colorScheme = new(C.SDL_MessageBoxColorScheme)
+        for i, col := range messageboxdata.ColorScheme.Colors {
+            mbox.colorScheme.colors[i] = toCFromMessageBoxColor(col)
+        }
+    }
+    mbox.numbuttons = C.int(len(messageboxdata.Buttons))
+    buttons := make([]C.SDL_MessageBoxButtonData, len(messageboxdata.Buttons))
+    for i, butt := range messageboxdata.Buttons {
+        buttons[i] = toCFromMessageBoxButtonData(butt)
+    }
+    defer func() {
+        for i := range buttons {
+            C.free(unsafe.Pointer(buttons[i].text))
+        }
+    }()
+    mbox.buttons = &(buttons[0])
+    retval = int(C.SDL_ShowMessageBox(mbox, (*C.int)(tmp_buttonid)))
+    buttonid = deref_int_ptr(tmp_buttonid)
+    return
+}

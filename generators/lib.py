@@ -211,7 +211,11 @@ class BaseTypeinfo(object):
         if argtype in custom_ccast:
             result["ccast"] = custom_ccast[argtype]
         else:
-            result["ccast"] = result["ctype"]
+            if gotype == "string" and result["alloc"] == "":
+                result["ccast"] = "C.CString"
+            else:
+                result["ccast"] = result["ctype"]
+
             if "[" in result["ccast"]:
                 result["ccast"] = "(" + result["ccast"] + ")"
             elif "*" in result["ccast"]:

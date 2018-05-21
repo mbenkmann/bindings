@@ -53,7 +53,7 @@ SDL_POINTER_ARG = {
     },
     "SDL_Window": {
         "default": "receiver",
-        "in": {"SDL_WarpMouseInWindow"}
+        "in": {"SDL_WarpMouseInWindow", "SDL_ShowSimpleMessageBox"}
     },
     "SDL_RWops": {
         "default": "receiver",
@@ -125,7 +125,9 @@ SDL_BLACKLIST = frozenset(
      "toCFromRendererInfo", "SDL_CreateWindowAndRenderer", "SDL_UpdateTexture",
      "SDL_UpdateYUVTexture", "SDL_LockTexture", "SDL_RenderDrawPoints", "SDL_RenderDrawLines",
      "SDL_RenderDrawRects", "SDL_RenderFillRects", "SDL_RenderReadPixels", "fromC2WindowShapeMode",
-     "toCFromWindowShapeMode", "SDL_GameControllerButtonBind"))
+     "toCFromWindowShapeMode", "SDL_GameControllerButtonBind", "fromC2MessageBoxButtonData",
+     "fromC2MessageBoxColorScheme", "toCFromMessageBoxColorScheme", "SDL_MessageBoxData",
+     "SDL_ShowMessageBox"))
 
 SDL_IGNORED_TYPE_ELEMENTS = frozenset(("SDL_FORCE_INLINE", ))
 
