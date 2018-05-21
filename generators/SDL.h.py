@@ -109,6 +109,12 @@ SDL_POINTER_ARG = {
     "SDL_Cursor": {
         "default": "receiver",
         "in": {"SDL_SetCursor"},
+    },
+    "SDL_Haptic": {
+        "default": "receiver",
+    },
+    "SDL_HapticEffect": {
+        "default": "in",
     }
 }
 
@@ -127,7 +133,7 @@ SDL_BLACKLIST = frozenset(
      "SDL_RenderDrawRects", "SDL_RenderFillRects", "SDL_RenderReadPixels", "fromC2WindowShapeMode",
      "toCFromWindowShapeMode", "SDL_GameControllerButtonBind", "fromC2MessageBoxButtonData",
      "fromC2MessageBoxColorScheme", "toCFromMessageBoxColorScheme", "SDL_MessageBoxData",
-     "SDL_ShowMessageBox"))
+     "SDL_ShowMessageBox","SDL_HapticCustom"))
 
 SDL_IGNORED_TYPE_ELEMENTS = frozenset(("SDL_FORCE_INLINE", ))
 

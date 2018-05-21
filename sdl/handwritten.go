@@ -63,6 +63,7 @@ type Surface C.SDL_Surface
 type PixelFormat C.SDL_PixelFormat
 type Palette C.SDL_Palette
 type GameControllerButtonBind C.SDL_GameControllerButtonBind
+type HapticCustom C.SDL_HapticCustom
 
 // Performs a fast blit from the source surface to the destination surface.
 //

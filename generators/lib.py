@@ -432,7 +432,7 @@ def describe(tag):
             # <para>Foo: Text</para><para>More Text</para>
             for retsec in desc.find_all("simplesect"):
                 kind = retsec["kind"]
-                if kind not in ("return", "warning", "note", "see"):
+                if kind not in ("return", "warning", "note", "see", "par"):
                     continue
                 retsec.para.unwrap()
                 retsec.name = "para"
@@ -447,6 +447,8 @@ def describe(tag):
                     retsec.insert(0, "Note: ")
                 elif kind == "see":
                     retsec.insert(0, "See also: ")
+                elif kind == "par":
+                    retsec.title.unwrap()
                 p.insert_before(retsec)
 
             for para in desc.find_all("para", recursive=False):
@@ -560,7 +562,7 @@ def describe(tag):
                                 for sp in item("sp"):  # replace non-breaking space tag with space
                                     sp.replace_with(" ")
                                 txt = "".join(item.strings)
-                                item.replace_with(txt + "\n")
+                                item.replace_with(txt)
 
                         # translate table into verbatim
                         # <table rows="5" cols="3">
@@ -805,11 +807,6 @@ def recursive_copy(refid, kindref, ti, dest, source):
     if kindref != "compound":
         out.append("%s%s = %s(%s)%s" % (indentation(), dest, ti["ccast"], source, ti["ccastend"]))
     else:
-        # If dest is a pointer deref expression, remove the star, because it is
-        # not necessary when using "."
-        if dest[0] == "*":
-            dest = dest[1:]
-
         with open("%s/%s.xml" % (doxyxml, refid)) as f:
             compound = BeautifulSoup(f, "xml").doxygen.compounddef
 
@@ -834,7 +831,7 @@ def recursive_copy(refid, kindref, ti, dest, source):
                 if member.argsstring is not None:
                     typargs = str("".join(member.argsstring.stripped_strings))
                 ti2 = typeinfo(name, 0, cmembname, typ, typargs)
-                recursive_copy(refid2, kindref2, ti2, "%s.%s" % (dest, cmembname),
+                recursive_copy(refid2, kindref2, ti2, "%s.%s" % (dest.lstrip("*"), cmembname),
                                "%s.%s" % (source, fix(membname)))
 
 
@@ -852,11 +849,6 @@ def go_copy_of(refid, kindref, ti, value):
     if kindref != "compound":
         return "%s(%s)%s" % (ti["gocast"], value, ti["gocastend"])
     else:
-        # If value is a pointer deref expression, remove the star, because it is
-        # not necessary when using "."
-        if value[0] == "*":
-            value = value[1:]
-
         s = []
         with open("%s/%s.xml" % (doxyxml, refid)) as f:
             compound = BeautifulSoup(f, "xml").doxygen.compounddef
@@ -882,7 +874,8 @@ def go_copy_of(refid, kindref, ti, value):
                 if member.argsstring is not None:
                     typargs = str("".join(member.argsstring.stripped_strings))
                 ti2 = typeinfo(name, 0, cmembname, typ, typargs)
-                s.append(go_copy_of(refid2, kindref2, ti2, "%s.%s" % (value, cmembname)))
+                s.append(
+                    go_copy_of(refid2, kindref2, ti2, "%s.%s" % (value.lstrip("*"), cmembname)))
 
         return ti["gotype"] + "{" + ", ".join(s) + "}"
 

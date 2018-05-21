@@ -58,13 +58,9 @@ func GetKeyboardFocus() (retval *Window) {
  //   
  // Example:
  //   const Uint8 *state = SDL_GetKeyboardState(NULL);
- //   
  //   if ( state[SDL_SCANCODE_RETURN] )   {
- //   
  //       printf("<RETURN> is pressed.\n");
- //   
  //   }
- //   
 func GetKeyboardState() (retval *[999999999]byte, numkeys int) {
     tmp_numkeys := new(C.int)
     retval = (*[999999999]byte)(unsafe.Pointer(C.SDL_GetKeyboardState((*C.int)(tmp_numkeys))))
