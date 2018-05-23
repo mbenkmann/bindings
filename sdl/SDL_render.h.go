@@ -113,6 +113,7 @@ const (
 )
 
 type Renderer C.SDL_Renderer
+
 type Texture C.SDL_Texture
 
 

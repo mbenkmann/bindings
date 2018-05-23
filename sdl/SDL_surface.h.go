@@ -124,7 +124,7 @@ func (surface *Surface) Unlock() {
  // 
  // Returns: the new surface, or NULL if there was an error.
  // 
-func (src *RWops) LoadBMP_RW(freesrc int) (retval *Surface) {
+func LoadBMP_RW(src *RWops, freesrc int) (retval *Surface) {
     retval = (*Surface)(unsafe.Pointer(C.SDL_LoadBMP_RW((*C.SDL_RWops)(src), C.int(freesrc))))
     return
 }
@@ -135,7 +135,7 @@ func (src *RWops) LoadBMP_RW(freesrc int) (retval *Surface) {
  // 
  // Returns: 0 if successful or -1 if there was an error.
  // 
-func (dst *RWops) SaveBMP_RW(surface *Surface, freedst int) (retval int) {
+func SaveBMP_RW(surface *Surface, dst *RWops, freedst int) (retval int) {
     retval = int(C.SDL_SaveBMP_RW((*C.SDL_Surface)(surface), (*C.SDL_RWops)(dst), C.int(freedst)))
     return
 }

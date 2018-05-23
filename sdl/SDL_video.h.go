@@ -509,8 +509,10 @@ const (
  // See also: SDL_ShowWindow()
  // 
 type Window C.SDL_Window
+
  // An opaque handle to an OpenGL context.
 type GLContext C.SDL_GLContext
+
  // Callback used for hit-testing.
  // 
  // See also: SDL_SetWindowHitTest

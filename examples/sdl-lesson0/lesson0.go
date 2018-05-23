@@ -18,7 +18,6 @@ func main() {
         fmt.Fprintf(os.Stderr, "SDL_Init Error: %v\n", sdl.GetError())
         os.Exit(1)
     }
-
     defer sdl.Quit()
 
     os.Exit(0)

@@ -128,9 +128,14 @@ func BlitScaled(src *Surface, srcrect Rect, dst *Surface, dstrect Rect) (retval 
     return UpperBlitScaled(src, srcrect, dst, dstrect)
 }
 
-// Convenience shortcut for RWFromFile(fpath, "rb").LoadBMP_RW(1)
+// Convenience shortcut for LoadBMP_RW(RWFromFile(fpath, "rb"), 1)
 func LoadBMP(fpath string) (retval *Surface) {
-    return RWFromFile(fpath, "rb").LoadBMP_RW(1)
+    return LoadBMP_RW(RWFromFile(fpath, "rb"), 1)
+}
+
+// Convenience shortcut for LoadWAV_RW(RWFromFile(fpath, "rb"), 1)
+func LoadWAV(fpath string) (retval *AudioSpec, audio_buf []byte) {
+    return LoadWAV_RW(RWFromFile(fpath, "rb"), 1)
 }
 
 // SDL_SetError supports extra parameters. At present these are not supported.
@@ -652,5 +657,163 @@ func ShowMessageBox(messageboxdata *MessageBoxData) (retval int, buttonid int) {
     mbox.buttons = &(buttons[0])
     retval = int(C.SDL_ShowMessageBox(mbox, (*C.int)(tmp_buttonid)))
     buttonid = deref_int_ptr(tmp_buttonid)
+    return
+}
+
+// A structure to hold a set of audio conversion filters and buffers.
+type AudioCVT struct {
+    // Set to 1 if conversion possible
+    Needed int
+
+    // Source audio format
+    Src_format AudioFormat
+
+    // Target audio format
+    Dst_format AudioFormat
+
+    // Rate conversion increment (dst_rate/src_rate)
+    Rate_incr float64
+
+    // Buffer to hold entire audio data
+    Buf []byte
+
+    cvt C.SDL_AudioCVT
+}
+
+// This function takes a source format and rate and a destination format
+// and rate, and initializes the cvt structure with information needed by
+// SDL_ConvertAudio() to convert a buffer of audio data from one format
+// to the other.
+//
+// Returns: -1 if the format conversion is not supported, 0 if there's no
+// conversion needed, or 1 if the audio filter is set up.
+//
+func BuildAudioCVT(src_format AudioFormat, src_channels uint8, src_rate int, dst_format AudioFormat, dst_channels uint8, dst_rate int) (retval int, cvt *AudioCVT) {
+    cvt = new(AudioCVT)
+    retval = int(C.SDL_BuildAudioCVT((*C.SDL_AudioCVT)(&cvt.cvt), C.SDL_AudioFormat(src_format), C.Uint8(src_channels), C.int(src_rate), C.SDL_AudioFormat(dst_format), C.Uint8(dst_channels), C.int(dst_rate)))
+    cvt.Needed = int(cvt.cvt.needed)
+    cvt.Src_format = AudioFormat(cvt.cvt.src_format)
+    cvt.Dst_format = AudioFormat(cvt.cvt.dst_format)
+    cvt.Rate_incr = float64(cvt.cvt.rate_incr)
+    return
+}
+
+// Once you have initialized the cvt structure using sdl.BuildAudioCVT(),
+// and filled in cvt.Buf of audio data in the source format, this function
+// will convert it to the desired format.
+//
+// The data conversion may expand or shrink the size of the audio data in
+// cvt.Buf.
+func ConvertAudio(cvt *AudioCVT) (retval int) {
+    cvt.cvt.len = C.int(len(cvt.Buf))
+    if cvt.cvt.len_mult > 1 {
+        new_len := len(cvt.Buf) * int(cvt.cvt.len_mult)
+        new_buf := make([]byte, new_len)
+        copy(new_buf, cvt.Buf)
+        cvt.Buf = new_buf
+    }
+    cvt.cvt.buf = (*C.Uint8)(&(cvt.Buf[0]))
+    retval = int(C.SDL_ConvertAudio((*C.SDL_AudioCVT)(&cvt.cvt)))
+    cvt.Buf = cvt.Buf[0:int(cvt.cvt.len_cvt)]
+    return
+}
+
+// This function loads a WAVE from the data source, automatically freeing
+// that source if freesrc is non-zero. For example, to load a WAVE file,
+// you could do:
+//   SDL_LoadWAV_RW(SDL_RWFromFile("sample.wav", "rb"), 1, ...);
+//
+// If this function succeeds, it returns an SDL_AudioSpec, filled
+// with the audio data format of the wave data, and sets audio_buf to a
+// buffer containing the audio data
+//
+// This function returns NULL and sets the SDL error message if the wave
+// file cannot be opened, uses an unknown data format, or is corrupt.
+// Currently raw and MS-ADPCM WAVE files are supported.
+func LoadWAV_RW(src *RWops, freesrc int) (retval *AudioSpec, audio_buf []byte) {
+    tmp_spec := new(C.SDL_AudioSpec)
+    tmp_audio_buf := new(C.Uint8)
+    audio_len := new(C.Uint32)
+    tmp_retval := C.SDL_LoadWAV_RW((*C.SDL_RWops)(src), C.int(freesrc), tmp_spec, &tmp_audio_buf, audio_len)
+    if tmp_retval != nil {
+        defer C.SDL_FreeWAV(tmp_audio_buf)
+        tr := fromC2AudioSpec(*tmp_retval)
+        retval = &tr
+        audio_buf = make([]byte, *audio_len)
+        copy(audio_buf, ((*[999999999]byte)(unsafe.Pointer(tmp_audio_buf)))[0:999999999])
+    }
+    return
+}
+
+// This takes two audio buffers of the playing audio format and mixes
+// them, performing addition, volume adjustment, and overflow clipping.
+// The volume ranges from 0 - 128, and should be set to SDL_MIX_MAXVOLUME
+// for full audio volume. Note this does not change hardware volume. This
+// is provided for convenience -- you can mix your own audio data.
+//
+// Note: If src and dst have different lengths, the shorter length determines
+// what will be mixed.
+func MixAudio(dst, src []byte, volume int) {
+    l := len(dst)
+    if len(src) < l { l = len(src) }
+    if l == 0       { return } // make sure dst[0] and src[0] don't trip range check
+    C.SDL_MixAudio((*C.Uint8)(unsafe.Pointer(&(dst[0]))), (*C.Uint8)(unsafe.Pointer(&(src[0]))), C.Uint32(l), C.int(volume))
+}
+
+// This works like SDL_MixAudio(), but you specify the audio format
+// instead of using the format of audio device 1. Thus it can be used
+// when no audio device is open at all.
+func MixAudioFormat(dst, src []byte, format AudioFormat, volume int) {
+    l := len(dst)
+    if len(src) < l { l = len(src) }
+    if l == 0       { return } // make sure dst[0] and src[0] don't trip range check
+    C.SDL_MixAudioFormat((*C.Uint8)(unsafe.Pointer(&(dst[0]))), (*C.Uint8)(unsafe.Pointer(&(src[0]))), C.SDL_AudioFormat(format), C.Uint32(l), C.int(volume))
+}
+
+// Queue more audio on non-callback devices.
+//
+// SDL offers two ways to feed audio to the device: you can either supply
+// a callback that SDL triggers with some frequency to obtain more audio
+// (pull method), or you can supply no callback, and then SDL will expect
+// you to supply data at regular intervals (push method) with this
+// function.
+//
+// There are no limits on the amount of data you can queue, short of
+// exhaustion of address space. Queued data will drain to the device as
+// necessary without further intervention from you. If the device needs
+// audio but there is not enough queued, it will play silence to make up
+// the difference. This means you will have skips in your audio playback
+// if you aren't routinely queueing sufficient data.
+//
+// This function copies the supplied data, so you are safe to free it
+// when the function returns. This function is thread-safe, but queueing
+// to the same device from two threads at once does not promise which
+// buffer will be queued first.
+//
+// You may not queue audio on a device that is using an application-
+// supplied callback; doing so returns an error. You have to use the
+// audio callback or queue audio with this function, but not both.
+//
+// You should not call SDL_LockAudio() on the device before queueing; SDL
+// handles locking internally for this function.
+//
+// Returns: zero on success, -1 on error.
+//
+// See also: SDL_GetQueuedAudioSize
+//
+// See also: SDL_ClearQueuedAudio
+//
+//   dev
+//     The device ID to which we will queue audio.
+//
+//   data
+//     The data to queue to the device for later playback.
+//
+//   len
+//     The number of bytes (not samples!) to which (data) points.
+//
+func QueueAudio(dev AudioDeviceID, data []byte) (retval int) {
+    if len(data) == 0 { return 0 } // make sure data[0] does not trip range check
+    retval = int(C.SDL_QueueAudio(C.SDL_AudioDeviceID(dev), unsafe.Pointer(&(data[0])), C.Uint32(len(data))))
     return
 }

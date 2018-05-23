@@ -56,8 +56,12 @@ SDL_POINTER_ARG = {
         "in": {"SDL_WarpMouseInWindow", "SDL_ShowSimpleMessageBox"}
     },
     "SDL_RWops": {
-        "default": "receiver",
-        "in": {"SDL_GameControllerAddMappingsFromRW"}
+        "default": "in",
+        "receiver": {
+            "SDL_ReadU8", "SDL_ReadLE16", "SDL_ReadBE16", "SDL_ReadLE32", "SDL_ReadBE32",
+            "SDL_ReadLE64", "SDL_ReadBE64", "SDL_WriteU8", "SDL_WriteLE16", "SDL_WriteBE16",
+            "SDL_WriteLE32", "SDL_WriteBE32", "SDL_WriteLE64", "SDL_WriteBE64"
+        }
     },
     "SDL_Surface": {
         "default": "receiver",
@@ -115,6 +119,13 @@ SDL_POINTER_ARG = {
     },
     "SDL_HapticEffect": {
         "default": "in",
+    },
+    "SDL_AudioCVT": {
+        "default": "in"
+    },
+    "SDL_AudioSpec": {
+        "default": "in",
+        "inout": {"SDL_OpenAudio.obtained", "SDL_OpenAudioDevice.obtained"}
     }
 }
 
@@ -133,7 +144,9 @@ SDL_BLACKLIST = frozenset(
      "SDL_RenderDrawRects", "SDL_RenderFillRects", "SDL_RenderReadPixels", "fromC2WindowShapeMode",
      "toCFromWindowShapeMode", "SDL_GameControllerButtonBind", "fromC2MessageBoxButtonData",
      "fromC2MessageBoxColorScheme", "toCFromMessageBoxColorScheme", "SDL_MessageBoxData",
-     "SDL_ShowMessageBox","SDL_HapticCustom"))
+     "SDL_ShowMessageBox", "SDL_HapticCustom", "SDL_AudioCVT", "SDL_BuildAudioCVT",
+     "SDL_ConvertAudio", "SDL_LoadWAV_RW", "SDL_FreeWAV", "SDL_MixAudio", "SDL_MixAudioFormat",
+     "SDL_QueueAudio"))
 
 SDL_IGNORED_TYPE_ELEMENTS = frozenset(("SDL_FORCE_INLINE", ))
 

@@ -73,14 +73,17 @@ boilerplate = set()
 #                         as receiver in Go.
 # This map maps a C type name to another map that describes how pointers to this
 # type that are used as function arguments are to be handled.
-#  "default": May be "in", "out" or "receiver" and specifies the default treatment,
+#  "default": May be "in", "out","inout" or "receiver" and specifies the default treatment,
 #  "receiver": An iterable of function names of functions for which the
 #              pointers should be treated as "receiver" arguments instead of
 #              the default.
+#              It's even possible to specify an individual argument of a function,
+#              e.g. "SDL_OpenAudio.obtained"
 #  "out": An iterable of function names of functions for which the
 #         pointers should be treated as "out" arguments instead of
 #         the default.
 #  "in": Like "out", but for "in"
+#  "inout": Like "out", but for "inout"
 #  "by-value": True => Pass arg by value in Go func even if C signature has it by pointer.
 #  "by-ptr": iterable of C function names for which by-value:True is ignored.
 pointer_arg_treatment = {}
@@ -242,6 +245,8 @@ class BaseTypeinfo(object):
                 treat = "out"
             if "in" in pointer_arg_treatment[argtype] and funcname in pointer_arg_treatment[argtype]["in"]:
                 treat = "in"
+            if "inout" in pointer_arg_treatment[argtype] and funcname in pointer_arg_treatment[argtype]["inout"]:
+                treat = "inout"
             if "receiver" in pointer_arg_treatment[argtype] and funcname in pointer_arg_treatment[argtype]["receiver"]:
                 treat = "receiver"
             if "out" in pointer_arg_treatment[argtype] and (
@@ -250,11 +255,14 @@ class BaseTypeinfo(object):
             if "in" in pointer_arg_treatment[argtype] and (
                     funcname + "." + argname) in pointer_arg_treatment[argtype]["in"]:
                 treat = "in"
+            if "inout" in pointer_arg_treatment[argtype] and (
+                    funcname + "." + argname) in pointer_arg_treatment[argtype]["inout"]:
+                treat = "inout"
             if "receiver" in pointer_arg_treatment[argtype] and (
                     funcname + "." + argname) in pointer_arg_treatment[argtype]["receiver"]:
                 treat = "receiver"
 
-        result["retval"] = (treat != "in")
+        result["retval"] = not treat.startswith("in")
 
         if treat == "receiver":
             result["goidx"] = 0
@@ -273,7 +281,7 @@ class BaseTypeinfo(object):
                                                                     result["name"], result["name"])
                     result["dealloc"] = result["dealloc"].replace("=", ":=", 1)
 
-        elif treat == "in":
+        elif treat.startswith("in"):
             result["goidx"] = argidx
             if result["struct"]:
                 if result["gotype"].startswith("*"):
@@ -281,6 +289,10 @@ class BaseTypeinfo(object):
                     result["alloc"] = "var %s %s; if %s != nil { x := toCFrom%s(*%s); %s = &x }" % (
                         result["allocarg"], result["ctype"], result["name"], gotype.lstrip("*"),
                         result["name"], result["allocarg"])
+                    if treat.endswith("out"):
+                        result["dealloc"] = "if %s != nil { *%s = %s(%s)%s }" % (
+                            result["name"], result["name"], result["gocast"], result["allocarg"],
+                            result["gocastend"])
                 else:
                     result["allocarg"] = "tmp_" + result["allocarg"]
                     result["alloc"] = result["allocarg"] + " := toCFrom%s(%s)" % (
@@ -894,6 +906,9 @@ def define2const(section):
         if define.find("param") is not None:
             continue
 
+        if define.find("initializer") is None:
+            continue
+
         if first:
             out.append("const (")
             push_indent()
@@ -968,6 +983,10 @@ def simpletypedefs(section):
         ti1 = typeinfo(td[1], 0, "", td[1], "")
         ti2 = typeinfo(td[1], 0, "", td[2], "")
 
+        if not first:
+            out.append("")
+        first = False
+
         describe(typedef)
         out.append("%stype %s %s" % (indentation(), ti2["gotype"], ti1["gotype"]))
 
@@ -984,6 +1003,11 @@ def aliastypedefs(section):
         td = str(typedef.definition.string).split()
         if len(td) != 3 or not td[1].isidentifier() or not td[2].isidentifier():
             name = typedef.find("name").string
+
+            if not first:
+                out.append("")
+            first = False
+
             describe(typedef)
             out.append("%stype %s C.%s" % (indentation(), fix(name), name))
 
