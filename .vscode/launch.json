@@ -8,8 +8,8 @@
       "program": "${workspaceFolder}/generators/SDL.h.py",
       "cwd": "${workspaceFolder}",
       "args": [
-        "SDL_audio.h",
-        "SDL2-2.0.4/output/xml"
+        "SDL_rect.h",
+        "doxygen/xml"
       ],
       "console": "integratedTerminal"
     },

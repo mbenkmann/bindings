@@ -1016,10 +1016,10 @@ def get_ctype(tag):
     '''
     Extracts a C type name from tag's contents.
     '''
-    for t in list(tag.children):
-        if str(t.string) in ignored_type_elements:
-            t.extract()
-    typ = " ".join(str(s) for s in tag.stripped_strings)
+    strs = []
+    for s in tag.stripped_strings:
+        strs.extend(x for x in s.split() if not x in ignored_type_elements)
+    typ = " ".join(strs)
     typ = typ.replace(" *", "*").strip()
     if typ.rstrip("*").replace(
             "const ",

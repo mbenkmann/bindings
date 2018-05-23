@@ -1441,6 +1441,8 @@ const (
     LASTEVENT EventType = C.SDL_LASTEVENT
 )
 
+type SysWMmsg C.SDL_SysWMmsg
+
 type EventFilter C.SDL_EventFilter
 
 
