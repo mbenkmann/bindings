@@ -5,10 +5,11 @@ SDLHEADERS:=SDL.h SDL_error.h SDL_events.h SDL_joystick.h SDL_keyboard.h SDL_key
             SDL_pixels.h SDL_render.h SDL_filesystem.h SDL_timer.h SDL_version.h SDL_shape.h \
             SDL_power.h SDL_clipboard.h SDL_cpuinfo.h SDL_mouse.h SDL_gamecontroller.h SDL_messagebox.h \
             SDL_hints.h SDL_haptic.h SDL_audio.h
+SDLGOOUT:=$(patsubst %.h,%.h.go,$(SDLHEADERS))
 
-.PHONY: doxygen clean $(SDLHEADERS) all
+.PHONY: clean $(SDLHEADERS) all
 
-all: $(SDLHEADERS)
+all: doxygen $(SDLHEADERS)
 
 # If there is a special case generators/headername.h.py we call that.
 # Otherwise we use the generic SDL.h.py.
@@ -23,7 +24,9 @@ doxygen:
 
 clean:
 	rm -rf $(DOXYXML)
+	rmdir doxygen
 	rm -f bin/debug-temp
+	cd $(SDLOUT) && rm -f $(SDLGOOUT)
 
 distclean: clean
 	find -name "*~" -exec rm {} \;
