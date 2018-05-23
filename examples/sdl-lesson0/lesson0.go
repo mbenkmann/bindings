@@ -20,5 +20,8 @@ func main() {
     }
     defer sdl.Quit()
 
+    version := sdl.GetVersion()
+    fmt.Printf("SDL Version: %v.%v.%v\n", version.Major, version.Minor, version.Patch)
+
     os.Exit(0)
 }
