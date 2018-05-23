@@ -3,9 +3,7 @@
 
 package sdl
 
-// #cgo linux freebsd darwin pkg-config: sdl2
-// #include <SDL.h>
-// #include <SDL_shape.h>
+// #include "includes.h"
 import "C"
 
  // Main include header for the SDL library

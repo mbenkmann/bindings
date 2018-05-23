@@ -24,9 +24,7 @@
 // Bindings for Simple DirectMedia Layer (www.libsdl.org)
 package sdl
 
-// #cgo linux freebsd darwin pkg-config: sdl2
-// #include <SDL.h>
-// #include <SDL_shape.h>
+// #include "includes.h"
 //
 // void GoSetError(const char *fmt) {
 //     SDL_SetError("%s", fmt);
