@@ -257,24 +257,6 @@ func GetRelativeMouseMode() (retval bool) {
     return
 }
 
- // Create a cursor, using the specified bitmap data and mask (in MSB
- // format).
- // 
- // The cursor width must be a multiple of 8 bits.
- // 
- // The cursor is created in black and white according to the following:
- //   data | mask | resulting pixel on screen                
- //   0    | 1    | White                                    
- //   1    | 1    | Black                                    
- //   0    | 0    | Transparent                              
- //   1    | 0    | Inverted color if possible, black if not.
- // 
- // See also: SDL_FreeCursor()
- // 
-func CreateCursor(data *[999999999]byte, mask *[999999999]byte, w int, h int, hot_x int, hot_y int) (retval *Cursor) {
-    retval = (*Cursor)(unsafe.Pointer(C.SDL_CreateCursor((*C.Uint8)(unsafe.Pointer(data)), (*C.Uint8)(unsafe.Pointer(mask)), C.int(w), C.int(h), C.int(hot_x), C.int(hot_y))))
-    return
-}
 
  // Create a color cursor.
  // 

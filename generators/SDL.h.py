@@ -165,7 +165,7 @@ SDL_BLACKLIST = frozenset(
      "fromC2MessageBoxButtonData", "fromC2MessageBoxColorScheme", "toCFromMessageBoxColorScheme",
      "SDL_MessageBoxData", "SDL_ShowMessageBox", "SDL_HapticCustom", "SDL_AudioCVT",
      "SDL_BuildAudioCVT", "SDL_ConvertAudio", "SDL_LoadWAV_RW", "SDL_FreeWAV", "SDL_LoadFile_RW",
-     "SDL_GetKeyboardState"))
+     "SDL_GetKeyboardState", "SDL_CreateCursor"))
 
 SDL_IGNORED_TYPE_ELEMENTS = frozenset(("SDL_FORCE_INLINE", ))
 

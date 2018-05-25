@@ -522,3 +522,35 @@ func checkParametersForSDL_CreateRGBSurfaceFrom(pixels []byte, width int, height
 func checkParametersForSDL_CreateRGBSurfaceWithFormatFrom(pixels []byte, width int, height int, depth int, pitch int, format uint32) {
     panic("Not implemented")
 }
+
+// Create a cursor, using the specified bitmap data and mask (in MSB
+// format).
+//
+// The cursor width must be a multiple of 8.
+//
+// The cursor is created in black and white according to the following:
+//   data | mask | resulting pixel on screen
+//   0    | 1    | White
+//   1    | 1    | Black
+//   0    | 0    | Transparent
+//   1    | 0    | Inverted color if possible, black if not.
+//
+// See also: SDL_FreeCursor()
+//
+func CreateCursor(data []byte, mask []byte, width int, height int, hot_x int, hot_y int) (retval *Cursor) {
+    width = (width + 7) &^ 7
+    wb := width >> 3
+    if len(data) < wb || len(mask) < wb || width <= 0 || height <= 0 {
+        return (*Cursor)(C.SDL_CreateCursor(nil, nil, 0, 0, 0, 0))
+    }
+    if len(data) < len(mask) {
+        mask = mask[:len(data)]
+    } else {
+        data = data[:len(mask)]
+    }
+    for wb*height > len(data) {
+        height--
+    }
+    retval = (*Cursor)(C.SDL_CreateCursor((*C.Uint8)(&(data[0])), (*C.Uint8)(&(mask[0])), C.int(width), C.int(height), C.int(hot_x), C.int(hot_y)))
+    return
+}
