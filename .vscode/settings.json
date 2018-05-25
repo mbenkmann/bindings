@@ -1,6 +1,6 @@
 {
   "go.buildOnSave": "workspace",
-  "go.formatTool": "gofmt", 
+  "go.formatTool": "goformat", 
   "go.formatFlags": [
     "--style=indent=4 enter=1 inlineblocks=keep"
   ],
