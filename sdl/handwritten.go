@@ -554,3 +554,69 @@ func CreateCursor(data []byte, mask []byte, width int, height int, hot_x int, ho
     retval = (*Cursor)(C.SDL_CreateCursor((*C.Uint8)(&(data[0])), (*C.Uint8)(&(mask[0])), C.int(width), C.int(height), C.int(hot_x), C.int(hot_y)))
     return
 }
+
+func DEFINE_PIXELFORMAT(typ, order, layout, bits, bytes uint32) uint32 {
+    return ((1 << 28) | ((typ) << 24) | ((order) << 20) | ((layout) << 16) |
+        ((bits) << 8) | ((bytes) << 0))
+}
+
+func PIXELFLAG(X uint32) uint32 {
+    return (((X) >> 28) & 0x0F)
+}
+
+func PIXELTYPE(X uint32) uint32    { return (((X) >> 24) & 0x0F) }
+func PIXELORDER(X uint32) uint32   { return (((X) >> 20) & 0x0F) }
+func PIXELLAYOUT(X uint32) uint32  { return (((X) >> 16) & 0x0F) }
+func BITSPERPIXEL(X uint32) uint32 { return (((X) >> 8) & 0xFF) }
+func BYTESPERPIXEL(X uint32) uint32 {
+    if ISPIXELFORMAT_FOURCC(X) {
+        if ((X) == PIXELFORMAT_YUY2) ||
+            ((X) == PIXELFORMAT_UYVY) ||
+            ((X) == PIXELFORMAT_YVYU) {
+            return 2
+        } else {
+            return 1
+        }
+    } else {
+        return (((X) >> 0) & 0xFF)
+    }
+}
+
+func ISPIXELFORMAT_INDEXED(format uint32) bool {
+    return (!ISPIXELFORMAT_FOURCC(format) &&
+        ((PIXELTYPE(format) == PIXELTYPE_INDEX1) ||
+            (PIXELTYPE(format) == PIXELTYPE_INDEX4) ||
+            (PIXELTYPE(format) == PIXELTYPE_INDEX8)))
+}
+
+func ISPIXELFORMAT_PACKED(format uint32) bool {
+    return (!ISPIXELFORMAT_FOURCC(format) &&
+        ((PIXELTYPE(format) == PIXELTYPE_PACKED8) ||
+            (PIXELTYPE(format) == PIXELTYPE_PACKED16) ||
+            (PIXELTYPE(format) == PIXELTYPE_PACKED32)))
+}
+func ISPIXELFORMAT_ARRAY(format uint32) bool {
+    return (!ISPIXELFORMAT_FOURCC(format) &&
+        ((PIXELTYPE(format) == PIXELTYPE_ARRAYU8) ||
+            (PIXELTYPE(format) == PIXELTYPE_ARRAYU16) ||
+            (PIXELTYPE(format) == PIXELTYPE_ARRAYU32) ||
+            (PIXELTYPE(format) == PIXELTYPE_ARRAYF16) ||
+            (PIXELTYPE(format) == PIXELTYPE_ARRAYF32)))
+}
+func ISPIXELFORMAT_ALPHA(format uint32) bool {
+    return ((ISPIXELFORMAT_PACKED(format) &&
+        ((PIXELORDER(format) == PACKEDORDER_ARGB) ||
+            (PIXELORDER(format) == PACKEDORDER_RGBA) ||
+            (PIXELORDER(format) == PACKEDORDER_ABGR) ||
+            (PIXELORDER(format) == PACKEDORDER_BGRA))) ||
+        (ISPIXELFORMAT_ARRAY(format) &&
+            ((PIXELORDER(format) == ARRAYORDER_ARGB) ||
+                (PIXELORDER(format) == ARRAYORDER_RGBA) ||
+                (PIXELORDER(format) == ARRAYORDER_ABGR) ||
+                (PIXELORDER(format) == ARRAYORDER_BGRA))))
+}
+
+/* The flag is set to 1 because 0x1? is not in the printable ASCII range */
+func ISPIXELFORMAT_FOURCC(format uint32) bool {
+    return ((format != 0) && (PIXELFLAG(format) != 1))
+}

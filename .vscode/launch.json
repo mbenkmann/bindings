@@ -57,5 +57,16 @@
       "showLog": false,
       "output": "${workspaceRoot}/bin/debug-temp"
     },
+    {
+      "name": "Go: Pixelformats",
+      "type": "go",
+      "request": "launch",
+      "mode": "debug",
+      "program": "${workspaceRoot}/examples/test-pixelformat/test-pixelformat.go",
+      "args": [],
+      "internalConsoleOptions": "openOnSessionStart",
+      "showLog": false,
+      "output": "${workspaceRoot}/bin/debug-temp"
+    },
   ]
 }
