@@ -53,6 +53,10 @@ Project Goals
      - tutorials written for the C API remain useable for Go programmers.
      - Go developers can participate in discussions with non-Go developers in
        the libraries' primary community (forums, mailing lists,...)
+
+   However, API that permits out of bounds writes without use of package unsafe
+   *must* be avoided; and API that permits out of bounds reads without package
+   unsafe *should* be avoided.
  * API stability matching the original library, i.e. as long as the original
    library's API does not change, the Go binding API should not change.
  * Produce as much of the bindings as possible with generalized scripts, keep
@@ -89,7 +93,7 @@ project has deliberately chosen not to pursue:
  * Being 100% complete. Some C functions do not work well with Go code, in
    particular everything including callbacks and varargs. Other functions have
    native Go alternatives that are preferable. If the generator scripts can
-   create working bindings for these functions they will be left in. Otherwise
+   create good bindings for these functions they will be left in. Otherwise
    they are blacklisted and omitted without replacement.
  * Replacing calls to the C library with native Go code. 
    While native Go code might be more efficient and/or have other benefits, its
@@ -114,8 +118,8 @@ Project status
 *The project is being developed mainly on Ubuntu Linux. Your help in supporting
 other platforms is appreciated.*
 
-This project was initiated in May 2018. It is therefore very young and still
-rapidly developing.
+This project was initiated in May 2018. It is therefore very young and not
+completely settled.
 
 Because the bindings are mechanically
 generated, most functions have only received little manual review. Especially
@@ -148,4 +152,4 @@ Examples of things to look out for:
 In all such cases it doesn't hurt to take a quick look at the generated wrapper
 function. Most issues are easy to spot, e.g. if the documentation mentions that
 the caller has to free a returned string, but the wrapper function does not
-contain a call to "C.free", that's an issue.
+contain the word "free", that's almost certainly an issue.
