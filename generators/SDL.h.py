@@ -115,6 +115,9 @@ SDL_POINTER_ARG = {
         "by-value": True,
         "default": "in",  # not as receiver to keep option open to write native Go methods
     },
+    "SDL_Color": {
+        "by-value": True,
+    },
     "SDL_Finger": {
         "by-value": True,
     },
