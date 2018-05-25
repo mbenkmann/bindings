@@ -368,6 +368,23 @@ func (src *Surface) ConvertFormat(pixel_format uint32, flags uint32) (retval *Su
     return
 }
 
+ // Copy a block of pixels of one format to another format.
+ // 
+ // Returns: 0 on success, or -1 if there was an error
+ // 
+func ConvertPixels(width int, height int, src_format uint32, src []byte, src_pitch int, dst_format uint32, dst []byte, dst_pitch int) (retval int) {
+    checkParametersForSDL_ConvertPixels(width, height, src_format, src, src_pitch, dst_format, dst, dst_pitch)
+    var tmp_src unsafe.Pointer
+    if len(src) > 0 {
+        tmp_src = (unsafe.Pointer)(unsafe.Pointer(&(src[0])))
+    }
+    var tmp_dst unsafe.Pointer
+    if len(dst) > 0 {
+        tmp_dst = (unsafe.Pointer)(unsafe.Pointer(&(dst[0])))
+    }
+    retval = int(C.SDL_ConvertPixels(C.int(width), C.int(height), C.Uint32(src_format), (tmp_src), C.int(src_pitch), C.Uint32(dst_format), (tmp_dst), C.int(dst_pitch)))
+    return
+}
 
  // Performs a fast fill of the given rectangle with color.
  // 

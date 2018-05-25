@@ -254,15 +254,6 @@ func (window *Window) GetGammaRamp(red *[256]uint16, green *[256]uint16, blue *[
     return
 }
 
-// Copy a block of pixels of one format to another format.
-//
-// Returns: 0 on success, or -1 if there was an error
-//
-func ConvertPixels(width int, height int, src_format uint32, src []byte, src_pitch int, dst_format uint32, dst []byte, dst_pitch int) (retval int) {
-    retval = int(C.SDL_ConvertPixels(C.int(width), C.int(height), C.Uint32(src_format), unsafe.Pointer(&(src[0])), C.int(src_pitch), C.Uint32(dst_format), unsafe.Pointer(&(dst[0])), C.int(dst_pitch)))
-    return
-}
-
 // Calculate a 256 entry gamma ramp for a gamma value.
 func CalculateGammaRamp(gamma float32, ramp *[256]uint16) {
     C.SDL_CalculateGammaRamp(C.float(gamma), (*C.Uint16)(unsafe.Pointer(ramp)))
@@ -520,6 +511,14 @@ func checkParametersForSDL_CreateRGBSurfaceFrom(pixels []byte, width int, height
 }
 
 func checkParametersForSDL_CreateRGBSurfaceWithFormatFrom(pixels []byte, width int, height int, depth int, pitch int, format uint32) {
+    panic("Not implemented")
+}
+
+func checkParametersForSDL_RenderReadPixels(renderer *Renderer, rect *Rect, format uint32, pixels []byte, pitch int) {
+    panic("Not implemented")
+}
+
+func checkParametersForSDL_ConvertPixels(width int, height int, src_format uint32, src []byte, src_pitch int, dst_format uint32, dst []byte, dst_pitch int) {
     panic("Not implemented")
 }
 

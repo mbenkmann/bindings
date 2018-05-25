@@ -509,7 +509,7 @@ def slices_instead_of_pointers(funcname, params):
                 for k in range(1, len(params) - i):
                     if params[i + k]["gotype"] in ("uint32", "int"):
                         n = params[i + k]["name"]
-                        if n.endswith("pitch") and p["name"].startswith(n[0:len(n) - 5]):
+                        if n.endswith("pitch") and p["name"].startswith(n[0:len(n) - 5].strip("_")):
                             fix.append((False, i, -1))
                             break
 

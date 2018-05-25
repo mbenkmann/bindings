@@ -102,7 +102,8 @@ SDL_POINTER_ARG = {
     },
     "SDL_Rect": {
         "by-value": True,
-        "by-ptr": {"SDL_RenderCopy", "SDL_UpdateTexture", "SDL_UpdateYUVTexture"},
+        "by-ptr":
+        {"SDL_RenderCopy", "SDL_UpdateTexture", "SDL_UpdateYUVTexture", "SDL_RenderReadPixels"},
         "default": "in",  # not as receiver to keep option open to write native Go methods
         "out": {
             "SDL_IntersectRect.result", "SDL_UnionRect.result", "SDL_GetDisplayBounds",
@@ -158,14 +159,13 @@ SDL_BLACKLIST = frozenset(
      "SDL_DelEventWatch", "SDL_FilterEvents", "SDL_JoystickGetGUIDString",
      "SDL_IntersectRectAndLine", "SDL_RWops", "SDL_RWFromFP", "SDL_RWFromMem", "SDL_RWFromConstMem",
      "SDL_AllocRW", "SDL_FreeRW", "SDL_SetWindowGammaRamp", "SDL_GetWindowGammaRamp",
-     "SDL_PixelFormat", "SDL_Surface", "SDL_BlitSurface", "SDL_BlitScaled", "SDL_ConvertPixels",
-     "SDL_Palette", "SDL_Colour", "SDL_CalculateGammaRamp", "toCFromRendererInfo",
-     "SDL_CreateWindowAndRenderer", "SDL_LockTexture", "SDL_RenderReadPixels",
-     "fromC2WindowShapeMode", "toCFromWindowShapeMode", "SDL_GameControllerButtonBind",
-     "fromC2MessageBoxButtonData", "fromC2MessageBoxColorScheme", "toCFromMessageBoxColorScheme",
-     "SDL_MessageBoxData", "SDL_ShowMessageBox", "SDL_HapticCustom", "SDL_AudioCVT",
-     "SDL_BuildAudioCVT", "SDL_ConvertAudio", "SDL_LoadWAV_RW", "SDL_FreeWAV", "SDL_LoadFile_RW",
-     "SDL_GetKeyboardState", "SDL_CreateCursor"))
+     "SDL_PixelFormat", "SDL_Surface", "SDL_BlitSurface", "SDL_BlitScaled", "SDL_Palette",
+     "SDL_Colour", "SDL_CalculateGammaRamp", "toCFromRendererInfo", "SDL_CreateWindowAndRenderer",
+     "SDL_LockTexture", "fromC2WindowShapeMode", "toCFromWindowShapeMode",
+     "SDL_GameControllerButtonBind", "fromC2MessageBoxButtonData", "fromC2MessageBoxColorScheme",
+     "toCFromMessageBoxColorScheme", "SDL_MessageBoxData", "SDL_ShowMessageBox", "SDL_HapticCustom",
+     "SDL_AudioCVT", "SDL_BuildAudioCVT", "SDL_ConvertAudio", "SDL_LoadWAV_RW", "SDL_FreeWAV",
+     "SDL_LoadFile_RW", "SDL_GetKeyboardState", "SDL_CreateCursor"))
 
 SDL_IGNORED_TYPE_ELEMENTS = frozenset(("SDL_FORCE_INLINE", ))
 

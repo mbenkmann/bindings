@@ -1120,6 +1120,40 @@ func (renderer *Renderer) CopyEx(texture *Texture, srcrect Rect, dstrect Rect, a
     return
 }
 
+ // Read pixels from the current rendering target.
+ // 
+ // Returns: 0 on success, or -1 if pixel reading is not supported.
+ // 
+ // Warning: This is a very slow operation, and should not be used
+ // frequently.
+ // 
+ //   renderer
+ //     The renderer from which pixels should be read.
+ //   
+ //   rect
+ //     A pointer to the rectangle to read, or NULL for the entire render
+ //     target.
+ //   
+ //   format
+ //     The desired format of the pixel data, or 0 to use the format of the
+ //     rendering target
+ //   
+ //   pixels
+ //     A pointer to be filled in with the pixel data
+ //   
+ //   pitch
+ //     The pitch of the pixels parameter.
+ //   
+func (renderer *Renderer) ReadPixels(rect *Rect, format uint32, pixels []byte, pitch int) (retval int) {
+    var tmp_rect *C.SDL_Rect; if rect != nil { x := toCFromRect(*rect); tmp_rect = &x }
+    checkParametersForSDL_RenderReadPixels(renderer, rect, format, pixels, pitch)
+    var tmp_pixels unsafe.Pointer
+    if len(pixels) > 0 {
+        tmp_pixels = (unsafe.Pointer)(unsafe.Pointer(&(pixels[0])))
+    }
+    retval = int(C.SDL_RenderReadPixels((*C.SDL_Renderer)(renderer), (*C.SDL_Rect)(tmp_rect), C.Uint32(format), (tmp_pixels), C.int(pitch)))
+    return
+}
 
  // Update the screen with rendering performed.
 func (renderer *Renderer) Present() {
