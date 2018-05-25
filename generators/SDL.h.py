@@ -28,10 +28,19 @@ SDL_TYPE_MAPPING = {
     "char": "int8",
     "char*": "string",
     "const char*": "string",
+
+    # We use uintptr as type for void* because
+    # a) we don't want to force users to import "unsafe"
+    # b) we want to make users think twice when using such a pointer to C space
+    # c) a typical place where this occurs is userdata for callbacks and we
+    #    want to encourage people to use a uintptr as key into a map instead of
+    #    as an actual pointer (which would in fact be illegal if it's a ptr to
+    #    a Go object stored in C space)
     "void*": "uintptr",
     "float": "float32",
     "double": "float64",
-    "const Uint8*": "*[999999999]byte",
+    "const Uint8*": "*byte",
+    "Uint8*": "*byte",
     "WindowShapeMode": "ShapeMode"
 }
 
@@ -39,6 +48,14 @@ SDL_GOCAST = {"SDL_bool": "C.SDL_TRUE=="}
 SDL_CCAST = {"SDL_bool": "bool2bool"}
 
 SDL_POINTER_ARG = {
+    "Uint8": {
+        "default":
+        "in",
+        "out": [
+            "SDL_GetTextureColorMod", "SDL_GetSurfaceColorMod", "SDL_GetTextureAlphaMod",
+            "SDL_GetSurfaceAlphaMod", "SDL_GetRenderDrawColor", "SDL_GetRGB", "SDL_GetRGBA"
+        ]
+    },
     "SDL_Event": {
         "default": "out",
         "receiver": {"SDL_PushEvent"}
@@ -51,7 +68,10 @@ SDL_POINTER_ARG = {
     },
     "SDL_Window": {
         "default": "receiver",
-        "in": {"SDL_WarpMouseInWindow", "SDL_ShowSimpleMessageBox"}
+        "in": {
+            "SDL_WarpMouseInWindow", "SDL_ShowSimpleMessageBox",
+            "SDL_SetWindowModalFor.parent_window"
+        }
     },
     "SDL_RWops": {
         "default": "in",
@@ -82,11 +102,12 @@ SDL_POINTER_ARG = {
     },
     "SDL_Rect": {
         "by-value": True,
-        "by-ptr": {"SDL_RenderCopy"},
+        "by-ptr": {"SDL_RenderCopy", "SDL_UpdateTexture", "SDL_UpdateYUVTexture"},
         "default": "in",  # not as receiver to keep option open to write native Go methods
         "out": {
             "SDL_IntersectRect.result", "SDL_UnionRect.result", "SDL_GetDisplayBounds",
-            "SDL_GetClipRect", "SDL_RenderGetViewport", "SDL_RenderGetClipRect"
+            "SDL_GetDisplayUsableBounds", "SDL_GetClipRect", "SDL_RenderGetViewport",
+            "SDL_RenderGetClipRect", "SDL_EnclosePoints.result"
         }
     },
     "SDL_Point": {
@@ -121,6 +142,9 @@ SDL_POINTER_ARG = {
     "SDL_AudioCVT": {
         "default": "in"
     },
+    "SDL_AudioStream": {
+        "default": "receiver"
+    },
     "SDL_AudioSpec": {
         "default": "in",
         "inout": {"SDL_OpenAudio.obtained", "SDL_OpenAudioDevice.obtained"}
@@ -132,19 +156,16 @@ SDL_BLACKLIST = frozenset(
      "SDL_GetEventState", "SDL_SysWMEvent", "SDL_Event.syswm", "Event.SetDrop", "toCFromDropEvent",
      "SDL_PeepEvents", "SDL_bool", "SDL_SetEventFilter", "SDL_GetEventFilter", "SDL_AddEventWatch",
      "SDL_DelEventWatch", "SDL_FilterEvents", "SDL_JoystickGetGUIDString",
-     "SDL_IntersectRectAndLine", "SDL_EnclosePoints", "SDL_RWops", "SDL_RWFromFP", "SDL_RWFromMem",
-     "SDL_RWFromConstMem", "SDL_AllocRW", "SDL_FreeRW", "SDL_UpdateWindowSurfaceRects",
-     "SDL_SetWindowGammaRamp", "SDL_GetWindowGammaRamp", "SDL_PixelFormat", "SDL_Surface",
-     "SDL_BlitSurface", "SDL_BlitScaled", "SDL_ConvertPixels", "SDL_CreateRGBSurfaceFrom",
-     "SDL_FillRects", "SDL_Palette", "SDL_Colour", "SDL_SetPaletteColors", "SDL_CalculateGammaRamp",
-     "toCFromRendererInfo", "SDL_CreateWindowAndRenderer", "SDL_UpdateTexture",
-     "SDL_UpdateYUVTexture", "SDL_LockTexture", "SDL_RenderDrawPoints", "SDL_RenderDrawLines",
-     "SDL_RenderDrawRects", "SDL_RenderFillRects", "SDL_RenderReadPixels", "fromC2WindowShapeMode",
-     "toCFromWindowShapeMode", "SDL_GameControllerButtonBind", "fromC2MessageBoxButtonData",
-     "fromC2MessageBoxColorScheme", "toCFromMessageBoxColorScheme", "SDL_MessageBoxData",
-     "SDL_ShowMessageBox", "SDL_HapticCustom", "SDL_AudioCVT", "SDL_BuildAudioCVT",
-     "SDL_ConvertAudio", "SDL_LoadWAV_RW", "SDL_FreeWAV", "SDL_MixAudio", "SDL_MixAudioFormat",
-     "SDL_QueueAudio"))
+     "SDL_IntersectRectAndLine", "SDL_RWops", "SDL_RWFromFP", "SDL_RWFromMem", "SDL_RWFromConstMem",
+     "SDL_AllocRW", "SDL_FreeRW", "SDL_SetWindowGammaRamp", "SDL_GetWindowGammaRamp",
+     "SDL_PixelFormat", "SDL_Surface", "SDL_BlitSurface", "SDL_BlitScaled", "SDL_ConvertPixels",
+     "SDL_Palette", "SDL_Colour", "SDL_CalculateGammaRamp", "toCFromRendererInfo",
+     "SDL_CreateWindowAndRenderer", "SDL_LockTexture", "SDL_RenderReadPixels",
+     "fromC2WindowShapeMode", "toCFromWindowShapeMode", "SDL_GameControllerButtonBind",
+     "fromC2MessageBoxButtonData", "fromC2MessageBoxColorScheme", "toCFromMessageBoxColorScheme",
+     "SDL_MessageBoxData", "SDL_ShowMessageBox", "SDL_HapticCustom", "SDL_AudioCVT",
+     "SDL_BuildAudioCVT", "SDL_ConvertAudio", "SDL_LoadWAV_RW", "SDL_FreeWAV", "SDL_LoadFile_RW",
+     "SDL_GetKeyboardState"))
 
 SDL_IGNORED_TYPE_ELEMENTS = frozenset(("SDL_FORCE_INLINE", ))
 

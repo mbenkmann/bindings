@@ -291,6 +291,35 @@ func (format *PixelFormat) SetPalette(palette *Palette) (retval int) {
     return
 }
 
+ // Set a range of colors in a palette.
+ // 
+ // Returns: 0 on success, or -1 if not all of the colors could be set.
+ // 
+ //   palette
+ //     The palette to modify.
+ //   
+ //   colors
+ //     An array of colors to copy into the palette.
+ //   
+ //   firstcolor
+ //     The index of the first palette entry to modify.
+ //   
+ //   ncolors
+ //     The number of entries to modify.
+ //   
+func (palette *Palette) SetColors(colors []Color, firstcolor int) (retval int) {
+    var tmp_colors *C.SDL_Color
+    if len(colors) > 0 {
+        sl_tmp_colors := make([]C.SDL_Color, len(colors))
+        for i := range colors {
+            sl_tmp_colors[i] = toCFromColor(colors[i])
+        }
+        tmp_colors = &(sl_tmp_colors[0])
+    }
+    tmp_ncolors := len(colors)
+    retval = int(C.SDL_SetPaletteColors((*C.SDL_Palette)(palette), (tmp_colors), C.int(firstcolor), C.int(tmp_ncolors)))
+    return
+}
 
  // Free a palette created with SDL_AllocPalette().
  // 
@@ -322,14 +351,14 @@ func (format *PixelFormat) MapRGBA(r uint8, g uint8, b uint8, a uint8) (retval u
  // 
  // See also: SDL_GetRGBA
  // 
-func (format *PixelFormat) GetRGB(pixel uint32) (r uint8, g uint8, b uint8) {
+func (format *PixelFormat) GetRGB(pixel uint32) (r byte, g byte, b byte) {
     tmp_r := new(C.Uint8)
     tmp_g := new(C.Uint8)
     tmp_b := new(C.Uint8)
     C.SDL_GetRGB(C.Uint32(pixel), (*C.SDL_PixelFormat)(format), (*C.Uint8)(tmp_r), (*C.Uint8)(tmp_g), (*C.Uint8)(tmp_b))
-    r = deref_uint8_ptr(tmp_r)
-    g = deref_uint8_ptr(tmp_g)
-    b = deref_uint8_ptr(tmp_b)
+    r = deref_byte_ptr(tmp_r)
+    g = deref_byte_ptr(tmp_g)
+    b = deref_byte_ptr(tmp_b)
     return
 }
 
@@ -337,16 +366,16 @@ func (format *PixelFormat) GetRGB(pixel uint32) (r uint8, g uint8, b uint8) {
  // 
  // See also: SDL_GetRGB
  // 
-func (format *PixelFormat) GetRGBA(pixel uint32) (r uint8, g uint8, b uint8, a uint8) {
+func (format *PixelFormat) GetRGBA(pixel uint32) (r byte, g byte, b byte, a byte) {
     tmp_r := new(C.Uint8)
     tmp_g := new(C.Uint8)
     tmp_b := new(C.Uint8)
     tmp_a := new(C.Uint8)
     C.SDL_GetRGBA(C.Uint32(pixel), (*C.SDL_PixelFormat)(format), (*C.Uint8)(tmp_r), (*C.Uint8)(tmp_g), (*C.Uint8)(tmp_b), (*C.Uint8)(tmp_a))
-    r = deref_uint8_ptr(tmp_r)
-    g = deref_uint8_ptr(tmp_g)
-    b = deref_uint8_ptr(tmp_b)
-    a = deref_uint8_ptr(tmp_a)
+    r = deref_byte_ptr(tmp_r)
+    g = deref_byte_ptr(tmp_g)
+    b = deref_byte_ptr(tmp_b)
+    a = deref_byte_ptr(tmp_a)
     return
 }
 

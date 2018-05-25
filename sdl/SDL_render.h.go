@@ -346,14 +346,14 @@ func (texture *Texture) SetColorMod(r uint8, g uint8, b uint8) (retval int) {
  //   b
  //     A pointer filled in with the current blue color value.
  //   
-func (texture *Texture) GetColorMod() (retval int, r uint8, g uint8, b uint8) {
+func (texture *Texture) GetColorMod() (retval int, r byte, g byte, b byte) {
     tmp_r := new(C.Uint8)
     tmp_g := new(C.Uint8)
     tmp_b := new(C.Uint8)
     retval = int(C.SDL_GetTextureColorMod((*C.SDL_Texture)(texture), (*C.Uint8)(tmp_r), (*C.Uint8)(tmp_g), (*C.Uint8)(tmp_b)))
-    r = deref_uint8_ptr(tmp_r)
-    g = deref_uint8_ptr(tmp_g)
-    b = deref_uint8_ptr(tmp_b)
+    r = deref_byte_ptr(tmp_r)
+    g = deref_byte_ptr(tmp_g)
+    b = deref_byte_ptr(tmp_b)
     return
 }
 
@@ -387,10 +387,10 @@ func (texture *Texture) SetAlphaMod(alpha uint8) (retval int) {
  //   alpha
  //     A pointer filled in with the current alpha value.
  //   
-func (texture *Texture) GetAlphaMod() (retval int, alpha uint8) {
+func (texture *Texture) GetAlphaMod() (retval int, alpha byte) {
     tmp_alpha := new(C.Uint8)
     retval = int(C.SDL_GetTextureAlphaMod((*C.SDL_Texture)(texture), (*C.Uint8)(tmp_alpha)))
-    alpha = deref_uint8_ptr(tmp_alpha)
+    alpha = deref_byte_ptr(tmp_alpha)
     return
 }
 
@@ -434,7 +434,89 @@ func (texture *Texture) GetBlendMode() (retval int, blendMode *BlendMode) {
     return
 }
 
+ // Update the given texture rectangle with new pixel data.
+ // 
+ // Returns: 0 on success, or -1 if the texture is not valid.
+ // 
+ // Note: This is a fairly slow function.
+ // 
+ //   texture
+ //     The texture to update
+ //   
+ //   rect
+ //     A pointer to the rectangle of pixels to update, or NULL to update the
+ //     entire texture.
+ //   
+ //   pixels
+ //     The raw pixel data.
+ //   
+ //   pitch
+ //     The number of bytes in a row of pixel data, including padding between
+ //     lines.
+ //   
+func (texture *Texture) Update(rect *Rect, pixels []byte, pitch int) (retval int) {
+    var tmp_rect *C.SDL_Rect; if rect != nil { x := toCFromRect(*rect); tmp_rect = &x }
+    checkParametersForSDL_UpdateTexture(texture, rect, pixels, pitch)
+    var tmp_pixels unsafe.Pointer
+    if len(pixels) > 0 {
+        tmp_pixels = (unsafe.Pointer)(unsafe.Pointer(&(pixels[0])))
+    }
+    retval = int(C.SDL_UpdateTexture((*C.SDL_Texture)(texture), (*C.SDL_Rect)(tmp_rect), (tmp_pixels), C.int(pitch)))
+    return
+}
 
+ // Update a rectangle within a planar YV12 or IYUV texture with new pixel
+ // data.
+ // 
+ // Returns: 0 on success, or -1 if the texture is not valid.
+ // 
+ // Note: You can use SDL_UpdateTexture() as long as your pixel data is a
+ // contiguous block of Y and U/V planes in the proper order, but this
+ // function is available if your pixel data is not contiguous.
+ // 
+ //   texture
+ //     The texture to update
+ //   
+ //   rect
+ //     A pointer to the rectangle of pixels to update, or NULL to update the
+ //     entire texture.
+ //   
+ //   Yplane
+ //     The raw pixel data for the Y plane.
+ //   
+ //   Ypitch
+ //     The number of bytes between rows of pixel data for the Y plane.
+ //   
+ //   Uplane
+ //     The raw pixel data for the U plane.
+ //   
+ //   Upitch
+ //     The number of bytes between rows of pixel data for the U plane.
+ //   
+ //   Vplane
+ //     The raw pixel data for the V plane.
+ //   
+ //   Vpitch
+ //     The number of bytes between rows of pixel data for the V plane.
+ //   
+func (texture *Texture) UpdateYUV(rect *Rect, Yplane []byte, Ypitch int, Uplane []byte, Upitch int, Vplane []byte, Vpitch int) (retval int) {
+    var tmp_rect *C.SDL_Rect; if rect != nil { x := toCFromRect(*rect); tmp_rect = &x }
+    checkParametersForSDL_UpdateYUVTexture(texture, rect, Yplane, Ypitch, Uplane, Upitch, Vplane, Vpitch)
+    var tmp_Yplane *C.Uint8
+    if len(Yplane) > 0 {
+        tmp_Yplane = (*C.Uint8)(unsafe.Pointer(&(Yplane[0])))
+    }
+    var tmp_Uplane *C.Uint8
+    if len(Uplane) > 0 {
+        tmp_Uplane = (*C.Uint8)(unsafe.Pointer(&(Uplane[0])))
+    }
+    var tmp_Vplane *C.Uint8
+    if len(Vplane) > 0 {
+        tmp_Vplane = (*C.Uint8)(unsafe.Pointer(&(Vplane[0])))
+    }
+    retval = int(C.SDL_UpdateYUVTexture((*C.SDL_Texture)(texture), (*C.SDL_Rect)(tmp_rect), (tmp_Yplane), C.int(Ypitch), (tmp_Uplane), C.int(Upitch), (tmp_Vplane), C.int(Vpitch)))
+    return
+}
 
 
  // Unlock a texture, uploading the changes to video memory, if needed.
@@ -725,16 +807,16 @@ func (renderer *Renderer) SetDrawColor(r uint8, g uint8, b uint8, a uint8) (retv
  //     A pointer to the alpha value used to draw on the rendering target,
  //     usually SDL_ALPHA_OPAQUE (255).
  //   
-func (renderer *Renderer) GetDrawColor() (retval int, r uint8, g uint8, b uint8, a uint8) {
+func (renderer *Renderer) GetDrawColor() (retval int, r byte, g byte, b byte, a byte) {
     tmp_r := new(C.Uint8)
     tmp_g := new(C.Uint8)
     tmp_b := new(C.Uint8)
     tmp_a := new(C.Uint8)
     retval = int(C.SDL_GetRenderDrawColor((*C.SDL_Renderer)(renderer), (*C.Uint8)(tmp_r), (*C.Uint8)(tmp_g), (*C.Uint8)(tmp_b), (*C.Uint8)(tmp_a)))
-    r = deref_uint8_ptr(tmp_r)
-    g = deref_uint8_ptr(tmp_g)
-    b = deref_uint8_ptr(tmp_b)
-    a = deref_uint8_ptr(tmp_a)
+    r = deref_byte_ptr(tmp_r)
+    g = deref_byte_ptr(tmp_g)
+    b = deref_byte_ptr(tmp_b)
+    a = deref_byte_ptr(tmp_a)
     return
 }
 
@@ -807,6 +889,32 @@ func (renderer *Renderer) DrawPoint(x int, y int) (retval int) {
     return
 }
 
+ // Draw multiple points on the current rendering target.
+ // 
+ // Returns: 0 on success, or -1 on error
+ // 
+ //   renderer
+ //     The renderer which should draw multiple points.
+ //   
+ //   points
+ //     The points to draw
+ //   
+ //   count
+ //     The number of points to draw
+ //   
+func (renderer *Renderer) DrawPoints(points []Point) (retval int) {
+    var tmp_points *C.SDL_Point
+    if len(points) > 0 {
+        sl_tmp_points := make([]C.SDL_Point, len(points))
+        for i := range points {
+            sl_tmp_points[i] = toCFromPoint(points[i])
+        }
+        tmp_points = &(sl_tmp_points[0])
+    }
+    tmp_count := len(points)
+    retval = int(C.SDL_RenderDrawPoints((*C.SDL_Renderer)(renderer), (tmp_points), C.int(tmp_count)))
+    return
+}
 
  // Draw a line on the current rendering target.
  // 
@@ -832,6 +940,32 @@ func (renderer *Renderer) DrawLine(x1 int, y1 int, x2 int, y2 int) (retval int) 
     return
 }
 
+ // Draw a series of connected lines on the current rendering target.
+ // 
+ // Returns: 0 on success, or -1 on error
+ // 
+ //   renderer
+ //     The renderer which should draw multiple lines.
+ //   
+ //   points
+ //     The points along the lines
+ //   
+ //   count
+ //     The number of points, drawing count-1 lines
+ //   
+func (renderer *Renderer) DrawLines(points []Point) (retval int) {
+    var tmp_points *C.SDL_Point
+    if len(points) > 0 {
+        sl_tmp_points := make([]C.SDL_Point, len(points))
+        for i := range points {
+            sl_tmp_points[i] = toCFromPoint(points[i])
+        }
+        tmp_points = &(sl_tmp_points[0])
+    }
+    tmp_count := len(points)
+    retval = int(C.SDL_RenderDrawLines((*C.SDL_Renderer)(renderer), (tmp_points), C.int(tmp_count)))
+    return
+}
 
  // Draw a rectangle on the current rendering target.
  // 
@@ -850,6 +984,32 @@ func (renderer *Renderer) DrawRect(rect Rect) (retval int) {
     return
 }
 
+ // Draw some number of rectangles on the current rendering target.
+ // 
+ // Returns: 0 on success, or -1 on error
+ // 
+ //   renderer
+ //     The renderer which should draw multiple rectangles.
+ //   
+ //   rects
+ //     A pointer to an array of destination rectangles.
+ //   
+ //   count
+ //     The number of rectangles.
+ //   
+func (renderer *Renderer) DrawRects(rects []Rect) (retval int) {
+    var tmp_rects *C.SDL_Rect
+    if len(rects) > 0 {
+        sl_tmp_rects := make([]C.SDL_Rect, len(rects))
+        for i := range rects {
+            sl_tmp_rects[i] = toCFromRect(rects[i])
+        }
+        tmp_rects = &(sl_tmp_rects[0])
+    }
+    tmp_count := len(rects)
+    retval = int(C.SDL_RenderDrawRects((*C.SDL_Renderer)(renderer), (tmp_rects), C.int(tmp_count)))
+    return
+}
 
  // Fill a rectangle on the current rendering target with the drawing
  // color.
@@ -869,6 +1029,33 @@ func (renderer *Renderer) FillRect(rect Rect) (retval int) {
     return
 }
 
+ // Fill some number of rectangles on the current rendering target with
+ // the drawing color.
+ // 
+ // Returns: 0 on success, or -1 on error
+ // 
+ //   renderer
+ //     The renderer which should fill multiple rectangles.
+ //   
+ //   rects
+ //     A pointer to an array of destination rectangles.
+ //   
+ //   count
+ //     The number of rectangles.
+ //   
+func (renderer *Renderer) FillRects(rects []Rect) (retval int) {
+    var tmp_rects *C.SDL_Rect
+    if len(rects) > 0 {
+        sl_tmp_rects := make([]C.SDL_Rect, len(rects))
+        for i := range rects {
+            sl_tmp_rects[i] = toCFromRect(rects[i])
+        }
+        tmp_rects = &(sl_tmp_rects[0])
+    }
+    tmp_count := len(rects)
+    retval = int(C.SDL_RenderFillRects((*C.SDL_Renderer)(renderer), (tmp_rects), C.int(tmp_count)))
+    return
+}
 
  // Copy a portion of the texture to the current rendering target.
  // 

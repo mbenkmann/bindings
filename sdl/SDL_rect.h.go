@@ -124,4 +124,24 @@ func UnionRect(A Rect, B Rect) (result Rect) {
     return
 }
 
+ // Calculate a minimal rectangle enclosing a set of points.
+ // 
+ // Returns: SDL_TRUE if any points were within the clipping rect
+ // 
+func EnclosePoints(points []Point, clip Rect) (retval bool, result Rect) {
+    var tmp_points *C.SDL_Point
+    if len(points) > 0 {
+        sl_tmp_points := make([]C.SDL_Point, len(points))
+        for i := range points {
+            sl_tmp_points[i] = toCFromPoint(points[i])
+        }
+        tmp_points = &(sl_tmp_points[0])
+    }
+    tmp_count := len(points)
+    tmp_clip := toCFromRect(clip)
+    tmp_result := new(C.SDL_Rect)
+    retval = C.SDL_TRUE==(C.SDL_EnclosePoints((tmp_points), C.int(tmp_count), (*C.SDL_Rect)(&tmp_clip), (*C.SDL_Rect)(tmp_result)))
+    result = fromC2Rect(*(tmp_result))
+    return
+}
 

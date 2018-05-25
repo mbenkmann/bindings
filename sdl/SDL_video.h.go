@@ -1227,6 +1227,27 @@ func (window *Window) UpdateSurface() (retval int) {
     return
 }
 
+ // Copy a number of rectangles on the window surface to the screen.
+ // 
+ // Returns: 0 on success, or -1 on error.
+ // 
+ // See also: SDL_GetWindowSurface()
+ // 
+ // See also: SDL_UpdateWindowSurfaceRect()
+ // 
+func (window *Window) UpdateSurfaceRects(rects []Rect) (retval int) {
+    var tmp_rects *C.SDL_Rect
+    if len(rects) > 0 {
+        sl_tmp_rects := make([]C.SDL_Rect, len(rects))
+        for i := range rects {
+            sl_tmp_rects[i] = toCFromRect(rects[i])
+        }
+        tmp_rects = &(sl_tmp_rects[0])
+    }
+    tmp_numrects := len(rects)
+    retval = int(C.SDL_UpdateWindowSurfaceRects((*C.SDL_Window)(window), (tmp_rects), C.int(tmp_numrects)))
+    return
+}
 
  // Set a window's input grab mode.
  // 

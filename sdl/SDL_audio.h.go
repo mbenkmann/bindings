@@ -395,8 +395,91 @@ func OpenAudioDevice(device string, iscapture int, desired *AudioSpec, obtained 
 
 
 
+ // This takes two audio buffers of the playing audio format and mixes
+ // them, performing addition, volume adjustment, and overflow clipping.
+ // The volume ranges from 0 - 128, and should be set to SDL_MIX_MAXVOLUME
+ // for full audio volume. Note this does not change hardware volume. This
+ // is provided for convenience -- you can mix your own audio data.
+func MixAudio(dst []byte, src []byte, volume int) {
+    var tmp_dst *C.Uint8
+    if len(dst) > 0 {
+        tmp_dst = (*C.Uint8)(unsafe.Pointer(&(dst[0])))
+    }
+    var tmp_src *C.Uint8
+    if len(src) > 0 {
+        tmp_src = (*C.Uint8)(unsafe.Pointer(&(src[0])))
+    }
+    tmp_len := len(dst); if len(src) < tmp_len { tmp_len = len(src) }
+    C.SDL_MixAudio((tmp_dst), (tmp_src), C.Uint32(tmp_len), C.int(volume))
+}
 
+ // This works like SDL_MixAudio(), but you specify the audio format
+ // instead of using the format of audio device 1. Thus it can be used
+ // when no audio device is open at all.
+func MixAudioFormat(dst []byte, src []byte, format AudioFormat, volume int) {
+    var tmp_dst *C.Uint8
+    if len(dst) > 0 {
+        tmp_dst = (*C.Uint8)(unsafe.Pointer(&(dst[0])))
+    }
+    var tmp_src *C.Uint8
+    if len(src) > 0 {
+        tmp_src = (*C.Uint8)(unsafe.Pointer(&(src[0])))
+    }
+    tmp_len := len(dst); if len(src) < tmp_len { tmp_len = len(src) }
+    C.SDL_MixAudioFormat((tmp_dst), (tmp_src), C.SDL_AudioFormat(format), C.Uint32(tmp_len), C.int(volume))
+}
 
+ // Queue more audio on non-callback devices.
+ // 
+ // SDL offers two ways to feed audio to the device: you can either supply
+ // a callback that SDL triggers with some frequency to obtain more audio
+ // (pull method), or you can supply no callback, and then SDL will expect
+ // you to supply data at regular intervals (push method) with this
+ // function.
+ // 
+ // There are no limits on the amount of data you can queue, short of
+ // exhaustion of address space. Queued data will drain to the device as
+ // necessary without further intervention from you. If the device needs
+ // audio but there is not enough queued, it will play silence to make up
+ // the difference. This means you will have skips in your audio playback
+ // if you aren't routinely queueing sufficient data.
+ // 
+ // This function copies the supplied data, so you are safe to free it
+ // when the function returns. This function is thread-safe, but queueing
+ // to the same device from two threads at once does not promise which
+ // buffer will be queued first.
+ // 
+ // You may not queue audio on a device that is using an application-
+ // supplied callback; doing so returns an error. You have to use the
+ // audio callback or queue audio with this function, but not both.
+ // 
+ // You should not call SDL_LockAudio() on the device before queueing; SDL
+ // handles locking internally for this function.
+ // 
+ // Returns: zero on success, -1 on error.
+ // 
+ // See also: SDL_GetQueuedAudioSize
+ // 
+ // See also: SDL_ClearQueuedAudio
+ // 
+ //   dev
+ //     The device ID to which we will queue audio.
+ //   
+ //   data
+ //     The data to queue to the device for later playback.
+ //   
+ //   len
+ //     The number of bytes (not samples!) to which (data) points.
+ //   
+func QueueAudio(dev AudioDeviceID, data []byte) (retval int) {
+    var tmp_data unsafe.Pointer
+    if len(data) > 0 {
+        tmp_data = (unsafe.Pointer)(unsafe.Pointer(&(data[0])))
+    }
+    tmp_len := len(data)
+    retval = int(C.SDL_QueueAudio(C.SDL_AudioDeviceID(dev), (tmp_data), C.Uint32(tmp_len)))
+    return
+}
 
  // Get the number of bytes of still-queued audio.
  // 

@@ -68,6 +68,15 @@ func CreateRGBSurface(flags uint32, width int, height int, depth int, Rmask uint
     return
 }
 
+func CreateRGBSurfaceFrom(pixels []byte, width int, height int, depth int, pitch int, Rmask uint32, Gmask uint32, Bmask uint32, Amask uint32) (retval *Surface) {
+    checkParametersForSDL_CreateRGBSurfaceFrom(pixels, width, height, depth, pitch, Rmask, Gmask, Bmask, Amask)
+    var tmp_pixels unsafe.Pointer
+    if len(pixels) > 0 {
+        tmp_pixels = (unsafe.Pointer)(unsafe.Pointer(&(pixels[0])))
+    }
+    retval = (*Surface)(unsafe.Pointer(C.SDL_CreateRGBSurfaceFrom((tmp_pixels), C.int(width), C.int(height), C.int(depth), C.int(pitch), C.Uint32(Rmask), C.Uint32(Gmask), C.Uint32(Bmask), C.Uint32(Amask))))
+    return
+}
 
 func (surface *Surface) Free() {
     C.SDL_FreeSurface((*C.SDL_Surface)(surface))
@@ -230,14 +239,14 @@ func (surface *Surface) SetColorMod(r uint8, g uint8, b uint8) (retval int) {
  //   b
  //     A pointer filled in with the current blue color value.
  //   
-func (surface *Surface) GetColorMod() (retval int, r uint8, g uint8, b uint8) {
+func (surface *Surface) GetColorMod() (retval int, r byte, g byte, b byte) {
     tmp_r := new(C.Uint8)
     tmp_g := new(C.Uint8)
     tmp_b := new(C.Uint8)
     retval = int(C.SDL_GetSurfaceColorMod((*C.SDL_Surface)(surface), (*C.Uint8)(tmp_r), (*C.Uint8)(tmp_g), (*C.Uint8)(tmp_b)))
-    r = deref_uint8_ptr(tmp_r)
-    g = deref_uint8_ptr(tmp_g)
-    b = deref_uint8_ptr(tmp_b)
+    r = deref_byte_ptr(tmp_r)
+    g = deref_byte_ptr(tmp_g)
+    b = deref_byte_ptr(tmp_b)
     return
 }
 
@@ -270,10 +279,10 @@ func (surface *Surface) SetAlphaMod(alpha uint8) (retval int) {
  //   alpha
  //     A pointer filled in with the current alpha value.
  //   
-func (surface *Surface) GetAlphaMod() (retval int, alpha uint8) {
+func (surface *Surface) GetAlphaMod() (retval int, alpha byte) {
     tmp_alpha := new(C.Uint8)
     retval = int(C.SDL_GetSurfaceAlphaMod((*C.SDL_Surface)(surface), (*C.Uint8)(tmp_alpha)))
-    alpha = deref_uint8_ptr(tmp_alpha)
+    alpha = deref_byte_ptr(tmp_alpha)
     return
 }
 
@@ -375,6 +384,19 @@ func (dst *Surface) FillRect(rect Rect, color uint32) (retval int) {
     return
 }
 
+func (dst *Surface) FillRects(rects []Rect, color uint32) (retval int) {
+    var tmp_rects *C.SDL_Rect
+    if len(rects) > 0 {
+        sl_tmp_rects := make([]C.SDL_Rect, len(rects))
+        for i := range rects {
+            sl_tmp_rects[i] = toCFromRect(rects[i])
+        }
+        tmp_rects = &(sl_tmp_rects[0])
+    }
+    tmp_count := len(rects)
+    retval = int(C.SDL_FillRects((*C.SDL_Surface)(dst), (tmp_rects), C.int(tmp_count), C.Uint32(color)))
+    return
+}
 
  // This is the public blit function, SDL_BlitSurface(), and it performs
  // rectangle validation and clipping before passing it to SDL_LowerBlit()

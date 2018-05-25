@@ -46,25 +46,6 @@ func GetKeyboardFocus() (retval *Window) {
     return
 }
 
- // Get a snapshot of the current state of the keyboard.
- // 
- // Returns: An array of key states. Indexes into this array are obtained
- // by using SDL_Scancode values.
- // 
- //   numkeys
- //     if non-NULL, receives the length of the returned array.
- //   
- // Example:
- //   const Uint8 *state = SDL_GetKeyboardState(NULL);
- //   if ( state[SDL_SCANCODE_RETURN] )   {
- //       printf("<RETURN> is pressed.\n");
- //   }
-func GetKeyboardState() (retval *[999999999]byte, numkeys int) {
-    tmp_numkeys := new(C.int)
-    retval = (*[999999999]byte)(unsafe.Pointer(C.SDL_GetKeyboardState((*C.int)(tmp_numkeys))))
-    numkeys = deref_int_ptr(tmp_numkeys)
-    return
-}
 
  // Get the current key modifier state for the keyboard.
 func GetModState() (retval Keymod) {

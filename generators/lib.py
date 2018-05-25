@@ -262,7 +262,7 @@ class BaseTypeinfo(object):
                     funcname + "." + argname) in pointer_arg_treatment[argtype]["receiver"]:
                 treat = "receiver"
 
-        result["retval"] = not treat.startswith("in")
+        result["retval"] = treat == "out"
 
         if treat == "receiver":
             result["goidx"] = 0
@@ -345,7 +345,7 @@ def typeinfo(funcname, argidx, argname, argtype, argtypeargs):
       gocastend: (str) A string with additional closing ")" required after
                  the closing ")" that every cast has.
       ctype: (str) C type of the argument within Go, e.g. "C.char".
-      ccast: (str) Cast to use for converting Go to C. Often the same as gotype,
+      ccast: (str) Cast to use for converting Go to C. Often the same as ctype,
                    but could include parentheses, e.g. "(*C.char)". Code using
                    ccast never has to add parentheses around ccast.
       ccastend: (str) A string with additional closing ")" required after
@@ -353,7 +353,7 @@ def typeinfo(funcname, argidx, argname, argtype, argtypeargs):
       array: (list of str) If the argument type is an array, this
                    is a list containing the array dimensions
                    (e.g. "char[2][3]" => ["2","3"])
-      retval: (bool) True => this argument is returned or modified via ptr
+      retval: (bool) True => this argument is a return value of the Go function
       goidx: (int) 0 => on the Go side the argument is a method receiver.
                    1 => (if not retval) 1st argument to the Go function.
                    ...
@@ -413,6 +413,163 @@ def fixup_params(params):
                     num_args += 1
 
     return num_recv, num_args, num_ret
+
+
+# The function slices_instead_of_pointers() deals with the following cases:
+#
+# *Struct+count => []Struct
+# Patterns to recognize: 1) "const Struct*" followed by "int count"
+#                           (also recognize "len" and "length")
+#                        2) "const Struct*" named "foo" followed by "int nfoo"
+#                           (also recognize "numfoo" and "num_foo")
+#                  In both cases, allow 1 optional int between the 2 arguments
+#SDL_RenderDrawPoints(SDL_Renderer* renderer, const SDL_Point * points,                 int count);
+#SDL_RenderDrawLines(SDL_Renderer * renderer, const SDL_Point * points,                 int count);
+#SDL_RenderDrawRects(SDL_Renderer * renderer, const SDL_Rect  * rects,                  int count);
+#SDL_RenderFillRects(SDL_Renderer * renderer, const SDL_Rect  * rects,                  int count);
+#SDL_FillRects(SDL_Surface * dst,             const SDL_Rect  * rects,                  int count, Uint32 color);
+#SDL_SetPaletteColors(SDL_Palette * palette,  const SDL_Color * colors, int firstcolor, int ncolors);
+
+# *byte+count => []byte
+# Patterns to recognize: [const] void* followed by Uint32/int named "len" (also recognize "length")
+#SDL_QueueAudio(SDL_AudioDeviceID    dev,    const void  *data,                       Uint32 len);
+#SDL_AudioStreamPut(SDL_AudioStream *stream, const void  *buf,                           int len);
+#SDL_DequeueAudio(SDL_AudioDeviceID  dev,          void  *data,                       Uint32 len);
+#SDL_AudioStreamGet(SDL_AudioStream *stream,       void  *buf,                           int len);
+
+# Variant of the previous case with an additional *byte and count that applies to both
+# Patterns to recognize: [[const] Uint8*] [const] Uint8* followed by Uint32/int named "len"
+#                        (also recognize "length")
+#                        allow 1 optional non-pointer before "len"
+#SDL_MixAudio(                Uint8 * dst,   const Uint8 *src,                        Uint32 len, int volume);
+#SDL_MixAudioFormat(          Uint8 * dst,   const Uint8 *src, SDL_AudioFormat format,Uint32 len, int volume);
+
+# *byte WITHOUT count => []byte + handwritten checkParametersFor...() function
+# Patterns to recognize: [const] void* followed by an "int pitch" (with potentially other parameters in between)
+#SDL_CreateRGBSurfaceWithFormatFrom(                                void *pixels, int width, int height, int depth, int pitch, Uint32 format);
+#SDL_CreateRGBSurfaceFrom(                                          void *pixels, int width, int height, int depth, int pitch, Uint32 Rmask,Uint32 Gmask, Uint32 Bmask, Uint32 Amask);
+#SDL_UpdateTexture(SDL_Texture* texture,const SDL_Rect* rect, const void *pixels, int pitch);
+
+# Variant of the previous case with multiple *byte
+# Patterns to recognize: [const] Uint8* named "foo" followed by an int whose name
+#                         ends with "pitch" and starts with a prefix of "foo"
+#SDL_UpdateYUVTexture(SDL_Texture* texture,const SDL_Rect* rect, const Uint8 *Yplane, int Ypitch, const Uint8 *Uplane, int Upitch, const Uint8 *Vplane, int Vpitch);
+#
+#
+
+
+def slices_instead_of_pointers(funcname, params):
+    '''
+    Takes a function name and its parameters as a list of dicts as returned from
+    typeinfo() that has already been through fixup_params(); and checks if there
+    are any pointer arguments that should be converted to slices instead.
+    These arguments are converted to slices and if necessary, accompanying
+    length/count arguments are marked by adding a mapping "nogo":True, so that
+    they can be omitted from the Go wrapper's signature.
+    '''
+    fix = []
+    for i in range(len(params)):
+        p = params[i]
+        if p is None or p["retval"]:
+            continue
+        if p["ctype"].startswith("*") or p["ctype"] == "unsafe.Pointer":
+            if p["struct"]:
+                # if there either is no next argument or it is a pointer, then
+                # it doesn't match the pattern
+                if i + 1 >= len(params) or (params[i + 1]["ctype"].startswith("*")
+                                            or params[i + 1]["ctype"] == "unsafe.Pointer"):
+                    continue
+                for k in (1, 2):
+                    if i + k < len(params) and params[i + k]["name"] in ("len", "length", "count",
+                                                                         "n" + p["name"],
+                                                                         "num" + p["name"],
+                                                                         "num_" + p["name"]):
+                        fix.append((True, i, i + k))
+                        break
+            elif p["ctype"] == "unsafe.Pointer" or isbyteptr(p["gotype"]):
+                one_non_pointer_allowed = True
+                for k in range(1, len(params) - i):
+                    if params[i + k]["name"] in ("len", "length",
+                                                 "count") and params[i + k]["gotype"] in ("uint32",
+                                                                                          "int"):
+                        fix.append((False, i, i + k))
+                        break
+                    elif params[i + k]["ctype"] == "unsafe.Pointer" or isbyteptr(
+                            params[i + k]["gotype"]):
+                        continue  # multiple subsequent pointers are allowed in this pattern
+                    else:
+                        if one_non_pointer_allowed and not (
+                                params[i + k]["ctype"].startswith("*")
+                                or params[i + k]["ctype"] == "unsafe.Pointer"):
+                            one_non_pointer_allowed = False
+                            continue
+                        else:
+                            break  # other stuff breaks the pattern
+
+                for k in range(1, len(params) - i):
+                    if params[i + k]["gotype"] in ("uint32", "int"):
+                        n = params[i + k]["name"]
+                        if n.endswith("pitch") and p["name"].startswith(n[0:len(n) - 5]):
+                            fix.append((False, i, -1))
+                            break
+
+    have_output_check = False
+
+    for struct, idx, lenidx in fix:
+        raw_gotype = params[idx]["gotype"].lstrip("*")
+
+        p = params[idx]
+        p["allocarg"] = "tmp_" + p["name"]
+        alloc = []
+        if lenidx < 0 and not have_output_check:
+            have_output_check = True
+            alloc.append("checkParametersFor" + funcname + "(")
+            first = True
+            for parm in params:
+                if parm is None or parm["retval"]:
+                    continue
+                if not first:
+                    alloc[-1] += ", "
+                first = False
+                alloc[-1] += parm["name"]
+            alloc[-1] += ")"
+        alloc.append("var %s %s" % (p["allocarg"], p["ctype"]))
+        alloc.append("if len(%s) > 0 {" % p["name"])
+        if struct:
+            p["gotype"] = "[]" + raw_gotype
+            alloc.append("    sl_%s := make([]%s, len(%s))" % (p["allocarg"],
+                                                               p["ctype"].lstrip("*"), p["name"]))
+            alloc.append("    for i := range %s {" % p["name"])
+            alloc.append("        sl_%s[i] = toCFrom%s(%s[i])" % (p["allocarg"], raw_gotype,
+                                                                  p["name"]))
+            alloc.append("    }")
+            alloc.append("    %s = &(sl_%s[0])" % (p["allocarg"], p["allocarg"]))
+        else:
+            p["gotype"] = "[]byte"
+            alloc.append("    %s = (%s)(unsafe.Pointer(&(%s[0])))" % (p["allocarg"], p["ctype"],
+                                                                      p["name"]))
+        alloc.append("}")
+
+        p["alloc"] = "\n    ".join(alloc)
+        p["dealloc"] = ""
+        p["ccast"] = ""
+        p["ccastend"] = ""
+
+        if lenidx >= 0:
+            p = params[lenidx]
+            if "nogo" not in p:
+                p["nogo"] = True
+                p["dealloc"] = ""
+                p["allocarg"] = "tmp_" + p["name"]
+                p["alloc"] = "%s := len(%s)" % (p["allocarg"], params[idx]["name"])
+            else:
+                p["alloc"] += "; if len(%s) < %s { %s = len(%s) }" % (params[idx]["name"],
+                                                                      p["allocarg"], p["allocarg"],
+                                                                      params[idx]["name"])
+
+
+def isbyteptr(gotype):
+    return gotype.startswith("*") and (gotype.endswith("byte") or gotype.endswith("uint8"))
 
 
 def additional_boilerplate(idx):
@@ -1061,6 +1218,8 @@ def wrapfunctions(section):
             raise ValueError(
                 "wrapfunctions(): Function '%s' tries to have more than 1 receiver" % name)
 
+        slices_instead_of_pointers(name, params)
+
         describe(fun)
         goname = fix(name)
         s = "func "
@@ -1076,9 +1235,13 @@ def wrapfunctions(section):
                 goname = goname.replace(recvpart, "", 1)
 
         s += goname + "("
+        first = True
         for i in range(1, num_args + 1):
-            if i > 1:
+            if "nogo" in params[i]:
+                continue
+            if not first:
                 s += ", "
+            first = False
             s += "%s %s" % (params[i]["name"], params[i]["gotype"])
 
         s += ")"
