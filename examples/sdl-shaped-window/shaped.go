@@ -62,6 +62,12 @@ func sdlmain() int {
         return 1
     }
 
+    // ATTENTION! Hit testing will only work if SDL events are regularly polled.
+    if win.SetHitTest(sdl.HitTest(myHitTest), 0) < 0 {
+        fmt.Fprintf(os.Stderr, "sdl.SetHitTest Error: %v\n", sdl.GetError())
+        // Don't return. We can live without.
+    }
+
     texture := renderer.CreateTextureFromSurface(windowShape)
     if texture == nil {
         fmt.Fprintf(os.Stderr, "sdl.CreateTextureFromSurface Error: %v\n", sdl.GetError())
@@ -71,7 +77,13 @@ func sdlmain() int {
 
     renderer.SetDrawColor(255, 100, 100, 100)
 
-    for i := 0; i < 100; i++ {
+    for {
+        for retval, event := sdl.PollEvent(); retval > 0; retval, event = sdl.PollEvent() {
+            if sdl.EventType(event.Type()) == sdl.QUIT {
+                fmt.Println("Window closed by user")
+                return 0
+            }
+        }
         renderer.Clear()
         renderer.Copy(texture, nil, nil)
         renderer.Present()
