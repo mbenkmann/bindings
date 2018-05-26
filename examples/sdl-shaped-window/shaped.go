@@ -11,14 +11,6 @@ import (
 
 /*
  * Creates a non-rectangular window.
- * NOTE: Does not seem to work. But seems to be unrelated to the Go bindings:
- * https://www.reddit.com/r/sdl/comments/8gmy8w/sdl_createshapedwindow/
- * I've also searched github and only found code from a python-sdl test suite
- * with comments that suggest that the author has not made it work.
- * I'm pretty sure that this is a bug in SDL.
- *
- * DO NOT FILE A BUG REPORT FOR THE GO BINDINGS UNLESS YOU HAVE A WORKING
- * C PROGRAM THAT SHOWS A SHAPED WINDOW.
  */
 func main() {
     os.Exit(sdlmain())
@@ -33,26 +25,23 @@ func sdlmain() int {
     }
     defer sdl.Quit()
 
-    win := sdl.CreateShapedWindow("Shaped Window", sdl.WINDOWPOS_CENTERED, sdl.WINDOWPOS_CENTERED, 100, 100, sdl.WINDOW_SHOWN|sdl.WINDOW_BORDERLESS)
-    if win == nil {
-        fmt.Fprintf(os.Stderr, "sdl.CreateShapedWindow Error: %v\n", sdl.GetError())
-        return 1
-    }
-    defer win.Destroy()
-
-    windowShape := sdl.LoadBMP(sdlutil.GetResourcePath("../examples/resources", "images", "shapemask.bmp"))
+    windowShape := sdl.LoadBMP(sdlutil.GetResourcePath("../examples/resources", "images", "troll.bmp"))
     if windowShape == nil {
         fmt.Fprintf(os.Stderr, "sdl.LoadBMP Error: %v\n", sdl.GetError())
         return 1
     }
     defer windowShape.Free()
 
-    shapeMode := &sdl.WindowShapeMode{Mode: sdl.ShapeModeBinarizeAlpha}
-    shapeMode.Parameters.SetBinarizationCutoff(100)
-    if win.SetShape(windowShape, shapeMode) != 0 {
-        fmt.Fprintf(os.Stderr, "sdl.SetShape Error: %v\n", sdl.GetError())
+    dimensions := windowShape.GetClipRect()
+    width, height := uint(dimensions.W), uint(dimensions.H)
+
+    win := sdl.CreateShapedWindow("Shaped Window", sdl.WINDOWPOS_CENTERED, sdl.WINDOWPOS_CENTERED,
+        width, height, sdl.WINDOW_SHOWN|sdl.WINDOW_BORDERLESS)
+    if win == nil {
+        fmt.Fprintf(os.Stderr, "sdl.CreateShapedWindow Error: %v\n", sdl.GetError())
         return 1
     }
+    defer win.Destroy()
 
     renderer := win.CreateRenderer(-1, sdl.RENDERER_ACCELERATED)
     if renderer == nil {
@@ -60,6 +49,18 @@ func sdlmain() int {
         return 1
     }
     defer renderer.Destroy()
+
+    /*
+       ATTENTION! win.SetShape() will only work
+       a) AFTER win.CreateRenderer() has been called!
+       b) IF then window size matches the shape's size
+    */
+    shapeMode := &sdl.WindowShapeMode{Mode: sdl.ShapeModeBinarizeAlpha}
+    shapeMode.Parameters.SetBinarizationCutoff(100)
+    if win.SetShape(windowShape, shapeMode) != 0 {
+        fmt.Fprintf(os.Stderr, "sdl.SetShape Error: %v\n", sdl.GetError())
+        return 1
+    }
 
     texture := renderer.CreateTextureFromSurface(windowShape)
     if texture == nil {
@@ -70,11 +71,11 @@ func sdlmain() int {
 
     renderer.SetDrawColor(255, 100, 100, 100)
 
-    for i := 0; i < 10; i++ {
+    for i := 0; i < 100; i++ {
         renderer.Clear()
         renderer.Copy(texture, nil, nil)
         renderer.Present()
-        sdl.Delay(1000)
+        sdl.Delay(100)
     }
 
     return 0
