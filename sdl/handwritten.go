@@ -498,28 +498,85 @@ func GetKeyboardState() []byte {
     return (*((*[999999999]byte)(unsafe.Pointer(states))))[0:numkeys]
 }
 
+const check_failed = "Function called with parameters that may call overwriting of random memory"
+
 func checkParametersForSDL_UpdateTexture(texture *Texture, rect *Rect, pixels []byte, pitch int) {
-    panic("Not implemented")
+    valid, format, _, w, h := texture.Query()
+    if valid < 0 { return } // texture invalid
+    if rect != nil {
+        w, h = rect.W, rect.H
+    }
+    line := int(BYTESPERPIXEL(format)) * w
+
+    if line >= 0 && w >= 0 && h >= 0 && pitch >= line && len(pixels) >= pitch*h {
+        return
+    }
+
+    panic(check_failed)
 }
 
 func checkParametersForSDL_UpdateYUVTexture(texture *Texture, rect *Rect, Yplane []byte, Ypitch int, Uplane []byte, Upitch int, Vplane []byte, Vpitch int) {
-    panic("Not implemented")
+    valid, _, _, w, h := texture.Query()
+    if valid < 0 { return } // texture invalid
+    if rect != nil {
+        w, h = rect.W, rect.H
+    }
+
+    if w >= 0 && h >= 0 && (Ypitch >= 0 && Upitch >= 0 && Vpitch >= 0) &&
+        (Ypitch >= w && len(Yplane) >= Ypitch*h) &&
+        (Upitch >= w && len(Uplane) >= Upitch*h) &&
+        (Vpitch >= w && len(Vplane) >= Vpitch*h) {
+        return
+    }
+
+    panic(check_failed)
 }
 
 func checkParametersForSDL_CreateRGBSurfaceFrom(pixels []byte, width int, height int, depth int, pitch int, Rmask uint32, Gmask uint32, Bmask uint32, Amask uint32) {
-    panic("Not implemented")
+    bpp := (depth + 7) >> 3
+    line := width * bpp
+    if pitch >= 0 && pitch >= line && width >= 0 && height >= 0 && len(pixels) >= pitch*height {
+        return
+    }
+    panic(check_failed)
 }
 
 func checkParametersForSDL_CreateRGBSurfaceWithFormatFrom(pixels []byte, width int, height int, depth int, pitch int, format uint32) {
-    panic("Not implemented")
+    bpp := int(BYTESPERPIXEL(format))
+    line := width * bpp
+    if pitch >= 0 && pitch >= line && width >= 0 && height >= 0 && len(pixels) >= pitch*height {
+        return
+    }
+    panic(check_failed)
 }
 
 func checkParametersForSDL_RenderReadPixels(renderer *Renderer, rect *Rect, format uint32, pixels []byte, pitch int) {
-    panic("Not implemented")
+    r := renderer.GetViewport()
+    width := r.W
+    height := r.H
+    if rect != nil {
+        width = rect.W
+        height = rect.H
+    }
+
+    bpp := int(BYTESPERPIXEL(format))
+    line := width * bpp
+    if pitch >= 0 && pitch >= line && width >= 0 && height >= 0 && len(pixels) >= pitch*height {
+        return
+    }
+    panic(check_failed)
 }
 
 func checkParametersForSDL_ConvertPixels(width int, height int, src_format uint32, src []byte, src_pitch int, dst_format uint32, dst []byte, dst_pitch int) {
-    panic("Not implemented")
+    src_bpp := int(BYTESPERPIXEL(src_format))
+    dst_bpp := int(BYTESPERPIXEL(dst_format))
+    src_line := width * src_bpp
+    dst_line := width * dst_bpp
+    if width >= 0 && height >= 0 && src_pitch >= src_line && dst_pitch >= dst_line &&
+        len(src) >= src_pitch*height && len(dst) >= dst_pitch*height {
+        return
+    }
+    panic(check_failed)
 }
 
 // Create a cursor, using the specified bitmap data and mask (in MSB
