@@ -45,6 +45,9 @@ custom_gocast = {}
 # Maps a C type name to a ccast value as for typeinfo().
 custom_ccast = {}
 
+# Maps a prefix in a C type name to a Go package name, for cross-package references.
+cprefix_to_go_package = {}
+
 # List of names for which not to generate wrappers.
 blacklist = frozenset()
 
@@ -171,6 +174,15 @@ class BaseTypeinfo(object):
 
         if funcname + "." + argname in gotype_override:
             gotype = gotype_override[funcname + "." + argname]
+
+        package = ""
+        for prefix, pkg in cprefix_to_go_package.items():
+            if argtype.startswith(prefix):
+                package = pkg + "."
+                break
+
+        i = min((x for x in range(len(gotype)) if gotype[x].isalpha()), default=0)
+        gotype = gotype[0:i] + package + gotype[i:]
         result["gotype"] = gotype
         result["gocastend"] = ""
 
@@ -196,6 +208,8 @@ class BaseTypeinfo(object):
                         result["gotype"] = gotype
 
                 result["gocast"] = "fromC2" + result["gocast"].lstrip("*")
+                if package != "":
+                    result["gocast"] = result["gocast"].replace(package, "", 1)
                 if argtype_stars != "":
                     result["gocast"] = result["gocast"] + "(*"
                     result["gocastend"] = ")"
@@ -222,7 +236,7 @@ class BaseTypeinfo(object):
             if "[" in result["ccast"]:
                 result["ccast"] = "(" + result["ccast"] + ")"
             elif "*" in result["ccast"]:
-                if "[" in result["gotype"]:
+                if "[" in result["gotype"] or package != "":
                     result["ccast"] = "(%s)(unsafe.Pointer" % result["ctype"]
                     result["ccastend"] = ")"
                 else:
@@ -301,8 +315,8 @@ class BaseTypeinfo(object):
                         result["allocarg"] = "&" + result["allocarg"]
 
         # Special case for pointer to primitive data type as out parameter
-        if treat == "out" and result["gotype"][0] == "*" and result["gotype"][1].islower():
-            result["gotype"] = result["gotype"][1:]
+        if treat == "out" and result["gotype"][0] == "*" and result["gotype"].islower():
+            result["gotype"] = result["gotype"].lstrip("*")
             new_go_cast = "deref_" + result["gotype"] + "_ptr"
             result["dealloc"] = result["dealloc"].replace(result["gocast"], new_go_cast)
             if result["gocastend"] != "":
