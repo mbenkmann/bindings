@@ -29,13 +29,64 @@ https://github.com/mbenkmann/bindings/tree/master/examples
 API Documentation
 =================
 
-https://godoc.org/github.com/mbenkmann/bindings/sdl
+https://godoc.org/github.com/mbenkmann/bindings
 
-Using the ready-made bindings
-=============================
+Installing the libraries
+========================
+The bindings need the C development files of the respective libraries.
+The following are example commands for installing the SDL library. Other
+libraries are installed in a similar fashion.
+
+On __Ubuntu__, type:
+
+    apt install libsdl2-dev
+
+On __Fedora__, type:
+
+    yum install SDL2-devel
+
+On __Arch Linux__, type:
+
+    pacman -S sdl2
+
+On __Gentoo__, type:
+
+    emerge -av libsdl2
+
+On __macOS__, use [Homebrew](http://brew.sh):
+
+    brew install sdl2 pkg-config
+
+Installing the ready-made bindings
+==================================
+Use `go get` to install the bindings to your `$GOPATH`. The following example
+command will install the bindings for SDL:
+
+    go get -v https://winterdrache.de/bindings/sdl
+
+Switching to the '`newest`' branch
+----------------------------------
+The default branch installed by `go get` contains bindings for library versions
+that are about 2 years old. That way they can be used right away with the
+libraries provided by your operation system even if you are not using the most
+recent version. Programs developed with these bindings will be compatible with
+older systems without you having to ship a recent version of the respective
+library.
+
+However, if you need features only provided by more recent library versions, or
+if you are going to ship copies of the libraries with your program anyway, you
+will want to use bindings that support the most recent features. To do this,
+make sure you have the most recent development files of the respective libraries
+installed, then switch to the '`newest`' branch like this
+
+    cd ${GOPATH%%:*}/src/winterdrache.de/bindings
+    git checkout newest
+
 
 Generating bindings yourself
 ============================
+Install the libraries __and__ the ready-made bindings first. Then follow these
+instructions:
 
 https://github.com/mbenkmann/bindings/tree/master/generators
 
