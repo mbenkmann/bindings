@@ -19,12 +19,11 @@ $(SDLHEADERS):
 	generators/$$generator $@ $(DOXYXML) >$(SDLOUT)/$@.go
 
 doxygen:
-	doxygen doxyfile
+	doxygen doxygen/SDL.dox
 
 
 clean:
 	rm -rf $(DOXYXML)
-	rmdir doxygen
 	rm -f bin/debug-temp
 	cd $(SDLOUT) && rm -f $(SDLGOOUT)
 
