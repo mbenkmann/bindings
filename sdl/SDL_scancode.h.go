@@ -20,13 +20,17 @@ import "C"
  // 
  // These are values that Christian Walther added (for mac keyboard?).
 
+ // Usage page 0x0C (additional media keys)
+ // 
+ // These values are mapped from usage page 0x0C (USB consumer page).
+
  // The SDL keyboard scancode representation.
  // 
  // Values of this type are used to represent keyboard keys, among other
  // places in the key.keysym.scancode  field of the SDL_Event structure.
  // 
  // The values in this enumeration are based on the USB usage page
- // standard: http://www.usb.org/developers/devclass_docs/Hut1_12v2.pdf
+ // standard: http://www.usb.org/developers/hidpage/Hut1_12v2.pdf
 type Scancode int
 const (
     SCANCODE_UNKNOWN Scancode = C.SDL_SCANCODE_UNKNOWN
@@ -567,6 +571,10 @@ const (
     SCANCODE_APP1 Scancode = C.SDL_SCANCODE_APP1
 
     SCANCODE_APP2 Scancode = C.SDL_SCANCODE_APP2
+
+    SCANCODE_AUDIOREWIND Scancode = C.SDL_SCANCODE_AUDIOREWIND
+
+    SCANCODE_AUDIOFASTFORWARD Scancode = C.SDL_SCANCODE_AUDIOFASTFORWARD
 
      // not a key, just marks the number of scancodes for array bounds
     NUM_SCANCODES Scancode = C.SDL_NUM_SCANCODES

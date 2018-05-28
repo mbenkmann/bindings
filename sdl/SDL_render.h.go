@@ -224,6 +224,8 @@ func (renderer *Renderer) GetOutputSize() (retval int, w int, h int) {
  // context was active, the format was unsupported, or the width or height
  // were out of range.
  // 
+ // Note: The contents of the texture are not defined at creation.
+ // 
  // See also: SDL_QueryTexture()
  // 
  // See also: SDL_UpdateTexture()
@@ -436,10 +438,6 @@ func (texture *Texture) GetBlendMode() (retval int, blendMode *BlendMode) {
 
  // Update the given texture rectangle with new pixel data.
  // 
- // Returns: 0 on success, or -1 if the texture is not valid.
- // 
- // Note: This is a fairly slow function.
- // 
  //   texture
  //     The texture to update
  //   
@@ -448,12 +446,19 @@ func (texture *Texture) GetBlendMode() (retval int, blendMode *BlendMode) {
  //     entire texture.
  //   
  //   pixels
- //     The raw pixel data.
+ //     The raw pixel data in the format of the texture.
  //   
  //   pitch
  //     The number of bytes in a row of pixel data, including padding between
  //     lines.
  //   
+ // The pixel data must be in the format of the texture. The pixel format
+ // can be queried with SDL_QueryTexture.
+ // 
+ // Returns: 0 on success, or -1 if the texture is not valid.
+ // 
+ // Note: This is a fairly slow function.
+ // 
 func (texture *Texture) Update(rect *Rect, pixels []byte, pitch int) (retval int) {
     var tmp_rect *C.SDL_Rect; if rect != nil { x := toCFromRect(*rect); tmp_rect = &x }
     checkParametersForSDL_UpdateTexture(texture, rect, pixels, pitch)
@@ -623,6 +628,39 @@ func (renderer *Renderer) GetLogicalSize() (w int, h int) {
     C.SDL_RenderGetLogicalSize((*C.SDL_Renderer)(renderer), (*C.int)(tmp_w), (*C.int)(tmp_h))
     w = deref_int_ptr(tmp_w)
     h = deref_int_ptr(tmp_h)
+    return
+}
+
+ // Set whether to force integer scales for resolution-independent
+ // rendering.
+ // 
+ //   renderer
+ //     The renderer for which integer scaling should be set.
+ //   
+ //   enable
+ //     Enable or disable integer scaling
+ //   
+ // This function restricts the logical viewport to integer values - that
+ // is, when a resolution is between two multiples of a logical size, the
+ // viewport size is rounded down to the lower multiple.
+ // 
+ // See also: SDL_RenderSetLogicalSize()
+ // 
+func (renderer *Renderer) SetIntegerScale(enable bool) (retval int) {
+    retval = int(C.SDL_RenderSetIntegerScale((*C.SDL_Renderer)(renderer), bool2bool(enable)))
+    return
+}
+
+ // Get whether integer scales are forced for resolution-independent
+ // rendering.
+ // 
+ // See also: SDL_RenderSetIntegerScale()
+ // 
+ //   renderer
+ //     The renderer from which integer scaling should be queried.
+ //   
+func (renderer *Renderer) GetIntegerScale() (retval bool) {
+    retval = C.SDL_TRUE==(C.SDL_RenderGetIntegerScale((*C.SDL_Renderer)(renderer)))
     return
 }
 
@@ -862,7 +900,7 @@ func (renderer *Renderer) GetDrawBlendMode() (retval int, blendMode *BlendMode) 
  // Clear the current rendering target with the drawing color.
  // 
  // This function clears the entire rendering target, ignoring the
- // viewport.
+ // viewport and the clip rectangle.
  // 
  // Returns: 0 on success, or -1 on error
  // 
@@ -1101,7 +1139,7 @@ func (renderer *Renderer) Copy(texture *Texture, srcrect *Rect, dstrect *Rect) (
  //   
  //   angle
  //     An angle in degrees that indicates the rotation that will be applied
- //     to dstrect
+ //     to dstrect, rotating it in a clockwise direction
  //   
  //   center
  //     A pointer to a point indicating the point around which dstrect will be
@@ -1211,5 +1249,35 @@ func (texture *Texture) GL_Bind() (retval int, texw float32, texh float32) {
  //   
 func (texture *Texture) GL_Unbind() (retval int) {
     retval = int(C.SDL_GL_UnbindTexture((*C.SDL_Texture)(texture)))
+    return
+}
+
+ // Get the CAMetalLayer associated with the given Metal renderer.
+ // 
+ // Returns: CAMetalLayer* on success, or NULL if the renderer isn't a
+ // Metal renderer
+ // 
+ // See also: SDL_RenderGetMetalCommandEncoder()
+ // 
+ //   renderer
+ //     The renderer to query
+ //   
+func (renderer *Renderer) GetMetalLayer() (retval uintptr) {
+    retval = uintptr(C.SDL_RenderGetMetalLayer((*C.SDL_Renderer)(renderer)))
+    return
+}
+
+ // Get the Metal command encoder for the current frame.
+ // 
+ // Returns: id<MTLRenderCommandEncoder> on success, or NULL if the
+ // renderer isn't a Metal renderer
+ // 
+ // See also: SDL_RenderGetMetalLayer()
+ // 
+ //   renderer
+ //     The renderer to query
+ //   
+func (renderer *Renderer) GetMetalCommandEncoder() (retval uintptr) {
+    retval = uintptr(C.SDL_RenderGetMetalCommandEncoder((*C.SDL_Renderer)(renderer)))
     return
 }

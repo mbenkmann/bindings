@@ -30,6 +30,13 @@ const (
 )
 
  // The list of axes available from a controller
+ // 
+ // Thumbstick axis values range from SDL_JOYSTICK_AXIS_MIN to
+ // SDL_JOYSTICK_AXIS_MAX, and are centered within ~8000 of zero, though
+ // advanced UI will allow users to set or autodetect the dead zone, which
+ // varies between controllers.
+ // 
+ // Trigger axis values range from 0 to SDL_JOYSTICK_AXIS_MAX.
 type GameControllerAxis int
 const (
     CONTROLLER_AXIS_INVALID GameControllerAxis = C.SDL_CONTROLLER_AXIS_INVALID
@@ -92,11 +99,11 @@ type GameController C.SDL_GameController
 
  // To count the number of game controllers in the system for the
  // following: int nJoysticks = SDL_NumJoysticks(); int nGameControllers =
- // 0; for ( int i = 0; i < nJoysticks; i++ ) { if (
- // SDL_IsGameController(i) ) { nGameControllers++; } }
+ // 0; for (int i = 0; i < nJoysticks; i++) { if (SDL_IsGameController(i))
+ // { nGameControllers++; } }
  // 
  // Using the SDL_HINT_GAMECONTROLLERCONFIG hint or the
- // SDL_GameControllerAddMapping you can add support for controllers SDL
+ // SDL_GameControllerAddMapping() you can add support for controllers SDL
  // is unaware of or cause an existing controller to have a different
  // binding. The format is: guid,name,mappings
  // 
@@ -109,14 +116,14 @@ type GameController C.SDL_GameController
  // controller axis and vice versa.
  // 
  // This string shows an example of a valid mapping for a controller
- // "341a3608000000000000504944564944,Afterglow PS3 Controller,a:b1,b:b2,y
- // :b3,x:b0,start:b9,guide:b12,back:b8,dpup:h0.1,dpleft:h0.8,dpdown:h0.4,
- // dpright:h0.2,leftshoulder:b4,rightshoulder:b5,leftstick:b10,rightstick
- // :b11,leftx:a0,lefty:a1,rightx:a2,righty:a3,lefttrigger:b6,righttrigger
- // :b7", Load a set of mappings from a seekable SDL data stream (memory
- // or file), filtered by the current SDL_GetPlatform() A community
- // sourced database of controllers is available at https://raw.github.com
- // /gabomdq/SDL_GameControllerDB/master/gamecontrollerdb.txt
+ // "03000000341a00003608000000000000,PS3 Controller,a:b1,b:b2,y:b3,x:b0,s
+ // tart:b9,guide:b12,back:b8,dpup:h0.1,dpleft:h0.8,dpdown:h0.4,dpright:h0
+ // .2,leftshoulder:b4,rightshoulder:b5,leftstick:b10,rightstick:b11,leftx
+ // :a0,lefty:a1,rightx:a2,righty:a3,lefttrigger:b6,righttrigger:b7", Load
+ // a set of mappings from a seekable SDL data stream (memory or file),
+ // filtered by the current SDL_GetPlatform() A community sourced database
+ // of controllers is available at https://raw.github.com/gabomdq/SDL_Game
+ // ControllerDB/master/gamecontrollerdb.txt
  // 
  // If freerw is non-zero, the stream will be closed after being read.
  // 
@@ -137,10 +144,29 @@ func GameControllerAddMapping(mappingString string) (retval int) {
     return
 }
 
+ // Get the number of mappings installed
+ // 
+ // Returns: the number of mappings
+ // 
+func GameControllerNumMappings() (retval int) {
+    retval = int(C.SDL_GameControllerNumMappings())
+    return
+}
+
+ // Get the mapping at a particular index.
+ // 
+ // Returns: the mapping string. Must be freed with SDL_free(). Returns
+ // NULL if the index is out of range.
+ // 
+func GameControllerMappingForIndex(mapping_index int) (retval string) {
+    retval = C.GoString(C.SDL_GameControllerMappingForIndex(C.int(mapping_index)))
+    return
+}
+
  // Get a mapping string for a GUID
  // 
- // Returns: the mapping string. Must be freed with SDL_free. Returns NULL
- // if no mapping is available
+ // Returns: the mapping string. Must be freed with SDL_free(). Returns
+ // NULL if no mapping is available
  // 
 func GameControllerMappingForGUID(guid JoystickGUID) (retval string) {
     tmp_guid := toCFromJoystickGUID(guid)
@@ -150,8 +176,8 @@ func GameControllerMappingForGUID(guid JoystickGUID) (retval string) {
 
  // Get a mapping string for an open GameController
  // 
- // Returns: the mapping string. Must be freed with SDL_free. Returns NULL
- // if no mapping is available
+ // Returns: the mapping string. Must be freed with SDL_free(). Returns
+ // NULL if no mapping is available
  // 
 func (gamecontroller *GameController) Mapping() (retval string) {
     retval = freeGoString(C.SDL_GameControllerMapping((*C.SDL_GameController)(gamecontroller)))
@@ -194,6 +220,27 @@ func GameControllerFromInstanceID(joyid JoystickID) (retval *GameController) {
  // Return the name for this currently opened controller
 func (gamecontroller *GameController) Name() (retval string) {
     retval = C.GoString(C.SDL_GameControllerName((*C.SDL_GameController)(gamecontroller)))
+    return
+}
+
+ // Get the USB vendor ID of an opened controller, if available. If the
+ // vendor ID isn't available this function returns 0.
+func (gamecontroller *GameController) GetVendor() (retval uint16) {
+    retval = uint16(C.SDL_GameControllerGetVendor((*C.SDL_GameController)(gamecontroller)))
+    return
+}
+
+ // Get the USB product ID of an opened controller, if available. If the
+ // product ID isn't available this function returns 0.
+func (gamecontroller *GameController) GetProduct() (retval uint16) {
+    retval = uint16(C.SDL_GameControllerGetProduct((*C.SDL_GameController)(gamecontroller)))
+    return
+}
+
+ // Get the product version of an opened controller, if available. If the
+ // product version isn't available this function returns 0.
+func (gamecontroller *GameController) GetProductVersion() (retval uint16) {
+    retval = uint16(C.SDL_GameControllerGetProductVersion((*C.SDL_GameController)(gamecontroller)))
     return
 }
 

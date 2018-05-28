@@ -13,6 +13,7 @@ import "unsafe"
 type CommonEvent struct {
     Type uint32
 
+     // In milliseconds, populated using SDL_GetTicks()
     Timestamp uint32
 }
 
@@ -31,6 +32,7 @@ type WindowEvent struct {
      // SDL_WINDOWEVENT
     Type uint32
 
+     // In milliseconds, populated using SDL_GetTicks()
     Timestamp uint32
 
      // The associated window
@@ -74,6 +76,7 @@ type KeyboardEvent struct {
      // SDL_KEYDOWN or SDL_KEYUP
     Type uint32
 
+     // In milliseconds, populated using SDL_GetTicks()
     Timestamp uint32
 
      // The window with keyboard focus, if any
@@ -117,6 +120,7 @@ type TextEditingEvent struct {
      // SDL_TEXTEDITING
     Type uint32
 
+     // In milliseconds, populated using SDL_GetTicks()
     Timestamp uint32
 
      // The window with keyboard focus, if any
@@ -151,6 +155,7 @@ type TextInputEvent struct {
      // SDL_TEXTINPUT
     Type uint32
 
+     // In milliseconds, populated using SDL_GetTicks()
     Timestamp uint32
 
      // The window with keyboard focus, if any
@@ -177,6 +182,7 @@ type MouseMotionEvent struct {
      // SDL_MOUSEMOTION
     Type uint32
 
+     // In milliseconds, populated using SDL_GetTicks()
     Timestamp uint32
 
      // The window with mouse focus, if any
@@ -223,6 +229,7 @@ type MouseButtonEvent struct {
      // SDL_MOUSEBUTTONDOWN or SDL_MOUSEBUTTONUP
     Type uint32
 
+     // In milliseconds, populated using SDL_GetTicks()
     Timestamp uint32
 
      // The window with mouse focus, if any
@@ -272,6 +279,7 @@ type MouseWheelEvent struct {
      // SDL_MOUSEWHEEL
     Type uint32
 
+     // In milliseconds, populated using SDL_GetTicks()
     Timestamp uint32
 
      // The window with mouse focus, if any
@@ -313,6 +321,7 @@ type JoyAxisEvent struct {
      // SDL_JOYAXISMOTION
     Type uint32
 
+     // In milliseconds, populated using SDL_GetTicks()
     Timestamp uint32
 
      // The joystick instance id
@@ -355,6 +364,7 @@ type JoyBallEvent struct {
      // SDL_JOYBALLMOTION
     Type uint32
 
+     // In milliseconds, populated using SDL_GetTicks()
     Timestamp uint32
 
      // The joystick instance id
@@ -398,6 +408,7 @@ type JoyHatEvent struct {
      // SDL_JOYHATMOTION
     Type uint32
 
+     // In milliseconds, populated using SDL_GetTicks()
     Timestamp uint32
 
      // The joystick instance id
@@ -440,6 +451,7 @@ type JoyButtonEvent struct {
      // SDL_JOYBUTTONDOWN or SDL_JOYBUTTONUP
     Type uint32
 
+     // In milliseconds, populated using SDL_GetTicks()
     Timestamp uint32
 
      // The joystick instance id
@@ -476,6 +488,7 @@ type JoyDeviceEvent struct {
      // SDL_JOYDEVICEADDED or SDL_JOYDEVICEREMOVED
     Type uint32
 
+     // In milliseconds, populated using SDL_GetTicks()
     Timestamp uint32
 
      // The joystick device index for the ADDED event, instance id for the
@@ -499,6 +512,7 @@ type ControllerAxisEvent struct {
      // SDL_CONTROLLERAXISMOTION
     Type uint32
 
+     // In milliseconds, populated using SDL_GetTicks()
     Timestamp uint32
 
      // The joystick instance id
@@ -541,6 +555,7 @@ type ControllerButtonEvent struct {
      // SDL_CONTROLLERBUTTONDOWN or SDL_CONTROLLERBUTTONUP
     Type uint32
 
+     // In milliseconds, populated using SDL_GetTicks()
     Timestamp uint32
 
      // The joystick instance id
@@ -578,6 +593,7 @@ type ControllerDeviceEvent struct {
      // SDL_CONTROLLERDEVICEREMAPPED
     Type uint32
 
+     // In milliseconds, populated using SDL_GetTicks()
     Timestamp uint32
 
      // The joystick device index for the ADDED event, instance id for the
@@ -601,6 +617,7 @@ type AudioDeviceEvent struct {
      // SDL_AUDIODEVICEADDED, or SDL_AUDIODEVICEREMOVED
     Type uint32
 
+     // In milliseconds, populated using SDL_GetTicks()
     Timestamp uint32
 
      // The audio device index for the ADDED event (valid until next
@@ -638,6 +655,7 @@ type TouchFingerEvent struct {
      // SDL_FINGERMOTION or SDL_FINGERDOWN or SDL_FINGERUP
     Type uint32
 
+     // In milliseconds, populated using SDL_GetTicks()
     Timestamp uint32
 
      // The touch device id
@@ -683,9 +701,10 @@ type MultiGestureEvent struct {
      // SDL_MULTIGESTURE
     Type uint32
 
+     // In milliseconds, populated using SDL_GetTicks()
     Timestamp uint32
 
-     // The touch device index
+     // The touch device id
     TouchId TouchID
 
     DTheta float32
@@ -723,6 +742,7 @@ type DollarGestureEvent struct {
      // SDL_DOLLARGESTURE or SDL_DOLLARRECORD
     Type uint32
 
+     // In milliseconds, populated using SDL_GetTicks()
     Timestamp uint32
 
      // The touch device id
@@ -764,17 +784,22 @@ func toCFromDollarGestureEvent(s DollarGestureEvent) (d C.SDL_DollarGestureEvent
  // event.
  // 
 type DropEvent struct {
-     // SDL_DROPFILE
+     // SDL_DROPBEGIN or SDL_DROPFILE or SDL_DROPTEXT or SDL_DROPCOMPLETE
     Type uint32
 
+     // In milliseconds, populated using SDL_GetTicks()
     Timestamp uint32
 
-     // The file name, which should be freed with SDL_free()
+     // The file name, which should be freed with SDL_free(), is NULL on
+     // begin/complete
     File string
+
+     // The window that was dropped on, if any
+    WindowID uint32
 }
 
 func fromC2DropEvent(s C.SDL_DropEvent) DropEvent {
-    return DropEvent{uint32(s._type), uint32(s.timestamp), C.GoString(s.file)}
+    return DropEvent{uint32(s._type), uint32(s.timestamp), C.GoString(s.file), uint32(s.windowID)}
 }
 
  // The "quit requested" event.
@@ -782,6 +807,7 @@ type QuitEvent struct {
      // SDL_QUIT
     Type uint32
 
+     // In milliseconds, populated using SDL_GetTicks()
     Timestamp uint32
 }
 
@@ -800,6 +826,7 @@ type OSEvent struct {
      // SDL_QUIT
     Type uint32
 
+     // In milliseconds, populated using SDL_GetTicks()
     Timestamp uint32
 }
 
@@ -818,6 +845,7 @@ type UserEvent struct {
      // SDL_USEREVENT through SDL_LASTEVENT-1
     Type uint32
 
+     // In milliseconds, populated using SDL_GetTicks()
     Timestamp uint32
 
      // The associated window if any
@@ -1237,7 +1265,7 @@ func (u *Event) SetDgesture(x DollarGestureEvent) {
  // Drag and drop event data
 func (u *Event) Drop() DropEvent {
     p := (*C.SDL_DropEvent)(unsafe.Pointer(u))
-    return DropEvent{uint32(p._type), uint32(p.timestamp), C.GoString(p.file)}
+    return DropEvent{uint32(p._type), uint32(p.timestamp), C.GoString(p.file), uint32(p.windowID)}
 }
 
 func (u *Event) Padding() [56]uint8 {
@@ -1273,7 +1301,7 @@ const (
  // events.
  //   
  //   - If state is set to SDL_IGNORE, that event will be automatically
- //     dropped from the event queue and will not event be filtered.
+ //     dropped from the event queue and will not be filtered.
  //   - If state is set to SDL_ENABLE, that event will be processed normally.
  //   - If state is set to SDL_QUERY, SDL_EventState() will return the current
  //     processing state of the specified event.
@@ -1417,6 +1445,15 @@ const (
 
      // The system requests a file open
     DROPFILE EventType = C.SDL_DROPFILE
+
+     // text/plain drag-and-drop event
+    DROPTEXT EventType = C.SDL_DROPTEXT
+
+     // A new set of drops is beginning (NULL filename)
+    DROPBEGIN EventType = C.SDL_DROPBEGIN
+
+     // Current set of drops is now complete (NULL filename)
+    DROPCOMPLETE EventType = C.SDL_DROPCOMPLETE
 
      // A new audio device is available
     AUDIODEVICEADDED EventType = C.SDL_AUDIODEVICEADDED

@@ -107,16 +107,22 @@ func (dst *RWops) WriteBE64(value uint64) (retval uint64) {
 }
 
 const (
+     // Unknown stream type
     RWOPS_UNKNOWN = C.SDL_RWOPS_UNKNOWN
 
+     // Win32 file
     RWOPS_WINFILE = C.SDL_RWOPS_WINFILE
 
+     // Stdio file
     RWOPS_STDFILE = C.SDL_RWOPS_STDFILE
 
+     // Android asset
     RWOPS_JNIFILE = C.SDL_RWOPS_JNIFILE
 
+     // Memory stream
     RWOPS_MEMORY = C.SDL_RWOPS_MEMORY
 
+     // Read-Only memory stream
     RWOPS_MEMORY_RO = C.SDL_RWOPS_MEMORY_RO
 
      // Seek from the beginning of data
@@ -128,6 +134,7 @@ const (
      // Seek relative to the end of data
     RW_SEEK_END = C.RW_SEEK_END
 )
+
 
 
 

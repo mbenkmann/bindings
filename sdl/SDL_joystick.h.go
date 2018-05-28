@@ -10,8 +10,8 @@ import "unsafe"
  // Include file for SDL joystick event handling
  // 
  // The term "device_index" identifies currently plugged in joystick
- // devices between 0 and SDL_NumJoysticks, with the exact joystick behind
- // a device_index changing as joysticks are plugged and unplugged.
+ // devices between 0 and SDL_NumJoysticks(), with the exact joystick
+ // behind a device_index changing as joysticks are plugged and unplugged.
  // 
  // The term "instance_id" is the current instantiation of a joystick
  // device in the system, if the joystick is removed and then re-inserted
@@ -65,6 +65,35 @@ const (
     HAT_LEFTDOWN = C.SDL_HAT_LEFTDOWN
 )
 
+const (
+    JOYSTICK_AXIS_MAX = C.SDL_JOYSTICK_AXIS_MAX
+
+    JOYSTICK_AXIS_MIN = C.SDL_JOYSTICK_AXIS_MIN
+)
+
+type JoystickType int
+const (
+    JOYSTICK_TYPE_UNKNOWN JoystickType = C.SDL_JOYSTICK_TYPE_UNKNOWN
+
+    JOYSTICK_TYPE_GAMECONTROLLER JoystickType = C.SDL_JOYSTICK_TYPE_GAMECONTROLLER
+
+    JOYSTICK_TYPE_WHEEL JoystickType = C.SDL_JOYSTICK_TYPE_WHEEL
+
+    JOYSTICK_TYPE_ARCADE_STICK JoystickType = C.SDL_JOYSTICK_TYPE_ARCADE_STICK
+
+    JOYSTICK_TYPE_FLIGHT_STICK JoystickType = C.SDL_JOYSTICK_TYPE_FLIGHT_STICK
+
+    JOYSTICK_TYPE_DANCE_PAD JoystickType = C.SDL_JOYSTICK_TYPE_DANCE_PAD
+
+    JOYSTICK_TYPE_GUITAR JoystickType = C.SDL_JOYSTICK_TYPE_GUITAR
+
+    JOYSTICK_TYPE_DRUM_KIT JoystickType = C.SDL_JOYSTICK_TYPE_DRUM_KIT
+
+    JOYSTICK_TYPE_ARCADE_PAD JoystickType = C.SDL_JOYSTICK_TYPE_ARCADE_PAD
+
+    JOYSTICK_TYPE_THROTTLE JoystickType = C.SDL_JOYSTICK_TYPE_THROTTLE
+)
+
 type JoystickPowerLevel int
 const (
     JOYSTICK_POWER_UNKNOWN JoystickPowerLevel = C.SDL_JOYSTICK_POWER_UNKNOWN
@@ -83,8 +112,31 @@ const (
 )
 
 type Joystick C.SDL_Joystick
+ // This is a unique ID for a joystick for the time it is connected to the
+ // system, and is never reused for the lifetime of the application. If
+ // the joystick is disconnected and reconnected, it will get a new ID.
+ // 
+ // The ID value starts at 0 and increments from there. The value -1 is an
+ // invalid ID.
 type JoystickID int32
 
+
+ // Locking for multi-threaded access to the joystick API
+ // 
+ // If you are using the joystick API or handling events from multiple
+ // threads you should use these locking functions to protect access to
+ // the joysticks.
+ // 
+ // In particular, you are guaranteed that the joystick list won't change,
+ // so the API functions that take a joystick index will be valid, and
+ // joystick and game controller events will not be delivered.
+func LockJoysticks() {
+    C.SDL_LockJoysticks()
+}
+
+func UnlockJoysticks() {
+    C.SDL_UnlockJoysticks()
+}
 
  // Count the number of joysticks attached to the system right now
 func NumJoysticks() (retval int) {
@@ -97,6 +149,52 @@ func NumJoysticks() (retval int) {
  // function returns NULL.
 func JoystickNameForIndex(device_index int) (retval string) {
     retval = C.GoString(C.SDL_JoystickNameForIndex(C.int(device_index)))
+    return
+}
+
+ // Return the GUID for the joystick at this index This can be called
+ // before any joysticks are opened.
+func JoystickGetDeviceGUID(device_index int) (retval JoystickGUID) {
+    retval = fromC2JoystickGUID(C.SDL_JoystickGetDeviceGUID(C.int(device_index)))
+    return
+}
+
+ // Get the USB vendor ID of a joystick, if available. This can be called
+ // before any joysticks are opened. If the vendor ID isn't available this
+ // function returns 0.
+func JoystickGetDeviceVendor(device_index int) (retval uint16) {
+    retval = uint16(C.SDL_JoystickGetDeviceVendor(C.int(device_index)))
+    return
+}
+
+ // Get the USB product ID of a joystick, if available. This can be called
+ // before any joysticks are opened. If the product ID isn't available
+ // this function returns 0.
+func JoystickGetDeviceProduct(device_index int) (retval uint16) {
+    retval = uint16(C.SDL_JoystickGetDeviceProduct(C.int(device_index)))
+    return
+}
+
+ // Get the product version of a joystick, if available. This can be
+ // called before any joysticks are opened. If the product version isn't
+ // available this function returns 0.
+func JoystickGetDeviceProductVersion(device_index int) (retval uint16) {
+    retval = uint16(C.SDL_JoystickGetDeviceProductVersion(C.int(device_index)))
+    return
+}
+
+ // Get the type of a joystick, if available. This can be called before
+ // any joysticks are opened.
+func JoystickGetDeviceType(device_index int) (retval JoystickType) {
+    retval = JoystickType(C.SDL_JoystickGetDeviceType(C.int(device_index)))
+    return
+}
+
+ // Get the instance ID of a joystick. This can be called before any
+ // joysticks are opened. If the index is out of range, this function will
+ // return -1.
+func JoystickGetDeviceInstanceID(device_index int) (retval JoystickID) {
+    retval = JoystickID(C.SDL_JoystickGetDeviceInstanceID(C.int(device_index)))
     return
 }
 
@@ -125,20 +223,41 @@ func (joystick *Joystick) Name() (retval string) {
     return
 }
 
- // Return the GUID for the joystick at this index
-func JoystickGetDeviceGUID(device_index int) (retval JoystickGUID) {
-    retval = fromC2JoystickGUID(C.SDL_JoystickGetDeviceGUID(C.int(device_index)))
-    return
-}
-
  // Return the GUID for this opened joystick
 func (joystick *Joystick) GetGUID() (retval JoystickGUID) {
     retval = fromC2JoystickGUID(C.SDL_JoystickGetGUID((*C.SDL_Joystick)(joystick)))
     return
 }
 
+ // Get the USB vendor ID of an opened joystick, if available. If the
+ // vendor ID isn't available this function returns 0.
+func (joystick *Joystick) GetVendor() (retval uint16) {
+    retval = uint16(C.SDL_JoystickGetVendor((*C.SDL_Joystick)(joystick)))
+    return
+}
 
- // convert a string into a joystick formatted guid
+ // Get the USB product ID of an opened joystick, if available. If the
+ // product ID isn't available this function returns 0.
+func (joystick *Joystick) GetProduct() (retval uint16) {
+    retval = uint16(C.SDL_JoystickGetProduct((*C.SDL_Joystick)(joystick)))
+    return
+}
+
+ // Get the product version of an opened joystick, if available. If the
+ // product version isn't available this function returns 0.
+func (joystick *Joystick) GetProductVersion() (retval uint16) {
+    retval = uint16(C.SDL_JoystickGetProductVersion((*C.SDL_Joystick)(joystick)))
+    return
+}
+
+ // Get the type of an opened joystick.
+func (joystick *Joystick) GetType() (retval JoystickType) {
+    retval = JoystickType(C.SDL_JoystickGetType((*C.SDL_Joystick)(joystick)))
+    return
+}
+
+
+ // Convert a string into a joystick guid
 func JoystickGetGUIDFromString(pchGUID string) (retval JoystickGUID) {
     tmp_pchGUID := C.CString(pchGUID); defer C.free(unsafe.Pointer(tmp_pchGUID))
     retval = fromC2JoystickGUID(C.SDL_JoystickGetGUIDFromString((*C.char)(tmp_pchGUID)))
@@ -213,6 +332,22 @@ func JoystickEventState(state int) (retval int) {
  // The axis indices start at index 0.
 func (joystick *Joystick) GetAxis(axis int) (retval int16) {
     retval = int16(C.SDL_JoystickGetAxis((*C.SDL_Joystick)(joystick), C.int(axis)))
+    return
+}
+
+ // Get the initial state of an axis control on a joystick.
+ // 
+ // The state is a value ranging from -32768 to 32767.
+ // 
+ // The axis indices start at index 0.
+ // 
+ // Returns: SDL_TRUE if this axis has any initial value, or SDL_FALSE if
+ // not.
+ // 
+func (joystick *Joystick) GetAxisInitialState(axis int) (retval bool, state int16) {
+    tmp_state := new(C.Sint16)
+    retval = C.SDL_TRUE==(C.SDL_JoystickGetAxisInitialState((*C.SDL_Joystick)(joystick), C.int(axis), (*C.Sint16)(tmp_state)))
+    state = deref_int16_ptr(tmp_state)
     return
 }
 

@@ -11,6 +11,12 @@ import "unsafe"
 
  // The calculated values in this structure are calculated by
  // SDL_OpenAudio().
+ // 
+ // For multi-channel audio, the default SDL channel mapping is: 2: FL FR
+ // (stereo) 3: FL FR LFE (2.1 surround) 4: FL FR BL BR (quad) 5: FL FR FC
+ // BL BR (quad + center) 6: FL FR FC LFE SL SR (5.1 surround - last two
+ // can also be BL BR) 7: FL FR FC LFE BC SL SR (6.1 surround) 8: FL FR FC
+ // LFE BL BR SL SR (7.1 surround)
 type AudioSpec struct {
      // DSP frequency -- samples per second
     Freq int
@@ -24,7 +30,8 @@ type AudioSpec struct {
      // Audio buffer silence value (calculated)
     Silence uint8
 
-     // Audio buffer size in samples (power of 2)
+     // Audio buffer size in sample FRAMES (total samples divided by channel
+     // count)
     Samples uint16
 
      // Necessary for some compile environments
@@ -230,6 +237,13 @@ func UnlockAudioDevice(dev AudioDeviceID) {
 }
 
 const (
+     // Upper limit of filters in SDL_AudioCVT.
+     // 
+     // The maximum number of SDL_AudioFilter functions in SDL_AudioCVT is
+     // currently limited to 9. The SDL_AudioCVT.filters array has 10
+     // pointers, one of which is the terminating NULL pointer.
+    AUDIOCVT_MAX_FILTERS = C.SDL_AUDIOCVT_MAX_FILTERS
+
     MIX_MAXVOLUME = C.SDL_MIX_MAXVOLUME
 )
 
@@ -252,6 +266,8 @@ const (
 type AudioCallback C.SDL_AudioCallback
 
 type AudioFilter C.SDL_AudioFilter
+
+type AudioStream C.SDL_AudioStream
  // Audio format flags.
  // 
  // These are what the 16 bits in SDL_AudioFormat currently mean...
@@ -321,7 +337,8 @@ func GetCurrentAudioDriver() (retval string) {
  //     data structures that it accesses by calling SDL_LockAudio() and
  //     SDL_UnlockAudio() in your code. Alternately, you may pass a NULL
  //     pointer here, and call SDL_QueueAudio() with some frequency, to queue
- //     more audio samples to be played.
+ //     more audio samples to be played (or for capture devices, call
+ //     SDL_DequeueAudio() with some frequency, to obtain audio samples).
  //   - desired->userdata is passed as the first parameter to your callback
  //     function. If you passed a NULL callback, this value is ignored.
  // 
@@ -395,6 +412,197 @@ func OpenAudioDevice(device string, iscapture int, desired *AudioSpec, obtained 
 
 
 
+ // Create a new audio stream
+ // 
+ // Returns: 0 on success, or -1 on error.
+ // 
+ // See also: SDL_AudioStreamPut
+ // 
+ // See also: SDL_AudioStreamGet
+ // 
+ // See also: SDL_AudioStreamAvailable
+ // 
+ // See also: SDL_AudioStreamFlush
+ // 
+ // See also: SDL_AudioStreamClear
+ // 
+ // See also: SDL_FreeAudioStream
+ // 
+ //   src_format
+ //     The format of the source audio
+ //   
+ //   src_channels
+ //     The number of channels of the source audio
+ //   
+ //   src_rate
+ //     The sampling rate of the source audio
+ //   
+ //   dst_format
+ //     The format of the desired audio output
+ //   
+ //   dst_channels
+ //     The number of channels of the desired audio output
+ //   
+ //   dst_rate
+ //     The sampling rate of the desired audio output
+ //   
+func NewAudioStream(src_format AudioFormat, src_channels uint8, src_rate int, dst_format AudioFormat, dst_channels uint8, dst_rate int) (retval *AudioStream) {
+    retval = (*AudioStream)(unsafe.Pointer(C.SDL_NewAudioStream(C.SDL_AudioFormat(src_format), C.Uint8(src_channels), C.int(src_rate), C.SDL_AudioFormat(dst_format), C.Uint8(dst_channels), C.int(dst_rate))))
+    return
+}
+
+ // Add data to be converted/resampled to the stream
+ // 
+ // Returns: 0 on success, or -1 on error.
+ // 
+ // See also: SDL_NewAudioStream
+ // 
+ // See also: SDL_AudioStreamGet
+ // 
+ // See also: SDL_AudioStreamAvailable
+ // 
+ // See also: SDL_AudioStreamFlush
+ // 
+ // See also: SDL_AudioStreamClear
+ // 
+ // See also: SDL_FreeAudioStream
+ // 
+ //   stream
+ //     The stream the audio data is being added to
+ //   
+ //   buf
+ //     A pointer to the audio data to add
+ //   
+ //   len
+ //     The number of bytes to write to the stream
+ //   
+func (stream *AudioStream) Put(buf []byte) (retval int) {
+    var tmp_buf unsafe.Pointer
+    if len(buf) > 0 {
+        tmp_buf = (unsafe.Pointer)(unsafe.Pointer(&(buf[0])))
+    }
+    tmp_len := len(buf)
+    retval = int(C.SDL_AudioStreamPut((*C.SDL_AudioStream)(stream), (tmp_buf), C.int(tmp_len)))
+    return
+}
+
+ // Get converted/resampled data from the stream
+ // 
+ // Returns: The number of bytes read from the stream, or -1 on error
+ // 
+ // See also: SDL_NewAudioStream
+ // 
+ // See also: SDL_AudioStreamPut
+ // 
+ // See also: SDL_AudioStreamAvailable
+ // 
+ // See also: SDL_AudioStreamFlush
+ // 
+ // See also: SDL_AudioStreamClear
+ // 
+ // See also: SDL_FreeAudioStream
+ // 
+ //   stream
+ //     The stream the audio is being requested from
+ //   
+ //   buf
+ //     A buffer to fill with audio data
+ //   
+ //   len
+ //     The maximum number of bytes to fill
+ //   
+func (stream *AudioStream) Get(buf []byte) (retval int) {
+    var tmp_buf unsafe.Pointer
+    if len(buf) > 0 {
+        tmp_buf = (unsafe.Pointer)(unsafe.Pointer(&(buf[0])))
+    }
+    tmp_len := len(buf)
+    retval = int(C.SDL_AudioStreamGet((*C.SDL_AudioStream)(stream), (tmp_buf), C.int(tmp_len)))
+    return
+}
+
+ // Get the number of converted/resampled bytes available. The stream may
+ // be buffering data behind the scenes until it has enough to resample
+ // correctly, so this number might be lower than what you expect, or even
+ // be zero. Add more data or flush the stream if you need the data now.
+ // 
+ // See also: SDL_NewAudioStream
+ // 
+ // See also: SDL_AudioStreamPut
+ // 
+ // See also: SDL_AudioStreamGet
+ // 
+ // See also: SDL_AudioStreamFlush
+ // 
+ // See also: SDL_AudioStreamClear
+ // 
+ // See also: SDL_FreeAudioStream
+ // 
+func (stream *AudioStream) Available() (retval int) {
+    retval = int(C.SDL_AudioStreamAvailable((*C.SDL_AudioStream)(stream)))
+    return
+}
+
+ // Tell the stream that you're done sending data, and anything being
+ // buffered should be converted/resampled and made available immediately.
+ // 
+ // It is legal to add more data to a stream after flushing, but there
+ // will be audio gaps in the output. Generally this is intended to signal
+ // the end of input, so the complete output becomes available.
+ // 
+ // See also: SDL_NewAudioStream
+ // 
+ // See also: SDL_AudioStreamPut
+ // 
+ // See also: SDL_AudioStreamGet
+ // 
+ // See also: SDL_AudioStreamAvailable
+ // 
+ // See also: SDL_AudioStreamClear
+ // 
+ // See also: SDL_FreeAudioStream
+ // 
+func (stream *AudioStream) Flush() (retval int) {
+    retval = int(C.SDL_AudioStreamFlush((*C.SDL_AudioStream)(stream)))
+    return
+}
+
+ // Clear any pending data in the stream without converting it
+ // 
+ // See also: SDL_NewAudioStream
+ // 
+ // See also: SDL_AudioStreamPut
+ // 
+ // See also: SDL_AudioStreamGet
+ // 
+ // See also: SDL_AudioStreamAvailable
+ // 
+ // See also: SDL_AudioStreamFlush
+ // 
+ // See also: SDL_FreeAudioStream
+ // 
+func (stream *AudioStream) Clear() {
+    C.SDL_AudioStreamClear((*C.SDL_AudioStream)(stream))
+}
+
+ // Free an audio stream
+ // 
+ // See also: SDL_NewAudioStream
+ // 
+ // See also: SDL_AudioStreamPut
+ // 
+ // See also: SDL_AudioStreamGet
+ // 
+ // See also: SDL_AudioStreamAvailable
+ // 
+ // See also: SDL_AudioStreamFlush
+ // 
+ // See also: SDL_AudioStreamClear
+ // 
+func (stream *AudioStream) Free() {
+    C.SDL_FreeAudioStream((*C.SDL_AudioStream)(stream))
+}
+
  // This takes two audio buffers of the playing audio format and mixes
  // them, performing addition, volume adjustment, and overflow clipping.
  // The volume ranges from 0 - 128, and should be set to SDL_MIX_MAXVOLUME
@@ -431,6 +639,10 @@ func MixAudioFormat(dst []byte, src []byte, format AudioFormat, volume int) {
 
  // Queue more audio on non-callback devices.
  // 
+ // (If you are looking to retrieve queued audio from a non-callback
+ // capture device, you want SDL_DequeueAudio() instead. This will return
+ // -1 to signify an error if you use it with capture devices.)
+ // 
  // SDL offers two ways to feed audio to the device: you can either supply
  // a callback that SDL triggers with some frequency to obtain more audio
  // (pull method), or you can supply no callback, and then SDL will expect
@@ -456,7 +668,7 @@ func MixAudioFormat(dst []byte, src []byte, format AudioFormat, volume int) {
  // You should not call SDL_LockAudio() on the device before queueing; SDL
  // handles locking internally for this function.
  // 
- // Returns: zero on success, -1 on error.
+ // Returns: 0 on success, or -1 on error.
  // 
  // See also: SDL_GetQueuedAudioSize
  // 
@@ -481,10 +693,73 @@ func QueueAudio(dev AudioDeviceID, data []byte) (retval int) {
     return
 }
 
+ // Dequeue more audio on non-callback devices.
+ // 
+ // (If you are looking to queue audio for output on a non-callback
+ // playback device, you want SDL_QueueAudio() instead. This will always
+ // return 0 if you use it with playback devices.)
+ // 
+ // SDL offers two ways to retrieve audio from a capture device: you can
+ // either supply a callback that SDL triggers with some frequency as the
+ // device records more audio data, (push method), or you can supply no
+ // callback, and then SDL will expect you to retrieve data at regular
+ // intervals (pull method) with this function.
+ // 
+ // There are no limits on the amount of data you can queue, short of
+ // exhaustion of address space. Data from the device will keep queuing as
+ // necessary without further intervention from you. This means you will
+ // eventually run out of memory if you aren't routinely dequeueing data.
+ // 
+ // Capture devices will not queue data when paused; if you are expecting
+ // to not need captured audio for some length of time, use
+ // SDL_PauseAudioDevice() to stop the capture device from queueing more
+ // data. This can be useful during, say, level loading times. When
+ // unpaused, capture devices will start queueing data from that point,
+ // having flushed any capturable data available while paused.
+ // 
+ // This function is thread-safe, but dequeueing from the same device from
+ // two threads at once does not promise which thread will dequeued data
+ // first.
+ // 
+ // You may not dequeue audio from a device that is using an application-
+ // supplied callback; doing so returns an error. You have to use the
+ // audio callback, or dequeue audio with this function, but not both.
+ // 
+ // You should not call SDL_LockAudio() on the device before queueing; SDL
+ // handles locking internally for this function.
+ // 
+ // Returns: number of bytes dequeued, which could be less than requested.
+ // 
+ // See also: SDL_GetQueuedAudioSize
+ // 
+ // See also: SDL_ClearQueuedAudio
+ // 
+ //   dev
+ //     The device ID from which we will dequeue audio.
+ //   
+ //   data
+ //     A pointer into where audio data should be copied.
+ //   
+ //   len
+ //     The number of bytes (not samples!) to which (data) points.
+ //   
+func DequeueAudio(dev AudioDeviceID, data []byte) (retval uint32) {
+    var tmp_data unsafe.Pointer
+    if len(data) > 0 {
+        tmp_data = (unsafe.Pointer)(unsafe.Pointer(&(data[0])))
+    }
+    tmp_len := len(data)
+    retval = uint32(C.SDL_DequeueAudio(C.SDL_AudioDeviceID(dev), (tmp_data), C.Uint32(tmp_len)))
+    return
+}
+
  // Get the number of bytes of still-queued audio.
  // 
+ // For playback device:
+ // 
  // This is the number of bytes that have been queued for playback with
- // SDL_QueueAudio(), but have not yet been sent to the hardware.
+ // SDL_QueueAudio(), but have not yet been sent to the hardware. This
+ // number may shrink at any time, so this only informs of pending data.
  // 
  // Once we've sent it to the hardware, this function can not decide the
  // exact byte boundary of what has been played. It's possible that we
@@ -492,10 +767,17 @@ func QueueAudio(dev AudioDeviceID, data []byte) (retval int) {
  // function, but it hasn't played any of it yet, or maybe half of it,
  // etc.
  // 
+ // For capture devices:
+ // 
+ // This is the number of bytes that have been captured by the device and
+ // are waiting for you to dequeue. This number may grow at any time, so
+ // this only informs of the lower-bound of available data.
+ // 
  // You may not queue audio on a device that is using an application-
  // supplied callback; calling this function on such a device always
- // returns 0. You have to use the audio callback or queue audio with
- // SDL_QueueAudio(), but not both.
+ // returns 0. You have to queue audio with
+ // SDL_QueueAudio()/SDL_DequeueAudio(), or use the audio callback, but
+ // not both.
  // 
  // You should not call SDL_LockAudio() on the device before querying; SDL
  // handles locking internally for this function.
@@ -514,11 +796,17 @@ func GetQueuedAudioSize(dev AudioDeviceID) (retval uint32) {
     return
 }
 
- // Drop any queued audio data waiting to be sent to the hardware.
+ // Drop any queued audio data. For playback devices, this is any queued
+ // data still waiting to be submitted to the hardware. For capture
+ // devices, this is any data that was queued by the device that hasn't
+ // yet been dequeued by the application.
  // 
- // Immediately after this call, SDL_GetQueuedAudioSize() will return 0
- // and the hardware will start playing silence if more audio isn't
- // queued.
+ // Immediately after this call, SDL_GetQueuedAudioSize() will return 0.
+ // For playback devices, the hardware will start playing silence if more
+ // audio isn't queued. Unpaused capture devices will start filling the
+ // queue again as soon as they have more data available (which, depending
+ // on the state of the hardware and the thread, could be before this
+ // function call returns!).
  // 
  // This will not prevent playback of queued audio that's already been
  // sent to the hardware, as we can not undo that, so expect there to be
@@ -528,8 +816,9 @@ func GetQueuedAudioSize(dev AudioDeviceID) (retval uint32) {
  // 
  // You may not queue audio on a device that is using an application-
  // supplied callback; calling this function on such a device is always a
- // no-op. You have to use the audio callback or queue audio with
- // SDL_QueueAudio(), but not both.
+ // no-op. You have to queue audio with
+ // SDL_QueueAudio()/SDL_DequeueAudio(), or use the audio callback, but
+ // not both.
  // 
  // You should not call SDL_LockAudio() on the device before clearing the
  // queue; SDL handles locking internally for this function.

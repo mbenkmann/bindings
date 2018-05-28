@@ -27,6 +27,22 @@ const (
 )
 
 
+ // The formula used for converting between YUV and RGB.
+type YUV_CONVERSION_MODE int
+const (
+     // Full range JPEG
+    YUV_CONVERSION_JPEG YUV_CONVERSION_MODE = C.SDL_YUV_CONVERSION_JPEG
+
+     // BT.601 (the default)
+    YUV_CONVERSION_BT601 YUV_CONVERSION_MODE = C.SDL_YUV_CONVERSION_BT601
+
+     // BT.709
+    YUV_CONVERSION_BT709 YUV_CONVERSION_MODE = C.SDL_YUV_CONVERSION_BT709
+
+     // BT.601 for SD content, BT.709 for HD content
+    YUV_CONVERSION_AUTOMATIC YUV_CONVERSION_MODE = C.SDL_YUV_CONVERSION_AUTOMATIC
+)
+
  // The type of function used for surface blitting functions.
 type Blit C.SDL_blit
 
@@ -68,6 +84,11 @@ func CreateRGBSurface(flags uint32, width int, height int, depth int, Rmask uint
     return
 }
 
+func CreateRGBSurfaceWithFormat(flags uint32, width int, height int, depth int, format uint32) (retval *Surface) {
+    retval = (*Surface)(unsafe.Pointer(C.SDL_CreateRGBSurfaceWithFormat(C.Uint32(flags), C.int(width), C.int(height), C.int(depth), C.Uint32(format))))
+    return
+}
+
 func CreateRGBSurfaceFrom(pixels []byte, width int, height int, depth int, pitch int, Rmask uint32, Gmask uint32, Bmask uint32, Amask uint32) (retval *Surface) {
     checkParametersForSDL_CreateRGBSurfaceFrom(pixels, width, height, depth, pitch, Rmask, Gmask, Bmask, Amask)
     var tmp_pixels unsafe.Pointer
@@ -75,6 +96,16 @@ func CreateRGBSurfaceFrom(pixels []byte, width int, height int, depth int, pitch
         tmp_pixels = (unsafe.Pointer)(unsafe.Pointer(&(pixels[0])))
     }
     retval = (*Surface)(unsafe.Pointer(C.SDL_CreateRGBSurfaceFrom((tmp_pixels), C.int(width), C.int(height), C.int(depth), C.int(pitch), C.Uint32(Rmask), C.Uint32(Gmask), C.Uint32(Bmask), C.Uint32(Amask))))
+    return
+}
+
+func CreateRGBSurfaceWithFormatFrom(pixels []byte, width int, height int, depth int, pitch int, format uint32) (retval *Surface) {
+    checkParametersForSDL_CreateRGBSurfaceWithFormatFrom(pixels, width, height, depth, pitch, format)
+    var tmp_pixels unsafe.Pointer
+    if len(pixels) > 0 {
+        tmp_pixels = (unsafe.Pointer)(unsafe.Pointer(&(pixels[0])))
+    }
+    retval = (*Surface)(unsafe.Pointer(C.SDL_CreateRGBSurfaceWithFormatFrom((tmp_pixels), C.int(width), C.int(height), C.int(depth), C.int(pitch), C.Uint32(format))))
     return
 }
 
@@ -137,6 +168,12 @@ func LoadBMP_RW(src *RWops, freesrc int) (retval *Surface) {
 }
 
  // Save a surface to a seekable SDL data stream (memory or file).
+ // 
+ // Surfaces with a 24-bit, 32-bit and paletted 8-bit format get saved in
+ // the BMP directly. Other RGB formats with 8-bit or higher get converted
+ // to a 24-bit surface or, if they have an alpha mask or a colorkey, to a
+ // 32-bit surface before they are saved. YUV and paletted 1-bit and 4-bit
+ // formats are not supported.
  // 
  // If freedst is non-zero, the stream will be closed after being written.
  // 
@@ -350,6 +387,11 @@ func (surface *Surface) GetClipRect() (rect Rect) {
     return
 }
 
+func (surface *Surface) Duplicate() (retval *Surface) {
+    retval = (*Surface)(unsafe.Pointer(C.SDL_DuplicateSurface((*C.SDL_Surface)(surface))))
+    return
+}
+
  // Creates a new surface of the specified format, and then copies and
  // maps the given surface to it so the blit of the converted surface will
  // be as fast as possible. If this function fails, it returns NULL.
@@ -461,5 +503,24 @@ func LowerBlitScaled(src *Surface, srcrect Rect, dst *Surface, dstrect Rect) (re
     tmp_srcrect := toCFromRect(srcrect)
     tmp_dstrect := toCFromRect(dstrect)
     retval = int(C.SDL_LowerBlitScaled((*C.SDL_Surface)(src), (*C.SDL_Rect)(&tmp_srcrect), (*C.SDL_Surface)(dst), (*C.SDL_Rect)(&tmp_dstrect)))
+    return
+}
+
+ // Set the YUV conversion mode.
+func SetYUVConversionMode(mode YUV_CONVERSION_MODE) {
+    C.SDL_SetYUVConversionMode(C.SDL_YUV_CONVERSION_MODE(mode))
+}
+
+ // Get the YUV conversion mode.
+func GetYUVConversionMode() (retval YUV_CONVERSION_MODE) {
+    retval = YUV_CONVERSION_MODE(C.SDL_GetYUVConversionMode())
+    return
+}
+
+ // Get the YUV conversion mode, returning the correct mode for the
+ // resolution when the current conversion mode is
+ // SDL_YUV_CONVERSION_AUTOMATIC.
+func GetYUVConversionModeForResolution(width int, height int) (retval YUV_CONVERSION_MODE) {
+    retval = YUV_CONVERSION_MODE(C.SDL_GetYUVConversionModeForResolution(C.int(width), C.int(height)))
     return
 }

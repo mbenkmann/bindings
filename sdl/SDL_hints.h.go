@@ -45,7 +45,7 @@ const (
      // is used.
      // 
      // This variable is case insensitive and can be set to the following
-     // values: "direct3d" "opengl" "opengles2" "opengles" "software"
+     // values: "direct3d" "opengl" "opengles2" "opengles" "metal" "software"
      // 
      // The default varies by platform, but it's the first one in the list
      // that is available on the current platform.
@@ -79,6 +79,17 @@ const (
      // 
      // By default, SDL does not use Direct3D Debug Layer.
     HINT_RENDER_DIRECT3D11_DEBUG = C.SDL_HINT_RENDER_DIRECT3D11_DEBUG
+
+     // A variable controlling the scaling policy for
+     // SDL_RenderSetLogicalSize.
+     // 
+     // This variable can be set to the following values: "0" or "letterbox" -
+     // Uses letterbox/sidebars to fit the entire rendering on screen "1" or
+     // "overscan" - Will zoom the rendering so it fills the entire screen,
+     // allowing edges to be drawn offscreen
+     // 
+     // By default letterbox is used
+    HINT_RENDER_LOGICAL_SIZE_MODE = C.SDL_HINT_RENDER_LOGICAL_SIZE_MODE
 
      // A variable controlling the scaling quality.
      // 
@@ -147,6 +158,15 @@ const (
      // app is hung. The hint is checked in CreateWindow.
     HINT_VIDEO_X11_NET_WM_PING = C.SDL_HINT_VIDEO_X11_NET_WM_PING
 
+     // A variable controlling whether the X11 _NET_WM_BYPASS_COMPOSITOR hint
+     // should be used.
+     // 
+     // This variable can be set to the following values: "0" - Disable
+     // _NET_WM_BYPASS_COMPOSITOR "1" - Enable _NET_WM_BYPASS_COMPOSITOR
+     // 
+     // By default SDL will use _NET_WM_BYPASS_COMPOSITOR
+    HINT_VIDEO_X11_NET_WM_BYPASS_COMPOSITOR = C.SDL_HINT_VIDEO_X11_NET_WM_BYPASS_COMPOSITOR
+
      // A variable controlling whether the window frame and title bar are
      // interactive when the cursor is hidden.
      // 
@@ -157,6 +177,12 @@ const (
      // By default SDL will allow interaction with the window frame when the
      // cursor is hidden
     HINT_WINDOW_FRAME_USABLE_WHILE_CURSOR_HIDDEN = C.SDL_HINT_WINDOW_FRAME_USABLE_WHILE_CURSOR_HIDDEN
+
+     // A variable to specify custom icon resource id from RC file on Windows
+     // platform.
+    HINT_WINDOWS_INTRESOURCE_ICON = C.SDL_HINT_WINDOWS_INTRESOURCE_ICON
+
+    HINT_WINDOWS_INTRESOURCE_ICON_SMALL = C.SDL_HINT_WINDOWS_INTRESOURCE_ICON_SMALL
 
      // A variable controlling whether the windows message loop is processed
      // by SDL.
@@ -177,6 +203,14 @@ const (
      // work.
     HINT_GRAB_KEYBOARD = C.SDL_HINT_GRAB_KEYBOARD
 
+     // A variable setting the speed scale for mouse motion, in floating
+     // point, when the mouse is not in relative mode.
+    HINT_MOUSE_NORMAL_SPEED_SCALE = C.SDL_HINT_MOUSE_NORMAL_SPEED_SCALE
+
+     // A variable setting the scale for mouse motion, in floating point, when
+     // the mouse is in relative mode.
+    HINT_MOUSE_RELATIVE_SPEED_SCALE = C.SDL_HINT_MOUSE_RELATIVE_SPEED_SCALE
+
      // A variable controlling whether relative mouse mode is implemented
      // using mouse warping.
      // 
@@ -185,6 +219,25 @@ const (
      // 
      // By default SDL will use raw input for relative mouse mode
     HINT_MOUSE_RELATIVE_MODE_WARP = C.SDL_HINT_MOUSE_RELATIVE_MODE_WARP
+
+     // Allow mouse click events when clicking to focus an SDL window.
+     // 
+     // This variable can be set to the following values: "0" - Ignore mouse
+     // clicks that activate a window "1" - Generate events for mouse clicks
+     // that activate a window
+     // 
+     // By default SDL will ignore mouse clicks that activate a window
+    HINT_MOUSE_FOCUS_CLICKTHROUGH = C.SDL_HINT_MOUSE_FOCUS_CLICKTHROUGH
+
+     // A variable controlling whether touch events should generate synthetic
+     // mouse events.
+     // 
+     // This variable can be set to the following values: "0" - Touch events
+     // will not generate mouse events "1" - Touch events will generate mouse
+     // events
+     // 
+     // By default SDL will generate mouse events for touch events
+    HINT_TOUCH_MOUSE_EVENTS = C.SDL_HINT_TOUCH_MOUSE_EVENTS
 
      // Minimize your SDL_Window if it loses key focus when in fullscreen
      // mode. Defaults to true.
@@ -197,7 +250,7 @@ const (
      // input this is problematic. This functionality can be disabled by
      // setting this hint.
      // 
-     // As of SDL 2.0.4, SDL_EnableScreenSaver and SDL_DisableScreenSaver
+     // As of SDL 2.0.4, SDL_EnableScreenSaver() and SDL_DisableScreenSaver()
      // accomplish the same thing on iOS. They should be preferred over this
      // hint.
      // 
@@ -214,14 +267,56 @@ const (
      // "LandscapeLeft", "LandscapeRight", "Portrait" "PortraitUpsideDown"
     HINT_ORIENTATIONS = C.SDL_HINT_ORIENTATIONS
 
-     // A variable controlling whether the Android / iOS built-in
-     // accelerometer should be listed as a joystick device, rather than
-     // listing actual joysticks only.
+     // A variable controlling whether controllers used with the Apple TV
+     // generate UI events.
      // 
-     // This variable can be set to the following values: "0" - List only real
-     // joysticks and accept input from them "1" - List real joysticks along
-     // with the accelerometer as if it were a 3 axis joystick (the default).
+     // When UI events are generated by controller input, the app will be
+     // backgrounded when the Apple TV remote's menu button is pressed, and
+     // when the pause or B buttons on gamepads are pressed.
+     // 
+     // More information about properly making use of controllers for the
+     // Apple TV can be found here: https://developer.apple.com/tvos/human-
+     // interface-guidelines/remote-and-controllers/
+     // 
+     // This variable can be set to the following values: "0" - Controller
+     // input does not generate UI events (the default). "1" - Controller
+     // input generates UI events.
+    HINT_APPLE_TV_CONTROLLER_UI_EVENTS = C.SDL_HINT_APPLE_TV_CONTROLLER_UI_EVENTS
+
+     // A variable controlling whether the Apple TV remote's joystick axes
+     // will automatically match the rotation of the remote.
+     // 
+     // This variable can be set to the following values: "0" - Remote
+     // orientation does not affect joystick axes (the default). "1" -
+     // Joystick axes are based on the orientation of the remote.
+    HINT_APPLE_TV_REMOTE_ALLOW_ROTATION = C.SDL_HINT_APPLE_TV_REMOTE_ALLOW_ROTATION
+
+     // A variable controlling whether the home indicator bar on iPhone X
+     // should be hidden.
+     // 
+     // This variable can be set to the following values: "0" - The indicator
+     // bar is not hidden (default for windowed applications) "1" - The
+     // indicator bar is hidden and is shown when the screen is touched
+     // (useful for movie playback applications) "2" - The indicator bar is
+     // dim and the first swipe makes it visible and the second swipe performs
+     // the "home" action (default for fullscreen applications)
+    HINT_IOS_HIDE_HOME_INDICATOR = C.SDL_HINT_IOS_HIDE_HOME_INDICATOR
+
+     // A variable controlling whether the Android / iOS built-in
+     // accelerometer should be listed as a joystick device.
+     // 
+     // This variable can be set to the following values: "0" - The
+     // accelerometer is not listed as a joystick "1" - The accelerometer is
+     // available as a 3 axis joystick (the default).
     HINT_ACCELEROMETER_AS_JOYSTICK = C.SDL_HINT_ACCELEROMETER_AS_JOYSTICK
+
+     // A variable controlling whether the Android / tvOS remotes should be
+     // listed as joystick devices, instead of sending keyboard events.
+     // 
+     // This variable can be set to the following values: "0" - Remotes send
+     // enter/escape/arrow key events "1" - Remotes are available as 2 axis, 2
+     // button joysticks (the default).
+    HINT_TV_REMOTE_AS_JOYSTICK = C.SDL_HINT_TV_REMOTE_AS_JOYSTICK
 
      // A variable that lets you disable the detection and use of Xinput
      // gamepad devices.
@@ -250,6 +345,10 @@ const (
      // You can update mappings after the system is initialized with
      // SDL_GameControllerMappingForGUID() and SDL_GameControllerAddMapping()
     HINT_GAMECONTROLLERCONFIG = C.SDL_HINT_GAMECONTROLLERCONFIG
+
+    HINT_GAMECONTROLLER_IGNORE_DEVICES = C.SDL_HINT_GAMECONTROLLER_IGNORE_DEVICES
+
+    HINT_GAMECONTROLLER_IGNORE_DEVICES_EXCEPT = C.SDL_HINT_GAMECONTROLLER_IGNORE_DEVICES_EXCEPT
 
      // A variable that lets you enable joystick (and gamecontroller) events
      // even when your app is in the background.
@@ -286,6 +385,35 @@ const (
      // The default value is "1". This hint may be set at any time.
     HINT_TIMER_RESOLUTION = C.SDL_HINT_TIMER_RESOLUTION
 
+     // A variable describing the content orientation on QtWayland-based
+     // platforms.
+     // 
+     // On QtWayland platforms, windows are rotated client-side to allow for
+     // custom transitions. In order to correctly position overlays (e.g.
+     // volume bar) and gestures (e.g. events view, close/minimize gestures),
+     // the system needs to know in which orientation the application is
+     // currently drawing its contents.
+     // 
+     // This does not cause the window to be rotated or resized, the
+     // application needs to take care of drawing the content in the right
+     // orientation (the framebuffer is always in portrait mode).
+     // 
+     // This variable can be one of the following values: "primary" (default),
+     // "portrait", "landscape", "inverted-portrait", "inverted-landscape"
+    HINT_QTWAYLAND_CONTENT_ORIENTATION = C.SDL_HINT_QTWAYLAND_CONTENT_ORIENTATION
+
+     // Flags to set on QtWayland windows to integrate with the native window
+     // manager.
+     // 
+     // On QtWayland platforms, this hint controls the flags to set on the
+     // windows. For example, on Sailfish OS "OverridesSystemGestures"
+     // disables swipe gestures.
+     // 
+     // This variable is a space-separated list of the following values (empty
+     // = no flags): "OverridesSystemGestures", "StaysOnTop",
+     // "BypassWindowManager"
+    HINT_QTWAYLAND_WINDOW_FLAGS = C.SDL_HINT_QTWAYLAND_WINDOW_FLAGS
+
      // A string specifying SDL's threads stack size in bytes or "0" for the
      // backend's default size.
      // 
@@ -294,7 +422,7 @@ const (
      // against a non glibc libc library (such as musl) which provides a
      // relatively small default thread stack size (a few kilobytes versus the
      // default 8MB glibc uses). Support for this hint is currently available
-     // only in the pthread backend.
+     // only in the pthread, Windows, and PSP backend.
     HINT_THREAD_STACK_SIZE = C.SDL_HINT_THREAD_STACK_SIZE
 
      // If set to 1, then do not allow high-DPI windows. ("Retina" on Mac and
@@ -354,7 +482,7 @@ const (
      // can point to the app's privacy policy.
      // 
      // To setup a URL to an app's privacy policy, set
-     // SDL_HINT_WINRT_PRIVACY_POLICY_URL before calling any SDL_Init
+     // SDL_HINT_WINRT_PRIVACY_POLICY_URL before calling any SDL_Init()
      // functions. The contents of the hint should be a valid URL. For
      // example, "http://www.example.com".
      // 
@@ -387,7 +515,7 @@ const (
      // The contents of this hint should be encoded as a UTF8 string.
      // 
      // The default value is "Privacy Policy". This hint should only be set
-     // during app initialization, preferably before any calls to SDL_Init.
+     // during app initialization, preferably before any calls to SDL_Init().
      // 
      // For additional information on linking to a privacy policy, see the
      // documentation for SDL_HINT_WINRT_PRIVACY_POLICY_URL.
@@ -519,6 +647,17 @@ const (
      // time.
     HINT_ANDROID_SEPARATE_MOUSE_AND_TOUCH = C.SDL_HINT_ANDROID_SEPARATE_MOUSE_AND_TOUCH
 
+     // A variable to control whether the return key on the soft keyboard
+     // should hide the soft keyboard on Android and iOS.
+     // 
+     // The variable can be set to the following values: "0" - The return key
+     // will be handled as a key event. This is the behaviour of SDL <= 2.0.3.
+     // (default) "1" - The return key will hide the keyboard.
+     // 
+     // The value of this hint is used at runtime, so it can be changed at any
+     // time.
+    HINT_RETURN_KEY_HIDES_IME = C.SDL_HINT_RETURN_KEY_HIDES_IME
+
      // override the binding element for keyboard inputs for Emscripten builds
      // 
      // This hint only applies to the emscripten platform
@@ -546,6 +685,132 @@ const (
      // generate a window-close event when it sees Alt+F4. "1" - SDL will only
      // do normal key handling for Alt+F4.
     HINT_WINDOWS_NO_CLOSE_ON_ALT_F4 = C.SDL_HINT_WINDOWS_NO_CLOSE_ON_ALT_F4
+
+     // Prevent SDL from using version 4 of the bitmap header when saving
+     // BMPs.
+     // 
+     // The bitmap header version 4 is required for proper alpha channel
+     // support and SDL will use it when required. Should this not be desired,
+     // this hint can force the use of the 40 byte header version which is
+     // supported everywhere.
+     // 
+     // The variable can be set to the following values: "0" - Surfaces with a
+     // colorkey or an alpha channel are saved to a 32-bit BMP file with an
+     // alpha mask. SDL will use the bitmap header version 4 and set the alpha
+     // mask accordingly. "1" - Surfaces with a colorkey or an alpha channel
+     // are saved to a 32-bit BMP file without an alpha mask. The alpha
+     // channel data will be in the file, but applications are going to ignore
+     // it.
+     // 
+     // The default value is "0".
+    HINT_BMP_SAVE_LEGACY_FORMAT = C.SDL_HINT_BMP_SAVE_LEGACY_FORMAT
+
+     // Tell SDL not to name threads on Windows with the 0x406D1388 Exception.
+     // The 0x406D1388 Exception is a trick used to inform Visual Studio of a
+     // thread's name, but it tends to cause problems with other debuggers,
+     // and the .NET runtime. Note that SDL 2.0.6 and later will still use the
+     // (safer) SetThreadDescription API, introduced in the Windows 10
+     // Creators Update, if available.
+     // 
+     // The variable can be set to the following values: "0" - SDL will raise
+     // the 0x406D1388 Exception to name threads. This is the default behavior
+     // of SDL <= 2.0.4. "1" - SDL will not raise this exception, and threads
+     // will be unnamed. (default) This is necessary with .NET languages or
+     // debuggers that aren't Visual Studio.
+    HINT_WINDOWS_DISABLE_THREAD_NAMING = C.SDL_HINT_WINDOWS_DISABLE_THREAD_NAMING
+
+     // Tell SDL which Dispmanx layer to use on a Raspberry PI.
+     // 
+     // Also known as Z-order. The variable can take a negative or positive
+     // value. The default is 10000.
+    HINT_RPI_VIDEO_LAYER = C.SDL_HINT_RPI_VIDEO_LAYER
+
+     // Tell the video driver that we only want a double buffer.
+     // 
+     // By default, most lowlevel 2D APIs will use a triple buffer scheme that
+     // wastes no CPU time on waiting for vsync after issuing a flip, but
+     // introduces a frame of latency. On the other hand, using a double
+     // buffer scheme instead is recommended for cases where low latency is an
+     // important factor because we save a whole frame of latency. We do so by
+     // waiting for vsync immediately after issuing a flip, usually just after
+     // eglSwapBuffers call in the backend's *_SwapWindow function.
+     // 
+     // Since it's driver-specific, it's only supported where possible and
+     // implemented. Currently supported the following drivers:
+     //   
+     //   - KMSDRM (kmsdrm)
+     //   - Raspberry Pi (raspberrypi)
+    HINT_VIDEO_DOUBLE_BUFFER = C.SDL_HINT_VIDEO_DOUBLE_BUFFER
+
+     // A variable controlling what driver to use for OpenGL ES contexts.
+     // 
+     // On some platforms, currently Windows and X11, OpenGL drivers may
+     // support creating contexts with an OpenGL ES profile. By default SDL
+     // uses these profiles, when available, otherwise it attempts to load an
+     // OpenGL ES library, e.g. that provided by the ANGLE project. This
+     // variable controls whether SDL follows this default behaviour or will
+     // always load an OpenGL ES library.
+     // 
+     // Circumstances where this is useful include
+     //   
+     //   - Testing an app with a particular OpenGL ES implementation, e.g ANGLE,
+     //     or emulator, e.g. those from ARM, Imagination or Qualcomm.
+     //   - Resolving OpenGL ES function addresses at link time by linking with
+     //     the OpenGL ES library instead of querying them at run time with
+     //     SDL_GL_GetProcAddress().
+     // 
+     // Caution: for an application to work with the default behaviour across
+     // different OpenGL drivers it must query the OpenGL ES function
+     // addresses at run time using SDL_GL_GetProcAddress().
+     // 
+     // This variable is ignored on most platforms because OpenGL ES is native
+     // or not supported.
+     // 
+     // This variable can be set to the following values: "0" - Use ES profile
+     // of OpenGL, if available. (Default when not set.) "1" - Load OpenGL ES
+     // library using the default library names.
+    HINT_OPENGL_ES_DRIVER = C.SDL_HINT_OPENGL_ES_DRIVER
+
+     // A variable controlling speed/quality tradeoff of audio resampling.
+     // 
+     // If available, SDL can use libsamplerate ( http://www.mega-
+     // nerd.com/SRC/ ) to handle audio resampling. There are different
+     // resampling modes available that produce different levels of quality,
+     // using more CPU.
+     // 
+     // If this hint isn't specified to a valid setting, or libsamplerate
+     // isn't available, SDL will use the default, internal resampling
+     // algorithm.
+     // 
+     // Note that this is currently only applicable to resampling audio that
+     // is being written to a device for playback or audio being read from a
+     // device for capture. SDL_AudioCVT always uses the default resampler
+     // (although this might change for SDL 2.1).
+     // 
+     // This hint is currently only checked at audio subsystem initialization.
+     // 
+     // This variable can be set to the following values:
+     // 
+     // "0" or "default" - Use SDL's internal resampling (Default when not set
+     // - low quality, fast) "1" or "fast" - Use fast, slightly higher quality
+     // resampling, if available "2" or "medium" - Use medium quality
+     // resampling, if available "3" or "best" - Use high quality resampling,
+     // if available
+    HINT_AUDIO_RESAMPLING_MODE = C.SDL_HINT_AUDIO_RESAMPLING_MODE
+
+     // A variable controlling the audio category on iOS and Mac OS X.
+     // 
+     // This variable can be set to the following values:
+     // 
+     // "ambient" - Use the AVAudioSessionCategoryAmbient audio category, will
+     // be muted by the phone mute switch (default) "playback" - Use the
+     // AVAudioSessionCategoryPlayback category
+     // 
+     // For more information, see Apple's documentation: https://developer.app
+     // le.com/library/content/documentation/Audio/Conceptual/AudioSessionProg
+     // rammingGuide/AudioSessionCategoriesandModes/AudioSessionCategoriesandM
+     // odes.html
+    HINT_AUDIO_CATEGORY = C.SDL_HINT_AUDIO_CATEGORY
 )
 
  // An enumeration of hint priorities.
@@ -558,17 +823,7 @@ const (
     HINT_OVERRIDE HintPriority = C.SDL_HINT_OVERRIDE
 )
 
- // Add a function to watch a particular hint.
- // 
- //   name
- //     The hint to watch
- //   
- //   callback
- //     The function to call when the hint value changes
- //   
- //   userdata
- //     A pointer to pass to the callback function
- //   
+ // type definition of the hint callback function.
 type HintCallback C.SDL_HintCallback
 
 
@@ -608,6 +863,27 @@ func GetHint(name string) (retval string) {
     return
 }
 
+ // Get a hint.
+ // 
+ // Returns: The boolean value of a hint variable.
+ // 
+func GetHintBoolean(name string, default_value bool) (retval bool) {
+    tmp_name := C.CString(name); defer C.free(unsafe.Pointer(tmp_name))
+    retval = C.SDL_TRUE==(C.SDL_GetHintBoolean((*C.char)(tmp_name), bool2bool(default_value)))
+    return
+}
+
+ // Add a function to watch a particular hint.
+ // 
+ //   name
+ //     The hint to watch
+ //   
+ //   callback
+ //     The function to call when the hint value changes
+ //   
+ //   userdata
+ //     A pointer to pass to the callback function
+ //   
 func AddHintCallback(name string, callback HintCallback, userdata uintptr) {
     tmp_name := C.CString(name); defer C.free(unsafe.Pointer(tmp_name))
     C.SDL_AddHintCallback((*C.char)(tmp_name), C.SDL_HintCallback(callback), unsafe.Pointer(userdata))

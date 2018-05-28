@@ -31,7 +31,7 @@ const (
     BUTTON_X2MASK = C.SDL_BUTTON_X2MASK
 )
 
- // Cursor types for SDL_CreateSystemCursor.
+ // Cursor types for SDL_CreateSystemCursor().
 type SystemCursor int
 const (
      // Arrow
@@ -83,6 +83,7 @@ const (
     MOUSEWHEEL_FLIPPED MouseWheelDirection = C.SDL_MOUSEWHEEL_FLIPPED
 )
 
+ // Implementation dependent
 type Cursor C.SDL_Cursor
 
 
@@ -293,9 +294,13 @@ func GetDefaultCursor() (retval *Cursor) {
     return
 }
 
- // Frees a cursor created with SDL_CreateCursor().
+ // Frees a cursor created with SDL_CreateCursor() or similar functions.
  // 
  // See also: SDL_CreateCursor()
+ // 
+ // See also: SDL_CreateColorCursor()
+ // 
+ // See also: SDL_CreateSystemCursor()
  // 
 func (cursor *Cursor) Free() {
     C.SDL_FreeCursor((*C.SDL_Cursor)(cursor))

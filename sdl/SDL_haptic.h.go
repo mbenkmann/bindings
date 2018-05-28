@@ -7,13 +7,13 @@ package sdl
 import "C"
 import "unsafe"
 
- // The SDL Haptic subsystem allows you to control haptic (force feedback)
+ // The SDL haptic subsystem allows you to control haptic (force feedback)
  // devices.
  // 
  // The basic usage is as follows:
  //   
- //   - Initialize the Subsystem (SDL_INIT_HAPTIC).
- //   - Open a Haptic Device. SDL_HapticOpen() to open from
+ //   - Initialize the subsystem (SDL_INIT_HAPTIC).
+ //   - Open a haptic device. SDL_HapticOpen() to open from
  //     index.SDL_HapticOpenFromJoystick() to open from an existing joystick.
  //   - Create an effect (SDL_HapticEffect).
  //   - Upload the effect with SDL_HapticNewEffect().
@@ -205,7 +205,7 @@ func toCFromHapticDirection(s HapticDirection) (d C.SDL_HapticDirection) {
 
  // A structure containing a template for a Constant effect.
  // 
- // The struct is exclusive to the SDL_HAPTIC_CONSTANT effect.
+ // This struct is exclusively for the SDL_HAPTIC_CONSTANT effect.
  // 
  // A constant effect applies a constant force in the specified direction
  // to the joystick.
@@ -941,13 +941,15 @@ const (
 
      // Device can be queried for effect status.
      // 
-     // Device can be queried for effect status.
+     // Device supports querying effect status.
      // 
      // See also: SDL_HapticGetEffectStatus
      // 
     HAPTIC_STATUS = C.SDL_HAPTIC_STATUS
 
      // Device can be paused.
+     // 
+     // Devices supports being paused.
      // 
      // See also: SDL_HapticPause
      // 
@@ -982,7 +984,7 @@ func NumHaptics() (retval int) {
     return
 }
 
- // Get the implementation dependent name of a Haptic device.
+ // Get the implementation dependent name of a haptic device.
  // 
  // This can be called before any joysticks are opened. If no name can be
  // found, this function returns NULL.
@@ -999,9 +1001,9 @@ func HapticName(device_index int) (retval string) {
     return
 }
 
- // Opens a Haptic device for usage.
+ // Opens a haptic device for use.
  // 
- // The index passed as an argument refers to the N'th Haptic device on
+ // The index passed as an argument refers to the N'th haptic device on
  // this system.
  // 
  // When opening a haptic device, its gain will be set to maximum and
@@ -1092,8 +1094,8 @@ func HapticOpenFromMouse() (retval *Haptic) {
 
  // Checks to see if a joystick has haptic features.
  // 
- // Returns: 1 if the joystick is haptic, 0 if it isn't or -1 if an error
- // ocurred.
+ // Returns: SDL_TRUE if the joystick is haptic, SDL_FALSE if it isn't or
+ // -1 if an error occurred.
  // 
  // See also: SDL_HapticOpenFromJoystick
  // 
@@ -1105,7 +1107,7 @@ func (joystick *Joystick) IsHaptic() (retval int) {
     return
 }
 
- // Opens a Haptic device for usage from a Joystick device.
+ // Opens a haptic device for use from a joystick device.
  // 
  // You must still close the haptic device separately. It will not be
  // closed with the joystick.
@@ -1129,7 +1131,7 @@ func (joystick *Joystick) HapticOpenFrom() (retval *Haptic) {
     return
 }
 
- // Closes a Haptic device previously opened with SDL_HapticOpen().
+ // Closes a haptic device previously opened with SDL_HapticOpen().
  // 
  //   haptic
  //     Haptic device to close.
@@ -1184,7 +1186,7 @@ func (haptic *Haptic) NumEffectsPlaying() (retval int) {
  // 
  // Example:
  //   if (SDL_HapticQuery(haptic) & SDL_HAPTIC_CONSTANT) {
- //       printf("We have constant haptic effect!");
+ //       printf("We have constant haptic effect!\n");
  //   }
  // 
  // Returns: Haptic features in bitwise manner (OR'd).
@@ -1232,7 +1234,7 @@ func (haptic *Haptic) EffectSupported(effect *HapticEffect) (retval int) {
 
  // Creates a new haptic effect on the device.
  // 
- // Returns: The id of the effect on success or -1 on error.
+ // Returns: The identifier of the effect on success or -1 on error.
  // 
  // See also: SDL_HapticUpdateEffect
  // 
@@ -1253,7 +1255,7 @@ func (haptic *Haptic) NewEffect(effect *HapticEffect) (retval int) {
 
  // Updates the properties of an effect.
  // 
- // Can be used dynamically, although behaviour when dynamically changing
+ // Can be used dynamically, although behavior when dynamically changing
  // direction may be strange. Specifically the effect may reupload itself
  // and start playing from the start. You cannot change the type either
  // when running SDL_HapticUpdateEffect().
@@ -1270,7 +1272,7 @@ func (haptic *Haptic) NewEffect(effect *HapticEffect) (retval int) {
  //     Haptic device that has the effect.
  //   
  //   effect
- //     Effect to update.
+ //     Identifier of the effect to update.
  //   
  //   data
  //     New effect properties to use.

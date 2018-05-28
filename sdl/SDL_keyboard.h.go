@@ -118,7 +118,7 @@ func GetScancodeFromName(name string) (retval Scancode) {
  // must copy it. If the key doesn't have a name, this function returns an
  // empty string ("").
  // 
- // See also: SDL_Key
+ // See also: SDL_Keycode
  // 
 func GetKeyName(key Keycode) (retval string) {
     retval = C.GoString(C.SDL_GetKeyName(C.SDL_Keycode(key)))

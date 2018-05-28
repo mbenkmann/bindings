@@ -22,13 +22,13 @@ type WindowShapeMode struct {
  // A union containing parameters for shaped windows.
 type WindowShapeParams C.SDL_WindowShapeParams
 
- // a cutoff alpha value for binarization of the window shape's alpha
+ // A cutoff alpha value for binarization of the window shape's alpha
  // channel.
 func (u *WindowShapeParams) BinarizationCutoff() uint8 {
     p := (*C.Uint8)(unsafe.Pointer(u))
     return uint8(*p)
 }
- // a cutoff alpha value for binarization of the window shape's alpha
+ // A cutoff alpha value for binarization of the window shape's alpha
  // channel.
 func (u *WindowShapeParams) SetBinarizationCutoff(x uint8) {
     p := (*C.Uint8)(unsafe.Pointer(u))
@@ -128,9 +128,9 @@ func (window *Window) IsShaped() (retval bool) {
 
  // Set the shape and parameters of a shaped window.
  // 
- // Returns: 0 on success, SDL_INVALID_SHAPE_ARGUMENT on invalid an
- // invalid shape argument, or SDL_NONSHAPEABLE_WINDOW if the SDL_Window*
- // given does not reference a valid shaped window.
+ // Returns: 0 on success, SDL_INVALID_SHAPE_ARGUMENT on an invalid shape
+ // argument, or SDL_NONSHAPEABLE_WINDOW if the SDL_Window given does not
+ // reference a valid shaped window.
  // 
  // See also: SDL_WindowShapeMode
  // 
@@ -156,7 +156,7 @@ func (window *Window) SetShape(shape *Surface, shape_mode *WindowShapeMode) (ret
  // Returns: 0 if the window has a shape and, provided shape_mode was not
  // NULL, shape_mode has been filled with the mode data,
  // SDL_NONSHAPEABLE_WINDOW if the SDL_Window given is not a shaped
- // window, or SDL_WINDOW_LACKS_SHAPE if the SDL_Window* given is a
+ // window, or SDL_WINDOW_LACKS_SHAPE if the SDL_Window given is a
  // shapeable window currently lacking a shape.
  // 
  // See also: SDL_WindowShapeMode

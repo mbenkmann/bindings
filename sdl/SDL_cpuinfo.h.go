@@ -94,6 +94,12 @@ func HasAVX2() (retval bool) {
     return
 }
 
+ // This function returns true if the CPU has NEON (ARM SIMD) features.
+func HasNEON() (retval bool) {
+    retval = C.SDL_TRUE==(C.SDL_HasNEON())
+    return
+}
+
  // This function returns the amount of RAM configured in the system, in
  // MB.
 func GetSystemRAM() (retval int) {

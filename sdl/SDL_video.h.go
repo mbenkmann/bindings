@@ -114,12 +114,19 @@ func GL_ResetAttributes() {
 }
 
  // Set an OpenGL window attribute before window creation.
+ // 
+ // Returns: 0 on success, or -1 if the attribute could not be set.
+ // 
 func GL_SetAttribute(attr GLattr, value int) (retval int) {
     retval = int(C.SDL_GL_SetAttribute(C.SDL_GLattr(attr), C.int(value)))
     return
 }
 
  // Get the actual value for an attribute from the current context.
+ // 
+ // Returns: 0 on success, or -1 if the attribute could not be retrieved.
+ // The integer at value will be modified in either case.
+ // 
 func GL_GetAttribute(attr GLattr) (retval int, value int) {
     tmp_value := new(C.int)
     retval = int(C.SDL_GL_GetAttribute(C.SDL_GLattr(attr), (*C.int)(tmp_value)))
@@ -291,11 +298,31 @@ const (
      // window not created by SDL
     WINDOW_FOREIGN WindowFlags = C.SDL_WINDOW_FOREIGN
 
-     // window should be created in high-DPI mode if supported
+     // window should be created in high-DPI mode if supported. On macOS
+     // NSHighResolutionCapable must be set true in the application's
+     // Info.plist for this to have any effect.
     WINDOW_ALLOW_HIGHDPI WindowFlags = C.SDL_WINDOW_ALLOW_HIGHDPI
 
      // window has mouse captured (unrelated to INPUT_GRABBED)
     WINDOW_MOUSE_CAPTURE WindowFlags = C.SDL_WINDOW_MOUSE_CAPTURE
+
+     // window should always be above others
+    WINDOW_ALWAYS_ON_TOP WindowFlags = C.SDL_WINDOW_ALWAYS_ON_TOP
+
+     // window should not be added to the taskbar
+    WINDOW_SKIP_TASKBAR WindowFlags = C.SDL_WINDOW_SKIP_TASKBAR
+
+     // window should be treated as a utility window
+    WINDOW_UTILITY WindowFlags = C.SDL_WINDOW_UTILITY
+
+     // window should be treated as a tooltip
+    WINDOW_TOOLTIP WindowFlags = C.SDL_WINDOW_TOOLTIP
+
+     // window should be treated as a popup menu
+    WINDOW_POPUP_MENU WindowFlags = C.SDL_WINDOW_POPUP_MENU
+
+     // window usable for Vulkan surface
+    WINDOW_VULKAN WindowFlags = C.SDL_WINDOW_VULKAN
 )
 
  // Event subtype for window events.
@@ -346,6 +373,13 @@ const (
 
      // The window manager requests that the window be closed
     WINDOWEVENT_CLOSE WindowEventID = C.SDL_WINDOWEVENT_CLOSE
+
+     // Window is being offered a focus (should SetWindowInputFocus() on
+     // itself or a subwindow, or ignore)
+    WINDOWEVENT_TAKE_FOCUS WindowEventID = C.SDL_WINDOWEVENT_TAKE_FOCUS
+
+     // Window had a hit test that wasn't SDL_HITTEST_NORMAL.
+    WINDOWEVENT_HIT_TEST WindowEventID = C.SDL_WINDOWEVENT_HIT_TEST
 )
 
  // OpenGL configuration attributes.
@@ -400,6 +434,10 @@ const (
     GL_FRAMEBUFFER_SRGB_CAPABLE GLattr = C.SDL_GL_FRAMEBUFFER_SRGB_CAPABLE
 
     GL_CONTEXT_RELEASE_BEHAVIOR GLattr = C.SDL_GL_CONTEXT_RELEASE_BEHAVIOR
+
+    GL_CONTEXT_RESET_NOTIFICATION GLattr = C.SDL_GL_CONTEXT_RESET_NOTIFICATION
+
+    GL_CONTEXT_NO_ERROR GLattr = C.SDL_GL_CONTEXT_NO_ERROR
 )
 
 type GLprofile int
@@ -408,6 +446,7 @@ const (
 
     GL_CONTEXT_PROFILE_COMPATIBILITY GLprofile = C.SDL_GL_CONTEXT_PROFILE_COMPATIBILITY
 
+     // GLX_CONTEXT_ES2_PROFILE_BIT_EXT
     GL_CONTEXT_PROFILE_ES GLprofile = C.SDL_GL_CONTEXT_PROFILE_ES
 )
 
@@ -427,6 +466,13 @@ const (
     GL_CONTEXT_RELEASE_BEHAVIOR_NONE GLcontextReleaseFlag = C.SDL_GL_CONTEXT_RELEASE_BEHAVIOR_NONE
 
     GL_CONTEXT_RELEASE_BEHAVIOR_FLUSH GLcontextReleaseFlag = C.SDL_GL_CONTEXT_RELEASE_BEHAVIOR_FLUSH
+)
+
+type GLContextResetNotification int
+const (
+    GL_CONTEXT_RESET_NO_NOTIFICATION GLContextResetNotification = C.SDL_GL_CONTEXT_RESET_NO_NOTIFICATION
+
+    GL_CONTEXT_RESET_LOSE_CONTEXT GLContextResetNotification = C.SDL_GL_CONTEXT_RESET_LOSE_CONTEXT
 )
 
  // Possible return values from the SDL_HitTest callback.
@@ -501,6 +547,8 @@ const (
  // See also: SDL_SetWindowSize()
  // 
  // See also: SDL_SetWindowBordered()
+ // 
+ // See also: SDL_SetWindowResizable()
  // 
  // See also: SDL_SetWindowTitle()
  // 
@@ -636,6 +684,30 @@ func GetDisplayDPI(displayIndex int) (retval int, ddpi float32, hdpi float32, vd
     ddpi = deref_float32_ptr(tmp_ddpi)
     hdpi = deref_float32_ptr(tmp_hdpi)
     vdpi = deref_float32_ptr(tmp_vdpi)
+    return
+}
+
+ // Get the usable desktop area represented by a display, with the primary
+ // display located at 0,0.
+ // 
+ // This is the same area as SDL_GetDisplayBounds() reports, but with
+ // portions reserved by the system removed. For example, on Mac OS X,
+ // this subtracts the area occupied by the menu bar and dock.
+ // 
+ // Setting a window to be fullscreen generally bypasses these unusable
+ // areas, so these are good guidelines for the maximum space available to
+ // a non-fullscreen window.
+ // 
+ // Returns: 0 on success, or -1 if the index is out of range.
+ // 
+ // See also: SDL_GetDisplayBounds()
+ // 
+ // See also: SDL_GetNumVideoDisplays()
+ // 
+func GetDisplayUsableBounds(displayIndex int) (retval int, rect Rect) {
+    tmp_rect := new(C.SDL_Rect)
+    retval = int(C.SDL_GetDisplayUsableBounds(C.int(displayIndex), (*C.SDL_Rect)(tmp_rect)))
+    rect = fromC2Rect(*(tmp_rect))
     return
 }
 
@@ -776,8 +848,7 @@ func (window *Window) GetPixelFormat() (retval uint32) {
 
  // Create a window with the specified position, dimensions, and flags.
  // 
- // Returns: The id of the window created, or zero if window creation
- // failed.
+ // Returns: The created window, or NULL if window creation failed.
  // 
  //   title
  //     The title of the window, in UTF-8 encoding.
@@ -801,16 +872,34 @@ func (window *Window) GetPixelFormat() (retval uint32) {
  //     SDL_WINDOW_FULLSCREEN, SDL_WINDOW_OPENGL, SDL_WINDOW_HIDDEN,
  //     SDL_WINDOW_BORDERLESS, SDL_WINDOW_RESIZABLE, SDL_WINDOW_MAXIMIZED,
  //     SDL_WINDOW_MINIMIZED, SDL_WINDOW_INPUT_GRABBED,
- //     SDL_WINDOW_ALLOW_HIGHDPI.
+ //     SDL_WINDOW_ALLOW_HIGHDPI, SDL_WINDOW_VULKAN.
  //   
  // If the window is created with the SDL_WINDOW_ALLOW_HIGHDPI flag, its
  // size in pixels may differ from its size in screen coordinates on
  // platforms with high-DPI support (e.g. iOS and Mac OS X). Use
  // SDL_GetWindowSize() to query the client area's size in screen
- // coordinates, and SDL_GL_GetDrawableSize() or
- // SDL_GetRendererOutputSize() to query the drawable size in pixels.
+ // coordinates, and SDL_GL_GetDrawableSize(),
+ // SDL_Vulkan_GetDrawableSize(), or SDL_GetRendererOutputSize() to query
+ // the drawable size in pixels.
+ // 
+ // If the window is created with any of the SDL_WINDOW_OPENGL or
+ // SDL_WINDOW_VULKAN flags, then the corresponding LoadLibrary function
+ // (SDL_GL_LoadLibrary or SDL_Vulkan_LoadLibrary) is called and the
+ // corresponding UnloadLibrary function is called by SDL_DestroyWindow().
+ // 
+ // If SDL_WINDOW_VULKAN is specified and there isn't a working Vulkan
+ // driver, SDL_CreateWindow() will fail because SDL_Vulkan_LoadLibrary()
+ // will fail.
+ // 
+ // Note: On non-Apple devices, SDL requires you to either not link to the
+ // Vulkan loader or link to a dynamic library version. This limitation
+ // may be removed in a future version of SDL.
  // 
  // See also: SDL_DestroyWindow()
+ // 
+ // See also: SDL_GL_LoadLibrary()
+ // 
+ // See also: SDL_Vulkan_LoadLibrary()
  // 
 func CreateWindow(title string, x int, y int, w int, h int, flags WindowFlags) (retval *Window) {
     tmp_title := C.CString(title); defer C.free(unsafe.Pointer(tmp_title))
@@ -820,8 +909,7 @@ func CreateWindow(title string, x int, y int, w int, h int, flags WindowFlags) (
 
  // Create an SDL window from an existing native window.
  // 
- // Returns: The id of the window created, or zero if window creation
- // failed.
+ // Returns: The created window, or NULL if window creation failed.
  // 
  // See also: SDL_DestroyWindow()
  // 
@@ -969,8 +1057,9 @@ func (window *Window) GetPosition() (x int, y int) {
 
  // Set the size of a window's client area.
  // 
- // Note: You can't change the size of a fullscreen window, it
- // automatically matches the size of the display mode.
+ // Note: Fullscreen windows automatically match the size of the display
+ // mode, and you should use SDL_SetWindowDisplayMode() to change their
+ // size.
  // 
  //   window
  //     The window to resize.
@@ -988,6 +1077,8 @@ func (window *Window) GetPosition() (x int, y int) {
  // real client area size in pixels.
  // 
  // See also: SDL_GetWindowSize()
+ // 
+ // See also: SDL_SetWindowDisplayMode()
  // 
 func (window *Window) SetSize(w int, h int) {
     C.SDL_SetWindowSize((*C.SDL_Window)(window), C.int(w), C.int(h))
@@ -1020,6 +1111,48 @@ func (window *Window) GetSize() (w int, h int) {
     C.SDL_GetWindowSize((*C.SDL_Window)(window), (*C.int)(tmp_w), (*C.int)(tmp_h))
     w = deref_int_ptr(tmp_w)
     h = deref_int_ptr(tmp_h)
+    return
+}
+
+ // Get the size of a window's borders (decorations) around the client
+ // area.
+ // 
+ // Returns: 0 on success, or -1 if getting this information is not
+ // supported.
+ // 
+ // Note: if this function fails (returns -1), the size values will be
+ // initialized to 0, 0, 0, 0 (if a non-NULL pointer is provided), as if
+ // the window in question was borderless.
+ // 
+ //   window
+ //     The window to query.
+ //   
+ //   top
+ //     Pointer to variable for storing the size of the top border. NULL is
+ //     permitted.
+ //   
+ //   left
+ //     Pointer to variable for storing the size of the left border. NULL is
+ //     permitted.
+ //   
+ //   bottom
+ //     Pointer to variable for storing the size of the bottom border. NULL is
+ //     permitted.
+ //   
+ //   right
+ //     Pointer to variable for storing the size of the right border. NULL is
+ //     permitted.
+ //   
+func (window *Window) GetBordersSize() (retval int, top int, left int, bottom int, right int) {
+    tmp_top := new(C.int)
+    tmp_left := new(C.int)
+    tmp_bottom := new(C.int)
+    tmp_right := new(C.int)
+    retval = int(C.SDL_GetWindowBordersSize((*C.SDL_Window)(window), (*C.int)(tmp_top), (*C.int)(tmp_left), (*C.int)(tmp_bottom), (*C.int)(tmp_right)))
+    top = deref_int_ptr(tmp_top)
+    left = deref_int_ptr(tmp_left)
+    bottom = deref_int_ptr(tmp_bottom)
+    right = deref_int_ptr(tmp_right)
     return
 }
 
@@ -1135,6 +1268,26 @@ func (window *Window) SetBordered(bordered bool) {
     C.SDL_SetWindowBordered((*C.SDL_Window)(window), bool2bool(bordered))
 }
 
+ // Set the user-resizable state of a window.
+ // 
+ // This will add or remove the window's SDL_WINDOW_RESIZABLE flag and
+ // allow/disallow user resizing of the window. This is a no-op if the
+ // window's resizable state already matches the requested state.
+ // 
+ // Note: You can't change the resizable state of a fullscreen window.
+ // 
+ // See also: SDL_GetWindowFlags()
+ // 
+ //   window
+ //     The window of which to change the resizable state.
+ //   
+ //   resizable
+ //     SDL_TRUE to allow resizing, SDL_FALSE to disallow.
+ //   
+func (window *Window) SetResizable(resizable bool) {
+    C.SDL_SetWindowResizable((*C.SDL_Window)(window), bool2bool(resizable))
+}
+
  // Show a window.
  // 
  // See also: SDL_HideWindow()
@@ -1233,7 +1386,7 @@ func (window *Window) UpdateSurface() (retval int) {
  // 
  // See also: SDL_GetWindowSurface()
  // 
- // See also: SDL_UpdateWindowSurfaceRect()
+ // See also: SDL_UpdateWindowSurface()
  // 
 func (window *Window) UpdateSurfaceRects(rects []Rect) (retval int) {
     var tmp_rects *C.SDL_Rect
@@ -1316,6 +1469,80 @@ func (window *Window) GetBrightness() (retval float32) {
     return
 }
 
+ // Set the opacity for a window.
+ // 
+ // Returns: 0 on success, or -1 if setting the opacity isn't supported.
+ // 
+ // See also: SDL_GetWindowOpacity()
+ // 
+ //   window
+ //     The window which will be made transparent or opaque
+ //   
+ //   opacity
+ //     Opacity (0.0f - transparent, 1.0f - opaque) This will be clamped
+ //     internally between 0.0f and 1.0f.
+ //   
+func (window *Window) SetOpacity(opacity float32) (retval int) {
+    retval = int(C.SDL_SetWindowOpacity((*C.SDL_Window)(window), C.float(opacity)))
+    return
+}
+
+ // Get the opacity of a window.
+ // 
+ // If transparency isn't supported on this platform, opacity will be
+ // reported as 1.0f without error.
+ // 
+ // Returns: 0 on success, or -1 on error (invalid window, etc).
+ // 
+ // See also: SDL_SetWindowOpacity()
+ // 
+ //   window
+ //     The window in question.
+ //   
+ //   out_opacity
+ //     Opacity (0.0f - transparent, 1.0f - opaque)
+ //   
+func (window *Window) GetOpacity() (retval int, out_opacity float32) {
+    tmp_out_opacity := new(C.float)
+    retval = int(C.SDL_GetWindowOpacity((*C.SDL_Window)(window), (*C.float)(tmp_out_opacity)))
+    out_opacity = deref_float32_ptr(tmp_out_opacity)
+    return
+}
+
+ // Sets the window as a modal for another window (TODO: reconsider this
+ // function and/or its name)
+ // 
+ // Returns: 0 on success, or -1 otherwise.
+ // 
+ //   modal_window
+ //     The window that should be modal
+ //   
+ //   parent_window
+ //     The parent window
+ //   
+func (modal_window *Window) SetModalFor(parent_window *Window) (retval int) {
+    retval = int(C.SDL_SetWindowModalFor((*C.SDL_Window)(modal_window), (*C.SDL_Window)(parent_window)))
+    return
+}
+
+ // Explicitly sets input focus to the window.
+ // 
+ // You almost certainly want SDL_RaiseWindow() instead of this function.
+ // Use this with caution, as you might give focus to a window that's
+ // completely obscured by other windows.
+ // 
+ // Returns: 0 on success, or -1 otherwise.
+ // 
+ // See also: SDL_RaiseWindow()
+ // 
+ //   window
+ //     The window that should get the input focus
+ //   
+func (window *Window) SetInputFocus() (retval int) {
+    retval = int(C.SDL_SetWindowInputFocus((*C.SDL_Window)(window)))
+    return
+}
+
 
 
  // Provide a callback that decides if a window region has special
@@ -1372,7 +1599,7 @@ func (window *Window) Destroy() {
     C.SDL_DestroyWindow((*C.SDL_Window)(window))
 }
 
- // Returns whether the screensaver is currently enabled (default on).
+ // Returns whether the screensaver is currently enabled (default off).
  // 
  // See also: SDL_EnableScreenSaver()
  // 
