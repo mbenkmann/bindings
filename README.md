@@ -29,7 +29,14 @@ https://github.com/mbenkmann/bindings/tree/master/examples
 API Documentation
 =================
 
+`master` branch
+----------------
 https://godoc.org/github.com/mbenkmann/bindings
+
+`newest` branch
+----------------
+https://godoc.org/gopkg.in/mbenkmann/bindings.v8
+
 
 Installing the libraries
 ========================
