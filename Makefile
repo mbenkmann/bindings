@@ -1,4 +1,4 @@
-DOXYXML:=doxygen/xml
+DOXYSDL:=doxygen/sdl
 SDLOUT:=sdl
 SDLHEADERS:=SDL.h SDL_error.h SDL_events.h SDL_joystick.h SDL_keyboard.h SDL_keycode.h SDL_scancode.h \
             SDL_rect.h SDL_touch.h SDL_gesture.h SDL_rwops.h SDL_video.h SDL_surface.h SDL_blendmode.h \
@@ -9,24 +9,23 @@ SDLGOOUT:=$(patsubst %.h,%.h.go,$(SDLHEADERS))
 
 .PHONY: clean $(SDLHEADERS) all
 
-all: doxygen $(SDLHEADERS)
+all: $(DOXYSDL) $(SDLHEADERS)
 
 # If there is a special case generators/headername.h.py we call that.
 # Otherwise we use the generic SDL.h.py.
 $(SDLHEADERS):
 	generator=SDL.h.py ; \
 	test -x generators/$@.py && generator=$@.py ; \
-	generators/$$generator $@ $(DOXYXML) >$(SDLOUT)/$@.go
+	generators/$$generator $@ $(DOXYSDL) >$(SDLOUT)/$@.go
 
-doxygen:
+$(DOXYSDL):
 	doxygen doxygen/SDL.dox
 
 
 clean:
-	rm -rf $(DOXYXML)
+	rm -rf $(DOXYSDL)
 	rm -f bin/debug-temp
 	cd $(SDLOUT) && rm -f $(SDLGOOUT)
 
 distclean: clean
 	find -name "*~" -exec rm {} \;
-	
