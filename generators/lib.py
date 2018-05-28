@@ -153,6 +153,25 @@ def generate_bindings():
         wrapfunctions(section)
 
 
+def generate_bindings():
+    '''
+    Performs standard binding generation, filling lib.out with the result.
+    '''
+    describe(soup.doxygen.compounddef)
+
+    structs()
+    unions()
+
+    for section in soup.doxygen.compounddef.find_all("sectiondef"):
+        out.append("")
+        describe(section)
+        define2const(section)
+        enum2const(section)
+        aliastypedefs(section)
+        simpletypedefs(section)
+        wrapfunctions(section)
+
+
 class BaseTypeinfo(object):
     '''
     A simple translation from source to destination types based on a dict.
