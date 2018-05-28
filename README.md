@@ -9,9 +9,6 @@ Supported libraries
 Ready to Use
 ------------
  * Simple Direct Media Layer (SDL) core (i.e. SDL_* functions), http://www.libsdl.org
-
-In Progress
------------
  * SDL_image, https://www.libsdl.org/projects/SDL_image
 
 Planned
