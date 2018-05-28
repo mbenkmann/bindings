@@ -16,6 +16,9 @@ const (
     IMAGE_MINOR_VERSION = C.SDL_IMAGE_MINOR_VERSION
 
     IMAGE_PATCHLEVEL = C.SDL_IMAGE_PATCHLEVEL
+
+     // This is the version number macro for the current SDL_image version.
+    IMAGE_COMPILEDVERSION = C.SDL_IMAGE_COMPILEDVERSION
 )
 
 type InitFlags int
@@ -124,6 +127,11 @@ func IsPNM(src *sdl.RWops) (retval int) {
     return
 }
 
+func IsSVG(src *sdl.RWops) (retval int) {
+    retval = int(C.IMG_isSVG((*C.SDL_RWops)(unsafe.Pointer(src))))
+    return
+}
+
 func IsTIF(src *sdl.RWops) (retval int) {
     retval = int(C.IMG_isTIF((*C.SDL_RWops)(unsafe.Pointer(src))))
     return
@@ -194,6 +202,11 @@ func LoadPNM_RW(src *sdl.RWops) (retval *sdl.Surface) {
     return
 }
 
+func LoadSVG_RW(src *sdl.RWops) (retval *sdl.Surface) {
+    retval = (*sdl.Surface)(unsafe.Pointer(C.IMG_LoadSVG_RW((*C.SDL_RWops)(unsafe.Pointer(src)))))
+    return
+}
+
 func LoadTGA_RW(src *sdl.RWops) (retval *sdl.Surface) {
     retval = (*sdl.Surface)(unsafe.Pointer(C.IMG_LoadTGA_RW((*C.SDL_RWops)(unsafe.Pointer(src)))))
     return
@@ -233,5 +246,16 @@ func SavePNG(surface *sdl.Surface, file string) (retval int) {
 
 func SavePNG_RW(surface *sdl.Surface, dst *sdl.RWops, freedst int) (retval int) {
     retval = int(C.IMG_SavePNG_RW((*C.SDL_Surface)(unsafe.Pointer(surface)), (*C.SDL_RWops)(unsafe.Pointer(dst)), C.int(freedst)))
+    return
+}
+
+func SaveJPG(surface *sdl.Surface, file string, quality int) (retval int) {
+    tmp_file := C.CString(file); defer C.free(unsafe.Pointer(tmp_file))
+    retval = int(C.IMG_SaveJPG((*C.SDL_Surface)(unsafe.Pointer(surface)), (*C.char)(tmp_file), C.int(quality)))
+    return
+}
+
+func SaveJPG_RW(surface *sdl.Surface, dst *sdl.RWops, freedst int, quality int) (retval int) {
+    retval = int(C.IMG_SaveJPG_RW((*C.SDL_Surface)(unsafe.Pointer(surface)), (*C.SDL_RWops)(unsafe.Pointer(dst)), C.int(freedst), C.int(quality)))
     return
 }
