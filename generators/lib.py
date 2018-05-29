@@ -23,6 +23,9 @@
 from bs4 import BeautifulSoup
 import textwrap
 import fnmatch
+import urllib.request
+import time
+import os
 
 # Set of prefixes that are removed from C names to produce Go names.
 prefixes = []
@@ -102,6 +105,13 @@ gotype_override = {}
 
 # Maps a C enum name to the integer type to be used on the Go side (if not "int").
 enum_types = {}
+
+# A mapping from a glob pattern to a URL which may contain the string "$0" that
+# will be replaced with the complete name that matches the pattern.
+# This map is used to include links to external URLs in documentation comments.
+# ATTENTION: Links are simply copied into the documentation unless the
+# environment variable CHECK_EXTERNAL_LINKS is set.
+external_link_urls = {}
 
 
 def generate_bindings():
@@ -633,6 +643,33 @@ def additional_boilerplate(idx):
         out.insert(idx, add)
 
 
+def external_link(name):
+    '''
+    If external_link_urls contains a pattern that matches name, this function
+    tests the resulting URL for a 404 and if it doesn't give a 404, a comment
+    with the URL is appended to out.
+    '''
+    append_link = False
+    for pattern in external_link_urls:
+        if fnmatch.fnmatchcase(name, pattern):
+            url = external_link_urls[pattern].replace("$0", name)
+            if "CHECK_EXTERNAL_LINKS" in os.environ:
+                time.sleep(1000)  # throttling to avoid triggering DDOS protection
+                request = urllib.request.Request(url, method='HEAD')
+                try:
+                    with urllib.request.urlopen(request) as r:
+                        if r.getcode() != 404:
+                            append_link = True
+                except:
+                    pass
+            else:
+                append_link = True
+
+    if append_link:
+        pre = indentation() + " // ↪ "
+        out.append(pre + url)
+
+
 def describe(tag):
     ''' Converts tag's description into a Go comment. '''
     global out
@@ -906,6 +943,7 @@ def structs():
 
         out.append("")  # empty line to separate entries
         describe(struct)
+        external_link(name)
         goname = fix(name)
         out.append("%stype %s struct {" % (indentation(), goname))
         push_indent()
@@ -965,6 +1003,7 @@ def unions():
 
         out.append("")  # empty line to separate entries
         describe(union)
+        external_link(name)
         goname = fix(name)
         out.append("%stype %s C.%s" % (indentation(), goname, name))
 
@@ -1125,6 +1164,7 @@ def define2const(section):
             out.append("")  # empty line to separate entries
 
         describe(define)
+        external_link(name)
         out.append("%s%s = C.%s" % (indentation(), fix(name), name))
 
     if not first:
@@ -1147,6 +1187,7 @@ def enum2const(section):
         firstE = False
 
         describe(enu)
+        external_link(name)
         ti = typeinfo(name, 0, "", name, "")
         goname = ti["gotype"]
         if goname.isidentifier():
@@ -1273,6 +1314,7 @@ def wrapfunctions(section):
         slices_instead_of_pointers(name, params)
 
         describe(fun)
+        external_link(name)
         goname = fix(name)
         s = "func "
         if num_recv > 0:
