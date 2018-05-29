@@ -1553,10 +1553,8 @@ func FlushEvents(minType EventType, maxType EventType) {
  //     that area.
  //   
  // ↪ https://wiki.libsdl.org/SDL_PollEvent
-func PollEvent() (retval int, event *Event) {
-    tmp_event := new(C.SDL_Event)
-    retval = int(C.SDL_PollEvent((*C.SDL_Event)(tmp_event)))
-    event = (*Event)(unsafe.Pointer(tmp_event))
+func PollEvent(event *Event) (retval bool) {
+    retval = 0 != (C.SDL_PollEvent((*C.SDL_Event)(event)))
     return
 }
 
