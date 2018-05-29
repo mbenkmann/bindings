@@ -31,7 +31,6 @@ import "unsafe"
  // in the background, you should set the following hint before calling
  // SDL_Init(): SDL_HINT_JOYSTICK_ALLOW_BACKGROUND_EVENTS
 
- // ↪ https://wiki.libsdl.org/SDL_JoystickGUID
 type JoystickGUID struct {
     Data [16]uint8
 }
@@ -47,31 +46,22 @@ func toCFromJoystickGUID(s JoystickGUID) (d C.SDL_JoystickGUID) {
 
  // Hat positions
 const (
-     // ↪ https://wiki.libsdl.org/SDL_HAT_CENTERED
     HAT_CENTERED = C.SDL_HAT_CENTERED
 
-     // ↪ https://wiki.libsdl.org/SDL_HAT_UP
     HAT_UP = C.SDL_HAT_UP
 
-     // ↪ https://wiki.libsdl.org/SDL_HAT_RIGHT
     HAT_RIGHT = C.SDL_HAT_RIGHT
 
-     // ↪ https://wiki.libsdl.org/SDL_HAT_DOWN
     HAT_DOWN = C.SDL_HAT_DOWN
 
-     // ↪ https://wiki.libsdl.org/SDL_HAT_LEFT
     HAT_LEFT = C.SDL_HAT_LEFT
 
-     // ↪ https://wiki.libsdl.org/SDL_HAT_RIGHTUP
     HAT_RIGHTUP = C.SDL_HAT_RIGHTUP
 
-     // ↪ https://wiki.libsdl.org/SDL_HAT_RIGHTDOWN
     HAT_RIGHTDOWN = C.SDL_HAT_RIGHTDOWN
 
-     // ↪ https://wiki.libsdl.org/SDL_HAT_LEFTUP
     HAT_LEFTUP = C.SDL_HAT_LEFTUP
 
-     // ↪ https://wiki.libsdl.org/SDL_HAT_LEFTDOWN
     HAT_LEFTDOWN = C.SDL_HAT_LEFTDOWN
 )
 
