@@ -122,22 +122,16 @@ func (dst *RWops) WriteBE64(value uint64) (retval uint64) {
 }
 
 const (
-     // ↪ https://wiki.libsdl.org/SDL_RWOPS_UNKNOWN
     RWOPS_UNKNOWN = C.SDL_RWOPS_UNKNOWN
 
-     // ↪ https://wiki.libsdl.org/SDL_RWOPS_WINFILE
     RWOPS_WINFILE = C.SDL_RWOPS_WINFILE
 
-     // ↪ https://wiki.libsdl.org/SDL_RWOPS_STDFILE
     RWOPS_STDFILE = C.SDL_RWOPS_STDFILE
 
-     // ↪ https://wiki.libsdl.org/SDL_RWOPS_JNIFILE
     RWOPS_JNIFILE = C.SDL_RWOPS_JNIFILE
 
-     // ↪ https://wiki.libsdl.org/SDL_RWOPS_MEMORY
     RWOPS_MEMORY = C.SDL_RWOPS_MEMORY
 
-     // ↪ https://wiki.libsdl.org/SDL_RWOPS_MEMORY_RO
     RWOPS_MEMORY_RO = C.SDL_RWOPS_MEMORY_RO
 
      // Seek from the beginning of data

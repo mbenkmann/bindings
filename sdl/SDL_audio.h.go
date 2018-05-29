@@ -60,16 +60,12 @@ func toCFromAudioSpec(s AudioSpec) (d C.SDL_AudioSpec) {
 
  // Audio flags
 const (
-     // ↪ https://wiki.libsdl.org/SDL_AUDIO_MASK_BITSIZE
     AUDIO_MASK_BITSIZE = C.SDL_AUDIO_MASK_BITSIZE
 
-     // ↪ https://wiki.libsdl.org/SDL_AUDIO_MASK_DATATYPE
     AUDIO_MASK_DATATYPE = C.SDL_AUDIO_MASK_DATATYPE
 
-     // ↪ https://wiki.libsdl.org/SDL_AUDIO_MASK_ENDIAN
     AUDIO_MASK_ENDIAN = C.SDL_AUDIO_MASK_ENDIAN
 
-     // ↪ https://wiki.libsdl.org/SDL_AUDIO_MASK_SIGNED
     AUDIO_MASK_SIGNED = C.SDL_AUDIO_MASK_SIGNED
 )
 
@@ -137,16 +133,12 @@ const (
  // 
  // Which audio format changes are allowed when opening a device.
 const (
-     // ↪ https://wiki.libsdl.org/SDL_AUDIO_ALLOW_FREQUENCY_CHANGE
     AUDIO_ALLOW_FREQUENCY_CHANGE = C.SDL_AUDIO_ALLOW_FREQUENCY_CHANGE
 
-     // ↪ https://wiki.libsdl.org/SDL_AUDIO_ALLOW_FORMAT_CHANGE
     AUDIO_ALLOW_FORMAT_CHANGE = C.SDL_AUDIO_ALLOW_FORMAT_CHANGE
 
-     // ↪ https://wiki.libsdl.org/SDL_AUDIO_ALLOW_CHANNELS_CHANGE
     AUDIO_ALLOW_CHANNELS_CHANGE = C.SDL_AUDIO_ALLOW_CHANNELS_CHANGE
 
-     // ↪ https://wiki.libsdl.org/SDL_AUDIO_ALLOW_ANY_CHANGE
     AUDIO_ALLOW_ANY_CHANGE = C.SDL_AUDIO_ALLOW_ANY_CHANGE
 )
 
@@ -252,7 +244,6 @@ func UnlockAudioDevice(dev AudioDeviceID) {
 }
 
 const (
-     // ↪ https://wiki.libsdl.org/SDL_MIX_MAXVOLUME
     MIX_MAXVOLUME = C.SDL_MIX_MAXVOLUME
 )
 

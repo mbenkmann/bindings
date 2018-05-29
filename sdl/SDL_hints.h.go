@@ -292,7 +292,6 @@ const (
      // 
      // This variable can be set to the following values: "0" - don't allow
      // topmost "1" - allow topmost
-     // ↪ https://wiki.libsdl.org/SDL_HINT_ALLOW_TOPMOST
     HINT_ALLOW_TOPMOST = C.SDL_HINT_ALLOW_TOPMOST
 
      // A variable that controls the timer resolution, in milliseconds.

@@ -9,7 +9,6 @@ import "C"
  // CPU feature detection for SDL.
 
 const (
-     // ↪ https://wiki.libsdl.org/SDL_CACHELINE_SIZE
     CACHELINE_SIZE = C.SDL_CACHELINE_SIZE
 )
 

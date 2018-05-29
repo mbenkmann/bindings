@@ -10,7 +10,6 @@ import "unsafe"
  // Include file for SDL event handling.
 
  // Fields shared by every event.
- // ↪ https://wiki.libsdl.org/SDL_CommonEvent
 type CommonEvent struct {
     Type EventType
 
@@ -818,7 +817,6 @@ func toCFromQuitEvent(s QuitEvent) (d C.SDL_QuitEvent) {
 }
 
  // OS Specific event.
- // ↪ https://wiki.libsdl.org/SDL_OSEvent
 type OSEvent struct {
      // SDL_QUIT
     Type EventType
@@ -1274,7 +1272,6 @@ func (u *Event) SetPadding(x [56]uint8) {
     *p = *(*[56]C.Uint8)(unsafe.Pointer(&(x)))
 }
 
- // ↪ https://wiki.libsdl.org/SDL_eventaction
 type Eventaction int
 const (
     ADDEVENT Eventaction = C.SDL_ADDEVENT
@@ -1286,16 +1283,12 @@ const (
 
 
 const (
-     // ↪ https://wiki.libsdl.org/SDL_QUERY
     QUERY = C.SDL_QUERY
 
-     // ↪ https://wiki.libsdl.org/SDL_IGNORE
     IGNORE = C.SDL_IGNORE
 
-     // ↪ https://wiki.libsdl.org/SDL_DISABLE
     DISABLE = C.SDL_DISABLE
 
-     // ↪ https://wiki.libsdl.org/SDL_ENABLE
     ENABLE = C.SDL_ENABLE
 )
 
@@ -1314,16 +1307,12 @@ func EventState(_type uint32, state int) (retval uint8) {
 }
 
 const (
-     // ↪ https://wiki.libsdl.org/SDL_RELEASED
     RELEASED = C.SDL_RELEASED
 
-     // ↪ https://wiki.libsdl.org/SDL_PRESSED
     PRESSED = C.SDL_PRESSED
 
-     // ↪ https://wiki.libsdl.org/SDL_TEXTEDITINGEVENT_TEXT_SIZE
     TEXTEDITINGEVENT_TEXT_SIZE = C.SDL_TEXTEDITINGEVENT_TEXT_SIZE
 
-     // ↪ https://wiki.libsdl.org/SDL_TEXTINPUTEVENT_TEXT_SIZE
     TEXTINPUTEVENT_TEXT_SIZE = C.SDL_TEXTINPUTEVENT_TEXT_SIZE
 )
 
