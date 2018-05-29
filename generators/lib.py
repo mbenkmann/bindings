@@ -654,7 +654,7 @@ def external_link(name):
         if fnmatch.fnmatchcase(name, pattern):
             url = external_link_urls[pattern].replace("$0", name)
             if "CHECK_EXTERNAL_LINKS" in os.environ:
-                time.sleep(1000)  # throttling to avoid triggering DDOS protection
+                time.sleep(1)  # throttling to avoid triggering DDOS protection
                 request = urllib.request.Request(url, method='HEAD')
                 try:
                     with urllib.request.urlopen(request) as r:
