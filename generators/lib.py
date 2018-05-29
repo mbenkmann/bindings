@@ -222,6 +222,8 @@ class BaseTypeinfo(object):
 
         if argtype in custom_gocast:
             result["gocast"] = custom_gocast[argtype]
+        elif gotype == "bool":
+            result["gocast"] = "0 != "
         elif gotype == "string":
             if funcname in free_strings:
                 result["gocast"] = "freeGoString"

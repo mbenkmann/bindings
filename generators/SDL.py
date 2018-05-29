@@ -58,7 +58,8 @@ SDL_POINTER_ARG = {
     },
     "SDL_Event": {
         "default": "out",
-        "receiver": {"SDL_PushEvent"}
+        "receiver": {"SDL_PushEvent"},
+        "inout": {"SDL_PollEvent"}
     },
     "SDL_Joystick": {
         "default": "receiver"
@@ -183,6 +184,7 @@ SDL_GOTYPE_OVERRIDE = {
     "SDL_CreateRenderer.flags": "RendererFlags",
     "SDL_*Event.type": "EventType",
     "SDL_FlushEvents.*Type": "EventType",
+    "SDL_PollEvent": "bool",
 }
 
 SDL_ENUM_TYPES = {"SDL_EventType": "uint32"}

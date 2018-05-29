@@ -78,7 +78,8 @@ func sdlmain() int {
     renderer.SetDrawColor(255, 100, 100, 100)
 
     for {
-        for retval, event := sdl.PollEvent(); retval > 0; retval, event = sdl.PollEvent() {
+        var event sdl.Event
+        for sdl.PollEvent(&event) {
             if event.Type() == sdl.QUIT {
                 fmt.Println("Window closed by user")
                 return 0
