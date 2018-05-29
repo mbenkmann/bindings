@@ -5,11 +5,11 @@
       "name": "Python: Test",
       "type": "python",
       "request": "launch",
-      "program": "${workspaceFolder}/generators/SDL_image.py",
+      "program": "${workspaceFolder}/generators/SDL.py",
       "cwd": "${workspaceFolder}",
       "args": [
-        "SDL_image.h",
-        "doxygen/sdl_image"
+        "SDL_events.h",
+        "doxygen/sdl"
       ],
       "console": "integratedTerminal"
     },

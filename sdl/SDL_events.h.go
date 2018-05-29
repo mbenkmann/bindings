@@ -11,13 +11,13 @@ import "unsafe"
 
  // Fields shared by every event.
 type CommonEvent struct {
-    Type uint32
+    Type EventType
 
     Timestamp uint32
 }
 
 func fromC2CommonEvent(s C.SDL_CommonEvent) CommonEvent {
-    return CommonEvent{uint32(s._type), uint32(s.timestamp)}
+    return CommonEvent{EventType(s._type), uint32(s.timestamp)}
 }
 
 func toCFromCommonEvent(s CommonEvent) (d C.SDL_CommonEvent) {
@@ -29,7 +29,7 @@ func toCFromCommonEvent(s CommonEvent) (d C.SDL_CommonEvent) {
  // Window state change event data (event.window.*)
 type WindowEvent struct {
      // SDL_WINDOWEVENT
-    Type uint32
+    Type EventType
 
     Timestamp uint32
 
@@ -53,7 +53,7 @@ type WindowEvent struct {
 }
 
 func fromC2WindowEvent(s C.SDL_WindowEvent) WindowEvent {
-    return WindowEvent{uint32(s._type), uint32(s.timestamp), uint32(s.windowID), uint8(s.event), uint8(s.padding1), uint8(s.padding2), uint8(s.padding3), int32(s.data1), int32(s.data2)}
+    return WindowEvent{EventType(s._type), uint32(s.timestamp), uint32(s.windowID), uint8(s.event), uint8(s.padding1), uint8(s.padding2), uint8(s.padding3), int32(s.data1), int32(s.data2)}
 }
 
 func toCFromWindowEvent(s WindowEvent) (d C.SDL_WindowEvent) {
@@ -72,7 +72,7 @@ func toCFromWindowEvent(s WindowEvent) (d C.SDL_WindowEvent) {
  // Keyboard button event structure (event.key.*)
 type KeyboardEvent struct {
      // SDL_KEYDOWN or SDL_KEYUP
-    Type uint32
+    Type EventType
 
     Timestamp uint32
 
@@ -94,7 +94,7 @@ type KeyboardEvent struct {
 }
 
 func fromC2KeyboardEvent(s C.SDL_KeyboardEvent) KeyboardEvent {
-    return KeyboardEvent{uint32(s._type), uint32(s.timestamp), uint32(s.windowID), uint8(s.state), uint8(s.repeat), uint8(s.padding2), uint8(s.padding3), Keysym{Scancode(s.keysym.scancode), Keycode(s.keysym.sym), uint16(s.keysym.mod), uint32(s.keysym.unused)}}
+    return KeyboardEvent{EventType(s._type), uint32(s.timestamp), uint32(s.windowID), uint8(s.state), uint8(s.repeat), uint8(s.padding2), uint8(s.padding3), Keysym{Scancode(s.keysym.scancode), Keycode(s.keysym.sym), uint16(s.keysym.mod), uint32(s.keysym.unused)}}
 }
 
 func toCFromKeyboardEvent(s KeyboardEvent) (d C.SDL_KeyboardEvent) {
@@ -115,7 +115,7 @@ func toCFromKeyboardEvent(s KeyboardEvent) (d C.SDL_KeyboardEvent) {
  // Keyboard text editing event structure (event.edit.*)
 type TextEditingEvent struct {
      // SDL_TEXTEDITING
-    Type uint32
+    Type EventType
 
     Timestamp uint32
 
@@ -133,7 +133,7 @@ type TextEditingEvent struct {
 }
 
 func fromC2TextEditingEvent(s C.SDL_TextEditingEvent) TextEditingEvent {
-    return TextEditingEvent{uint32(s._type), uint32(s.timestamp), uint32(s.windowID), *(*[TEXTEDITINGEVENT_TEXT_SIZE]int8)(unsafe.Pointer(&(s.text))), int32(s.start), int32(s.length)}
+    return TextEditingEvent{EventType(s._type), uint32(s.timestamp), uint32(s.windowID), *(*[TEXTEDITINGEVENT_TEXT_SIZE]int8)(unsafe.Pointer(&(s.text))), int32(s.start), int32(s.length)}
 }
 
 func toCFromTextEditingEvent(s TextEditingEvent) (d C.SDL_TextEditingEvent) {
@@ -149,7 +149,7 @@ func toCFromTextEditingEvent(s TextEditingEvent) (d C.SDL_TextEditingEvent) {
  // Keyboard text input event structure (event.text.*)
 type TextInputEvent struct {
      // SDL_TEXTINPUT
-    Type uint32
+    Type EventType
 
     Timestamp uint32
 
@@ -161,7 +161,7 @@ type TextInputEvent struct {
 }
 
 func fromC2TextInputEvent(s C.SDL_TextInputEvent) TextInputEvent {
-    return TextInputEvent{uint32(s._type), uint32(s.timestamp), uint32(s.windowID), *(*[TEXTINPUTEVENT_TEXT_SIZE]int8)(unsafe.Pointer(&(s.text)))}
+    return TextInputEvent{EventType(s._type), uint32(s.timestamp), uint32(s.windowID), *(*[TEXTINPUTEVENT_TEXT_SIZE]int8)(unsafe.Pointer(&(s.text)))}
 }
 
 func toCFromTextInputEvent(s TextInputEvent) (d C.SDL_TextInputEvent) {
@@ -175,7 +175,7 @@ func toCFromTextInputEvent(s TextInputEvent) (d C.SDL_TextInputEvent) {
  // Mouse motion event structure (event.motion.*)
 type MouseMotionEvent struct {
      // SDL_MOUSEMOTION
-    Type uint32
+    Type EventType
 
     Timestamp uint32
 
@@ -202,7 +202,7 @@ type MouseMotionEvent struct {
 }
 
 func fromC2MouseMotionEvent(s C.SDL_MouseMotionEvent) MouseMotionEvent {
-    return MouseMotionEvent{uint32(s._type), uint32(s.timestamp), uint32(s.windowID), uint32(s.which), uint32(s.state), int32(s.x), int32(s.y), int32(s.xrel), int32(s.yrel)}
+    return MouseMotionEvent{EventType(s._type), uint32(s.timestamp), uint32(s.windowID), uint32(s.which), uint32(s.state), int32(s.x), int32(s.y), int32(s.xrel), int32(s.yrel)}
 }
 
 func toCFromMouseMotionEvent(s MouseMotionEvent) (d C.SDL_MouseMotionEvent) {
@@ -221,7 +221,7 @@ func toCFromMouseMotionEvent(s MouseMotionEvent) (d C.SDL_MouseMotionEvent) {
  // Mouse button event structure (event.button.*)
 type MouseButtonEvent struct {
      // SDL_MOUSEBUTTONDOWN or SDL_MOUSEBUTTONUP
-    Type uint32
+    Type EventType
 
     Timestamp uint32
 
@@ -250,7 +250,7 @@ type MouseButtonEvent struct {
 }
 
 func fromC2MouseButtonEvent(s C.SDL_MouseButtonEvent) MouseButtonEvent {
-    return MouseButtonEvent{uint32(s._type), uint32(s.timestamp), uint32(s.windowID), uint32(s.which), uint8(s.button), uint8(s.state), uint8(s.clicks), uint8(s.padding1), int32(s.x), int32(s.y)}
+    return MouseButtonEvent{EventType(s._type), uint32(s.timestamp), uint32(s.windowID), uint32(s.which), uint8(s.button), uint8(s.state), uint8(s.clicks), uint8(s.padding1), int32(s.x), int32(s.y)}
 }
 
 func toCFromMouseButtonEvent(s MouseButtonEvent) (d C.SDL_MouseButtonEvent) {
@@ -270,7 +270,7 @@ func toCFromMouseButtonEvent(s MouseButtonEvent) (d C.SDL_MouseButtonEvent) {
  // Mouse wheel event structure (event.wheel.*)
 type MouseWheelEvent struct {
      // SDL_MOUSEWHEEL
-    Type uint32
+    Type EventType
 
     Timestamp uint32
 
@@ -294,7 +294,7 @@ type MouseWheelEvent struct {
 }
 
 func fromC2MouseWheelEvent(s C.SDL_MouseWheelEvent) MouseWheelEvent {
-    return MouseWheelEvent{uint32(s._type), uint32(s.timestamp), uint32(s.windowID), uint32(s.which), int32(s.x), int32(s.y), uint32(s.direction)}
+    return MouseWheelEvent{EventType(s._type), uint32(s.timestamp), uint32(s.windowID), uint32(s.which), int32(s.x), int32(s.y), uint32(s.direction)}
 }
 
 func toCFromMouseWheelEvent(s MouseWheelEvent) (d C.SDL_MouseWheelEvent) {
@@ -311,7 +311,7 @@ func toCFromMouseWheelEvent(s MouseWheelEvent) (d C.SDL_MouseWheelEvent) {
  // Joystick axis motion event structure (event.jaxis.*)
 type JoyAxisEvent struct {
      // SDL_JOYAXISMOTION
-    Type uint32
+    Type EventType
 
     Timestamp uint32
 
@@ -334,7 +334,7 @@ type JoyAxisEvent struct {
 }
 
 func fromC2JoyAxisEvent(s C.SDL_JoyAxisEvent) JoyAxisEvent {
-    return JoyAxisEvent{uint32(s._type), uint32(s.timestamp), JoystickID(s.which), uint8(s.axis), uint8(s.padding1), uint8(s.padding2), uint8(s.padding3), int16(s.value), uint16(s.padding4)}
+    return JoyAxisEvent{EventType(s._type), uint32(s.timestamp), JoystickID(s.which), uint8(s.axis), uint8(s.padding1), uint8(s.padding2), uint8(s.padding3), int16(s.value), uint16(s.padding4)}
 }
 
 func toCFromJoyAxisEvent(s JoyAxisEvent) (d C.SDL_JoyAxisEvent) {
@@ -353,7 +353,7 @@ func toCFromJoyAxisEvent(s JoyAxisEvent) (d C.SDL_JoyAxisEvent) {
  // Joystick trackball motion event structure (event.jball.*)
 type JoyBallEvent struct {
      // SDL_JOYBALLMOTION
-    Type uint32
+    Type EventType
 
     Timestamp uint32
 
@@ -377,7 +377,7 @@ type JoyBallEvent struct {
 }
 
 func fromC2JoyBallEvent(s C.SDL_JoyBallEvent) JoyBallEvent {
-    return JoyBallEvent{uint32(s._type), uint32(s.timestamp), JoystickID(s.which), uint8(s.ball), uint8(s.padding1), uint8(s.padding2), uint8(s.padding3), int16(s.xrel), int16(s.yrel)}
+    return JoyBallEvent{EventType(s._type), uint32(s.timestamp), JoystickID(s.which), uint8(s.ball), uint8(s.padding1), uint8(s.padding2), uint8(s.padding3), int16(s.xrel), int16(s.yrel)}
 }
 
 func toCFromJoyBallEvent(s JoyBallEvent) (d C.SDL_JoyBallEvent) {
@@ -396,7 +396,7 @@ func toCFromJoyBallEvent(s JoyBallEvent) (d C.SDL_JoyBallEvent) {
  // Joystick hat position change event structure (event.jhat.*)
 type JoyHatEvent struct {
      // SDL_JOYHATMOTION
-    Type uint32
+    Type EventType
 
     Timestamp uint32
 
@@ -421,7 +421,7 @@ type JoyHatEvent struct {
 }
 
 func fromC2JoyHatEvent(s C.SDL_JoyHatEvent) JoyHatEvent {
-    return JoyHatEvent{uint32(s._type), uint32(s.timestamp), JoystickID(s.which), uint8(s.hat), uint8(s.value), uint8(s.padding1), uint8(s.padding2)}
+    return JoyHatEvent{EventType(s._type), uint32(s.timestamp), JoystickID(s.which), uint8(s.hat), uint8(s.value), uint8(s.padding1), uint8(s.padding2)}
 }
 
 func toCFromJoyHatEvent(s JoyHatEvent) (d C.SDL_JoyHatEvent) {
@@ -438,7 +438,7 @@ func toCFromJoyHatEvent(s JoyHatEvent) (d C.SDL_JoyHatEvent) {
  // Joystick button event structure (event.jbutton.*)
 type JoyButtonEvent struct {
      // SDL_JOYBUTTONDOWN or SDL_JOYBUTTONUP
-    Type uint32
+    Type EventType
 
     Timestamp uint32
 
@@ -457,7 +457,7 @@ type JoyButtonEvent struct {
 }
 
 func fromC2JoyButtonEvent(s C.SDL_JoyButtonEvent) JoyButtonEvent {
-    return JoyButtonEvent{uint32(s._type), uint32(s.timestamp), JoystickID(s.which), uint8(s.button), uint8(s.state), uint8(s.padding1), uint8(s.padding2)}
+    return JoyButtonEvent{EventType(s._type), uint32(s.timestamp), JoystickID(s.which), uint8(s.button), uint8(s.state), uint8(s.padding1), uint8(s.padding2)}
 }
 
 func toCFromJoyButtonEvent(s JoyButtonEvent) (d C.SDL_JoyButtonEvent) {
@@ -474,7 +474,7 @@ func toCFromJoyButtonEvent(s JoyButtonEvent) (d C.SDL_JoyButtonEvent) {
  // Joystick device event structure (event.jdevice.*)
 type JoyDeviceEvent struct {
      // SDL_JOYDEVICEADDED or SDL_JOYDEVICEREMOVED
-    Type uint32
+    Type EventType
 
     Timestamp uint32
 
@@ -484,7 +484,7 @@ type JoyDeviceEvent struct {
 }
 
 func fromC2JoyDeviceEvent(s C.SDL_JoyDeviceEvent) JoyDeviceEvent {
-    return JoyDeviceEvent{uint32(s._type), uint32(s.timestamp), int32(s.which)}
+    return JoyDeviceEvent{EventType(s._type), uint32(s.timestamp), int32(s.which)}
 }
 
 func toCFromJoyDeviceEvent(s JoyDeviceEvent) (d C.SDL_JoyDeviceEvent) {
@@ -497,7 +497,7 @@ func toCFromJoyDeviceEvent(s JoyDeviceEvent) (d C.SDL_JoyDeviceEvent) {
  // Game controller axis motion event structure (event.caxis.*)
 type ControllerAxisEvent struct {
      // SDL_CONTROLLERAXISMOTION
-    Type uint32
+    Type EventType
 
     Timestamp uint32
 
@@ -520,7 +520,7 @@ type ControllerAxisEvent struct {
 }
 
 func fromC2ControllerAxisEvent(s C.SDL_ControllerAxisEvent) ControllerAxisEvent {
-    return ControllerAxisEvent{uint32(s._type), uint32(s.timestamp), JoystickID(s.which), uint8(s.axis), uint8(s.padding1), uint8(s.padding2), uint8(s.padding3), int16(s.value), uint16(s.padding4)}
+    return ControllerAxisEvent{EventType(s._type), uint32(s.timestamp), JoystickID(s.which), uint8(s.axis), uint8(s.padding1), uint8(s.padding2), uint8(s.padding3), int16(s.value), uint16(s.padding4)}
 }
 
 func toCFromControllerAxisEvent(s ControllerAxisEvent) (d C.SDL_ControllerAxisEvent) {
@@ -539,7 +539,7 @@ func toCFromControllerAxisEvent(s ControllerAxisEvent) (d C.SDL_ControllerAxisEv
  // Game controller button event structure (event.cbutton.*)
 type ControllerButtonEvent struct {
      // SDL_CONTROLLERBUTTONDOWN or SDL_CONTROLLERBUTTONUP
-    Type uint32
+    Type EventType
 
     Timestamp uint32
 
@@ -558,7 +558,7 @@ type ControllerButtonEvent struct {
 }
 
 func fromC2ControllerButtonEvent(s C.SDL_ControllerButtonEvent) ControllerButtonEvent {
-    return ControllerButtonEvent{uint32(s._type), uint32(s.timestamp), JoystickID(s.which), uint8(s.button), uint8(s.state), uint8(s.padding1), uint8(s.padding2)}
+    return ControllerButtonEvent{EventType(s._type), uint32(s.timestamp), JoystickID(s.which), uint8(s.button), uint8(s.state), uint8(s.padding1), uint8(s.padding2)}
 }
 
 func toCFromControllerButtonEvent(s ControllerButtonEvent) (d C.SDL_ControllerButtonEvent) {
@@ -576,7 +576,7 @@ func toCFromControllerButtonEvent(s ControllerButtonEvent) (d C.SDL_ControllerBu
 type ControllerDeviceEvent struct {
      // SDL_CONTROLLERDEVICEADDED, SDL_CONTROLLERDEVICEREMOVED, or
      // SDL_CONTROLLERDEVICEREMAPPED
-    Type uint32
+    Type EventType
 
     Timestamp uint32
 
@@ -586,7 +586,7 @@ type ControllerDeviceEvent struct {
 }
 
 func fromC2ControllerDeviceEvent(s C.SDL_ControllerDeviceEvent) ControllerDeviceEvent {
-    return ControllerDeviceEvent{uint32(s._type), uint32(s.timestamp), int32(s.which)}
+    return ControllerDeviceEvent{EventType(s._type), uint32(s.timestamp), int32(s.which)}
 }
 
 func toCFromControllerDeviceEvent(s ControllerDeviceEvent) (d C.SDL_ControllerDeviceEvent) {
@@ -599,7 +599,7 @@ func toCFromControllerDeviceEvent(s ControllerDeviceEvent) (d C.SDL_ControllerDe
  // Audio device event structure (event.adevice.*)
 type AudioDeviceEvent struct {
      // SDL_AUDIODEVICEADDED, or SDL_AUDIODEVICEREMOVED
-    Type uint32
+    Type EventType
 
     Timestamp uint32
 
@@ -619,7 +619,7 @@ type AudioDeviceEvent struct {
 }
 
 func fromC2AudioDeviceEvent(s C.SDL_AudioDeviceEvent) AudioDeviceEvent {
-    return AudioDeviceEvent{uint32(s._type), uint32(s.timestamp), uint32(s.which), uint8(s.iscapture), uint8(s.padding1), uint8(s.padding2), uint8(s.padding3)}
+    return AudioDeviceEvent{EventType(s._type), uint32(s.timestamp), uint32(s.which), uint8(s.iscapture), uint8(s.padding1), uint8(s.padding2), uint8(s.padding3)}
 }
 
 func toCFromAudioDeviceEvent(s AudioDeviceEvent) (d C.SDL_AudioDeviceEvent) {
@@ -636,7 +636,7 @@ func toCFromAudioDeviceEvent(s AudioDeviceEvent) (d C.SDL_AudioDeviceEvent) {
  // Touch finger event structure (event.tfinger.*)
 type TouchFingerEvent struct {
      // SDL_FINGERMOTION or SDL_FINGERDOWN or SDL_FINGERUP
-    Type uint32
+    Type EventType
 
     Timestamp uint32
 
@@ -662,7 +662,7 @@ type TouchFingerEvent struct {
 }
 
 func fromC2TouchFingerEvent(s C.SDL_TouchFingerEvent) TouchFingerEvent {
-    return TouchFingerEvent{uint32(s._type), uint32(s.timestamp), TouchID(s.touchId), FingerID(s.fingerId), float32(s.x), float32(s.y), float32(s.dx), float32(s.dy), float32(s.pressure)}
+    return TouchFingerEvent{EventType(s._type), uint32(s.timestamp), TouchID(s.touchId), FingerID(s.fingerId), float32(s.x), float32(s.y), float32(s.dx), float32(s.dy), float32(s.pressure)}
 }
 
 func toCFromTouchFingerEvent(s TouchFingerEvent) (d C.SDL_TouchFingerEvent) {
@@ -681,7 +681,7 @@ func toCFromTouchFingerEvent(s TouchFingerEvent) (d C.SDL_TouchFingerEvent) {
  // Multiple Finger Gesture Event (event.mgesture.*)
 type MultiGestureEvent struct {
      // SDL_MULTIGESTURE
-    Type uint32
+    Type EventType
 
     Timestamp uint32
 
@@ -702,7 +702,7 @@ type MultiGestureEvent struct {
 }
 
 func fromC2MultiGestureEvent(s C.SDL_MultiGestureEvent) MultiGestureEvent {
-    return MultiGestureEvent{uint32(s._type), uint32(s.timestamp), TouchID(s.touchId), float32(s.dTheta), float32(s.dDist), float32(s.x), float32(s.y), uint16(s.numFingers), uint16(s.padding)}
+    return MultiGestureEvent{EventType(s._type), uint32(s.timestamp), TouchID(s.touchId), float32(s.dTheta), float32(s.dDist), float32(s.x), float32(s.y), uint16(s.numFingers), uint16(s.padding)}
 }
 
 func toCFromMultiGestureEvent(s MultiGestureEvent) (d C.SDL_MultiGestureEvent) {
@@ -721,7 +721,7 @@ func toCFromMultiGestureEvent(s MultiGestureEvent) (d C.SDL_MultiGestureEvent) {
  // Dollar Gesture Event (event.dgesture.*)
 type DollarGestureEvent struct {
      // SDL_DOLLARGESTURE or SDL_DOLLARRECORD
-    Type uint32
+    Type EventType
 
     Timestamp uint32
 
@@ -742,7 +742,7 @@ type DollarGestureEvent struct {
 }
 
 func fromC2DollarGestureEvent(s C.SDL_DollarGestureEvent) DollarGestureEvent {
-    return DollarGestureEvent{uint32(s._type), uint32(s.timestamp), TouchID(s.touchId), GestureID(s.gestureId), uint32(s.numFingers), float32(s.error), float32(s.x), float32(s.y)}
+    return DollarGestureEvent{EventType(s._type), uint32(s.timestamp), TouchID(s.touchId), GestureID(s.gestureId), uint32(s.numFingers), float32(s.error), float32(s.x), float32(s.y)}
 }
 
 func toCFromDollarGestureEvent(s DollarGestureEvent) (d C.SDL_DollarGestureEvent) {
@@ -765,7 +765,7 @@ func toCFromDollarGestureEvent(s DollarGestureEvent) (d C.SDL_DollarGestureEvent
  // 
 type DropEvent struct {
      // SDL_DROPFILE
-    Type uint32
+    Type EventType
 
     Timestamp uint32
 
@@ -774,19 +774,19 @@ type DropEvent struct {
 }
 
 func fromC2DropEvent(s C.SDL_DropEvent) DropEvent {
-    return DropEvent{uint32(s._type), uint32(s.timestamp), C.GoString(s.file)}
+    return DropEvent{EventType(s._type), uint32(s.timestamp), C.GoString(s.file)}
 }
 
  // The "quit requested" event.
 type QuitEvent struct {
      // SDL_QUIT
-    Type uint32
+    Type EventType
 
     Timestamp uint32
 }
 
 func fromC2QuitEvent(s C.SDL_QuitEvent) QuitEvent {
-    return QuitEvent{uint32(s._type), uint32(s.timestamp)}
+    return QuitEvent{EventType(s._type), uint32(s.timestamp)}
 }
 
 func toCFromQuitEvent(s QuitEvent) (d C.SDL_QuitEvent) {
@@ -798,13 +798,13 @@ func toCFromQuitEvent(s QuitEvent) (d C.SDL_QuitEvent) {
  // OS Specific event.
 type OSEvent struct {
      // SDL_QUIT
-    Type uint32
+    Type EventType
 
     Timestamp uint32
 }
 
 func fromC2OSEvent(s C.SDL_OSEvent) OSEvent {
-    return OSEvent{uint32(s._type), uint32(s.timestamp)}
+    return OSEvent{EventType(s._type), uint32(s.timestamp)}
 }
 
 func toCFromOSEvent(s OSEvent) (d C.SDL_OSEvent) {
@@ -816,7 +816,7 @@ func toCFromOSEvent(s OSEvent) (d C.SDL_OSEvent) {
  // A user-defined event type (event.user.*)
 type UserEvent struct {
      // SDL_USEREVENT through SDL_LASTEVENT-1
-    Type uint32
+    Type EventType
 
     Timestamp uint32
 
@@ -834,7 +834,7 @@ type UserEvent struct {
 }
 
 func fromC2UserEvent(s C.SDL_UserEvent) UserEvent {
-    return UserEvent{uint32(s._type), uint32(s.timestamp), uint32(s.windowID), int32(s.code), uintptr(s.data1), uintptr(s.data2)}
+    return UserEvent{EventType(s._type), uint32(s.timestamp), uint32(s.windowID), int32(s.code), uintptr(s.data1), uintptr(s.data2)}
 }
 
 func toCFromUserEvent(s UserEvent) (d C.SDL_UserEvent) {
@@ -851,12 +851,12 @@ func toCFromUserEvent(s UserEvent) (d C.SDL_UserEvent) {
 type Event C.SDL_Event
 
  // Event type, shared with all events
-func (u *Event) Type() uint32 {
+func (u *Event) Type() EventType {
     p := (*C.Uint32)(unsafe.Pointer(u))
-    return uint32(*p)
+    return EventType(*p)
 }
  // Event type, shared with all events
-func (u *Event) SetType(x uint32) {
+func (u *Event) SetType(x EventType) {
     p := (*C.Uint32)(unsafe.Pointer(u))
     *p = C.Uint32(x)
 }
@@ -864,7 +864,7 @@ func (u *Event) SetType(x uint32) {
  // Common event data
 func (u *Event) Common() CommonEvent {
     p := (*C.SDL_CommonEvent)(unsafe.Pointer(u))
-    return CommonEvent{uint32(p._type), uint32(p.timestamp)}
+    return CommonEvent{EventType(p._type), uint32(p.timestamp)}
 }
  // Common event data
 func (u *Event) SetCommon(x CommonEvent) {
@@ -876,7 +876,7 @@ func (u *Event) SetCommon(x CommonEvent) {
  // Window event data
 func (u *Event) Window() WindowEvent {
     p := (*C.SDL_WindowEvent)(unsafe.Pointer(u))
-    return WindowEvent{uint32(p._type), uint32(p.timestamp), uint32(p.windowID), uint8(p.event), uint8(p.padding1), uint8(p.padding2), uint8(p.padding3), int32(p.data1), int32(p.data2)}
+    return WindowEvent{EventType(p._type), uint32(p.timestamp), uint32(p.windowID), uint8(p.event), uint8(p.padding1), uint8(p.padding2), uint8(p.padding3), int32(p.data1), int32(p.data2)}
 }
  // Window event data
 func (u *Event) SetWindow(x WindowEvent) {
@@ -895,7 +895,7 @@ func (u *Event) SetWindow(x WindowEvent) {
  // Keyboard event data
 func (u *Event) Key() KeyboardEvent {
     p := (*C.SDL_KeyboardEvent)(unsafe.Pointer(u))
-    return KeyboardEvent{uint32(p._type), uint32(p.timestamp), uint32(p.windowID), uint8(p.state), uint8(p.repeat), uint8(p.padding2), uint8(p.padding3), Keysym{Scancode(p.keysym.scancode), Keycode(p.keysym.sym), uint16(p.keysym.mod), uint32(p.keysym.unused)}}
+    return KeyboardEvent{EventType(p._type), uint32(p.timestamp), uint32(p.windowID), uint8(p.state), uint8(p.repeat), uint8(p.padding2), uint8(p.padding3), Keysym{Scancode(p.keysym.scancode), Keycode(p.keysym.sym), uint16(p.keysym.mod), uint32(p.keysym.unused)}}
 }
  // Keyboard event data
 func (u *Event) SetKey(x KeyboardEvent) {
@@ -916,7 +916,7 @@ func (u *Event) SetKey(x KeyboardEvent) {
  // Text editing event data
 func (u *Event) Edit() TextEditingEvent {
     p := (*C.SDL_TextEditingEvent)(unsafe.Pointer(u))
-    return TextEditingEvent{uint32(p._type), uint32(p.timestamp), uint32(p.windowID), *(*[TEXTEDITINGEVENT_TEXT_SIZE]int8)(unsafe.Pointer(&(p.text))), int32(p.start), int32(p.length)}
+    return TextEditingEvent{EventType(p._type), uint32(p.timestamp), uint32(p.windowID), *(*[TEXTEDITINGEVENT_TEXT_SIZE]int8)(unsafe.Pointer(&(p.text))), int32(p.start), int32(p.length)}
 }
  // Text editing event data
 func (u *Event) SetEdit(x TextEditingEvent) {
@@ -932,7 +932,7 @@ func (u *Event) SetEdit(x TextEditingEvent) {
  // Text input event data
 func (u *Event) Text() TextInputEvent {
     p := (*C.SDL_TextInputEvent)(unsafe.Pointer(u))
-    return TextInputEvent{uint32(p._type), uint32(p.timestamp), uint32(p.windowID), *(*[TEXTINPUTEVENT_TEXT_SIZE]int8)(unsafe.Pointer(&(p.text)))}
+    return TextInputEvent{EventType(p._type), uint32(p.timestamp), uint32(p.windowID), *(*[TEXTINPUTEVENT_TEXT_SIZE]int8)(unsafe.Pointer(&(p.text)))}
 }
  // Text input event data
 func (u *Event) SetText(x TextInputEvent) {
@@ -946,7 +946,7 @@ func (u *Event) SetText(x TextInputEvent) {
  // Mouse motion event data
 func (u *Event) Motion() MouseMotionEvent {
     p := (*C.SDL_MouseMotionEvent)(unsafe.Pointer(u))
-    return MouseMotionEvent{uint32(p._type), uint32(p.timestamp), uint32(p.windowID), uint32(p.which), uint32(p.state), int32(p.x), int32(p.y), int32(p.xrel), int32(p.yrel)}
+    return MouseMotionEvent{EventType(p._type), uint32(p.timestamp), uint32(p.windowID), uint32(p.which), uint32(p.state), int32(p.x), int32(p.y), int32(p.xrel), int32(p.yrel)}
 }
  // Mouse motion event data
 func (u *Event) SetMotion(x MouseMotionEvent) {
@@ -965,7 +965,7 @@ func (u *Event) SetMotion(x MouseMotionEvent) {
  // Mouse button event data
 func (u *Event) Button() MouseButtonEvent {
     p := (*C.SDL_MouseButtonEvent)(unsafe.Pointer(u))
-    return MouseButtonEvent{uint32(p._type), uint32(p.timestamp), uint32(p.windowID), uint32(p.which), uint8(p.button), uint8(p.state), uint8(p.clicks), uint8(p.padding1), int32(p.x), int32(p.y)}
+    return MouseButtonEvent{EventType(p._type), uint32(p.timestamp), uint32(p.windowID), uint32(p.which), uint8(p.button), uint8(p.state), uint8(p.clicks), uint8(p.padding1), int32(p.x), int32(p.y)}
 }
  // Mouse button event data
 func (u *Event) SetButton(x MouseButtonEvent) {
@@ -985,7 +985,7 @@ func (u *Event) SetButton(x MouseButtonEvent) {
  // Mouse wheel event data
 func (u *Event) Wheel() MouseWheelEvent {
     p := (*C.SDL_MouseWheelEvent)(unsafe.Pointer(u))
-    return MouseWheelEvent{uint32(p._type), uint32(p.timestamp), uint32(p.windowID), uint32(p.which), int32(p.x), int32(p.y), uint32(p.direction)}
+    return MouseWheelEvent{EventType(p._type), uint32(p.timestamp), uint32(p.windowID), uint32(p.which), int32(p.x), int32(p.y), uint32(p.direction)}
 }
  // Mouse wheel event data
 func (u *Event) SetWheel(x MouseWheelEvent) {
@@ -1002,7 +1002,7 @@ func (u *Event) SetWheel(x MouseWheelEvent) {
  // Joystick axis event data
 func (u *Event) Jaxis() JoyAxisEvent {
     p := (*C.SDL_JoyAxisEvent)(unsafe.Pointer(u))
-    return JoyAxisEvent{uint32(p._type), uint32(p.timestamp), JoystickID(p.which), uint8(p.axis), uint8(p.padding1), uint8(p.padding2), uint8(p.padding3), int16(p.value), uint16(p.padding4)}
+    return JoyAxisEvent{EventType(p._type), uint32(p.timestamp), JoystickID(p.which), uint8(p.axis), uint8(p.padding1), uint8(p.padding2), uint8(p.padding3), int16(p.value), uint16(p.padding4)}
 }
  // Joystick axis event data
 func (u *Event) SetJaxis(x JoyAxisEvent) {
@@ -1021,7 +1021,7 @@ func (u *Event) SetJaxis(x JoyAxisEvent) {
  // Joystick ball event data
 func (u *Event) Jball() JoyBallEvent {
     p := (*C.SDL_JoyBallEvent)(unsafe.Pointer(u))
-    return JoyBallEvent{uint32(p._type), uint32(p.timestamp), JoystickID(p.which), uint8(p.ball), uint8(p.padding1), uint8(p.padding2), uint8(p.padding3), int16(p.xrel), int16(p.yrel)}
+    return JoyBallEvent{EventType(p._type), uint32(p.timestamp), JoystickID(p.which), uint8(p.ball), uint8(p.padding1), uint8(p.padding2), uint8(p.padding3), int16(p.xrel), int16(p.yrel)}
 }
  // Joystick ball event data
 func (u *Event) SetJball(x JoyBallEvent) {
@@ -1040,7 +1040,7 @@ func (u *Event) SetJball(x JoyBallEvent) {
  // Joystick hat event data
 func (u *Event) Jhat() JoyHatEvent {
     p := (*C.SDL_JoyHatEvent)(unsafe.Pointer(u))
-    return JoyHatEvent{uint32(p._type), uint32(p.timestamp), JoystickID(p.which), uint8(p.hat), uint8(p.value), uint8(p.padding1), uint8(p.padding2)}
+    return JoyHatEvent{EventType(p._type), uint32(p.timestamp), JoystickID(p.which), uint8(p.hat), uint8(p.value), uint8(p.padding1), uint8(p.padding2)}
 }
  // Joystick hat event data
 func (u *Event) SetJhat(x JoyHatEvent) {
@@ -1057,7 +1057,7 @@ func (u *Event) SetJhat(x JoyHatEvent) {
  // Joystick button event data
 func (u *Event) Jbutton() JoyButtonEvent {
     p := (*C.SDL_JoyButtonEvent)(unsafe.Pointer(u))
-    return JoyButtonEvent{uint32(p._type), uint32(p.timestamp), JoystickID(p.which), uint8(p.button), uint8(p.state), uint8(p.padding1), uint8(p.padding2)}
+    return JoyButtonEvent{EventType(p._type), uint32(p.timestamp), JoystickID(p.which), uint8(p.button), uint8(p.state), uint8(p.padding1), uint8(p.padding2)}
 }
  // Joystick button event data
 func (u *Event) SetJbutton(x JoyButtonEvent) {
@@ -1074,7 +1074,7 @@ func (u *Event) SetJbutton(x JoyButtonEvent) {
  // Joystick device change event data
 func (u *Event) Jdevice() JoyDeviceEvent {
     p := (*C.SDL_JoyDeviceEvent)(unsafe.Pointer(u))
-    return JoyDeviceEvent{uint32(p._type), uint32(p.timestamp), int32(p.which)}
+    return JoyDeviceEvent{EventType(p._type), uint32(p.timestamp), int32(p.which)}
 }
  // Joystick device change event data
 func (u *Event) SetJdevice(x JoyDeviceEvent) {
@@ -1087,7 +1087,7 @@ func (u *Event) SetJdevice(x JoyDeviceEvent) {
  // Game Controller axis event data
 func (u *Event) Caxis() ControllerAxisEvent {
     p := (*C.SDL_ControllerAxisEvent)(unsafe.Pointer(u))
-    return ControllerAxisEvent{uint32(p._type), uint32(p.timestamp), JoystickID(p.which), uint8(p.axis), uint8(p.padding1), uint8(p.padding2), uint8(p.padding3), int16(p.value), uint16(p.padding4)}
+    return ControllerAxisEvent{EventType(p._type), uint32(p.timestamp), JoystickID(p.which), uint8(p.axis), uint8(p.padding1), uint8(p.padding2), uint8(p.padding3), int16(p.value), uint16(p.padding4)}
 }
  // Game Controller axis event data
 func (u *Event) SetCaxis(x ControllerAxisEvent) {
@@ -1106,7 +1106,7 @@ func (u *Event) SetCaxis(x ControllerAxisEvent) {
  // Game Controller button event data
 func (u *Event) Cbutton() ControllerButtonEvent {
     p := (*C.SDL_ControllerButtonEvent)(unsafe.Pointer(u))
-    return ControllerButtonEvent{uint32(p._type), uint32(p.timestamp), JoystickID(p.which), uint8(p.button), uint8(p.state), uint8(p.padding1), uint8(p.padding2)}
+    return ControllerButtonEvent{EventType(p._type), uint32(p.timestamp), JoystickID(p.which), uint8(p.button), uint8(p.state), uint8(p.padding1), uint8(p.padding2)}
 }
  // Game Controller button event data
 func (u *Event) SetCbutton(x ControllerButtonEvent) {
@@ -1123,7 +1123,7 @@ func (u *Event) SetCbutton(x ControllerButtonEvent) {
  // Game Controller device event data
 func (u *Event) Cdevice() ControllerDeviceEvent {
     p := (*C.SDL_ControllerDeviceEvent)(unsafe.Pointer(u))
-    return ControllerDeviceEvent{uint32(p._type), uint32(p.timestamp), int32(p.which)}
+    return ControllerDeviceEvent{EventType(p._type), uint32(p.timestamp), int32(p.which)}
 }
  // Game Controller device event data
 func (u *Event) SetCdevice(x ControllerDeviceEvent) {
@@ -1136,7 +1136,7 @@ func (u *Event) SetCdevice(x ControllerDeviceEvent) {
  // Audio device event data
 func (u *Event) Adevice() AudioDeviceEvent {
     p := (*C.SDL_AudioDeviceEvent)(unsafe.Pointer(u))
-    return AudioDeviceEvent{uint32(p._type), uint32(p.timestamp), uint32(p.which), uint8(p.iscapture), uint8(p.padding1), uint8(p.padding2), uint8(p.padding3)}
+    return AudioDeviceEvent{EventType(p._type), uint32(p.timestamp), uint32(p.which), uint8(p.iscapture), uint8(p.padding1), uint8(p.padding2), uint8(p.padding3)}
 }
  // Audio device event data
 func (u *Event) SetAdevice(x AudioDeviceEvent) {
@@ -1153,7 +1153,7 @@ func (u *Event) SetAdevice(x AudioDeviceEvent) {
  // Quit request event data
 func (u *Event) Quit() QuitEvent {
     p := (*C.SDL_QuitEvent)(unsafe.Pointer(u))
-    return QuitEvent{uint32(p._type), uint32(p.timestamp)}
+    return QuitEvent{EventType(p._type), uint32(p.timestamp)}
 }
  // Quit request event data
 func (u *Event) SetQuit(x QuitEvent) {
@@ -1165,7 +1165,7 @@ func (u *Event) SetQuit(x QuitEvent) {
  // Custom event data
 func (u *Event) User() UserEvent {
     p := (*C.SDL_UserEvent)(unsafe.Pointer(u))
-    return UserEvent{uint32(p._type), uint32(p.timestamp), uint32(p.windowID), int32(p.code), uintptr(p.data1), uintptr(p.data2)}
+    return UserEvent{EventType(p._type), uint32(p.timestamp), uint32(p.windowID), int32(p.code), uintptr(p.data1), uintptr(p.data2)}
 }
  // Custom event data
 func (u *Event) SetUser(x UserEvent) {
@@ -1181,7 +1181,7 @@ func (u *Event) SetUser(x UserEvent) {
  // Touch finger event data
 func (u *Event) Tfinger() TouchFingerEvent {
     p := (*C.SDL_TouchFingerEvent)(unsafe.Pointer(u))
-    return TouchFingerEvent{uint32(p._type), uint32(p.timestamp), TouchID(p.touchId), FingerID(p.fingerId), float32(p.x), float32(p.y), float32(p.dx), float32(p.dy), float32(p.pressure)}
+    return TouchFingerEvent{EventType(p._type), uint32(p.timestamp), TouchID(p.touchId), FingerID(p.fingerId), float32(p.x), float32(p.y), float32(p.dx), float32(p.dy), float32(p.pressure)}
 }
  // Touch finger event data
 func (u *Event) SetTfinger(x TouchFingerEvent) {
@@ -1200,7 +1200,7 @@ func (u *Event) SetTfinger(x TouchFingerEvent) {
  // Gesture event data
 func (u *Event) Mgesture() MultiGestureEvent {
     p := (*C.SDL_MultiGestureEvent)(unsafe.Pointer(u))
-    return MultiGestureEvent{uint32(p._type), uint32(p.timestamp), TouchID(p.touchId), float32(p.dTheta), float32(p.dDist), float32(p.x), float32(p.y), uint16(p.numFingers), uint16(p.padding)}
+    return MultiGestureEvent{EventType(p._type), uint32(p.timestamp), TouchID(p.touchId), float32(p.dTheta), float32(p.dDist), float32(p.x), float32(p.y), uint16(p.numFingers), uint16(p.padding)}
 }
  // Gesture event data
 func (u *Event) SetMgesture(x MultiGestureEvent) {
@@ -1219,7 +1219,7 @@ func (u *Event) SetMgesture(x MultiGestureEvent) {
  // Gesture event data
 func (u *Event) Dgesture() DollarGestureEvent {
     p := (*C.SDL_DollarGestureEvent)(unsafe.Pointer(u))
-    return DollarGestureEvent{uint32(p._type), uint32(p.timestamp), TouchID(p.touchId), GestureID(p.gestureId), uint32(p.numFingers), float32(p.error), float32(p.x), float32(p.y)}
+    return DollarGestureEvent{EventType(p._type), uint32(p.timestamp), TouchID(p.touchId), GestureID(p.gestureId), uint32(p.numFingers), float32(p.error), float32(p.x), float32(p.y)}
 }
  // Gesture event data
 func (u *Event) SetDgesture(x DollarGestureEvent) {
@@ -1237,7 +1237,7 @@ func (u *Event) SetDgesture(x DollarGestureEvent) {
  // Drag and drop event data
 func (u *Event) Drop() DropEvent {
     p := (*C.SDL_DropEvent)(unsafe.Pointer(u))
-    return DropEvent{uint32(p._type), uint32(p.timestamp), C.GoString(p.file)}
+    return DropEvent{EventType(p._type), uint32(p.timestamp), C.GoString(p.file)}
 }
 
 func (u *Event) Padding() [56]uint8 {
@@ -1293,7 +1293,7 @@ const (
 )
 
  // The types of events that can be delivered.
-type EventType int
+type EventType uint32
 const (
      // Unused (do not remove)
     FIRSTEVENT EventType = C.SDL_FIRSTEVENT
@@ -1454,7 +1454,7 @@ func PumpEvents() {
 }
 
  // Checks to see if certain event types are in the event queue.
-func HasEvent(_type uint32) (retval bool) {
+func HasEvent(_type EventType) (retval bool) {
     retval = C.SDL_TRUE==(C.SDL_HasEvent(C.Uint32(_type)))
     return
 }
@@ -1468,11 +1468,11 @@ func HasEvents(minType uint32, maxType uint32) (retval bool) {
  // affects currently queued events. If you want to make sure that all
  // pending OS events are flushed, you can call SDL_PumpEvents() on the
  // main thread immediately before the flush call.
-func FlushEvent(_type uint32) {
+func FlushEvent(_type EventType) {
     C.SDL_FlushEvent(C.Uint32(_type))
 }
 
-func FlushEvents(minType uint32, maxType uint32) {
+func FlushEvents(minType EventType, maxType EventType) {
     C.SDL_FlushEvents(C.Uint32(minType), C.Uint32(maxType))
 }
 
