@@ -261,17 +261,13 @@ func GL_DeleteContext(context GLContext) {
 
 const (
      // Used to indicate that you don't care what the window position is.
-     // ↪ https://wiki.libsdl.org/SDL_WINDOWPOS_UNDEFINED_MASK
     WINDOWPOS_UNDEFINED_MASK = C.SDL_WINDOWPOS_UNDEFINED_MASK
 
-     // ↪ https://wiki.libsdl.org/SDL_WINDOWPOS_UNDEFINED
     WINDOWPOS_UNDEFINED = C.SDL_WINDOWPOS_UNDEFINED
 
      // Used to indicate that the window position should be centered.
-     // ↪ https://wiki.libsdl.org/SDL_WINDOWPOS_CENTERED_MASK
     WINDOWPOS_CENTERED_MASK = C.SDL_WINDOWPOS_CENTERED_MASK
 
-     // ↪ https://wiki.libsdl.org/SDL_WINDOWPOS_CENTERED
     WINDOWPOS_CENTERED = C.SDL_WINDOWPOS_CENTERED
 )
 
@@ -487,7 +483,6 @@ const (
     GL_CONTEXT_RESET_ISOLATION_FLAG GLcontextFlag = C.SDL_GL_CONTEXT_RESET_ISOLATION_FLAG
 )
 
- // ↪ https://wiki.libsdl.org/SDL_GLcontextReleaseFlag
 type GLcontextReleaseFlag int
 const (
     GL_CONTEXT_RELEASE_BEHAVIOR_NONE GLcontextReleaseFlag = C.SDL_GL_CONTEXT_RELEASE_BEHAVIOR_NONE

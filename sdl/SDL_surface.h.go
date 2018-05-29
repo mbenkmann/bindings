@@ -14,19 +14,15 @@ import "unsafe"
  // These are the currently supported flags for the SDL_Surface.
 const (
      // Just here for compatibility
-     // ↪ https://wiki.libsdl.org/SDL_SWSURFACE
     SWSURFACE = C.SDL_SWSURFACE
 
      // Surface uses preallocated memory
-     // ↪ https://wiki.libsdl.org/SDL_PREALLOC
     PREALLOC = C.SDL_PREALLOC
 
      // Surface is RLE encoded
-     // ↪ https://wiki.libsdl.org/SDL_RLEACCEL
     RLEACCEL = C.SDL_RLEACCEL
 
      // Surface is referenced internally
-     // ↪ https://wiki.libsdl.org/SDL_DONTFREE
     DONTFREE = C.SDL_DONTFREE
 )
 
