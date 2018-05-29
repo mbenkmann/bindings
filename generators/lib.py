@@ -22,6 +22,7 @@
 
 from bs4 import BeautifulSoup
 import textwrap
+import fnmatch
 
 # Set of prefixes that are removed from C names to produce Go names.
 prefixes = []
@@ -94,9 +95,13 @@ pointer_arg_treatment = {}
 # Names of functions whose returned C strings need to be freed by the caller.
 free_strings = frozenset()
 
-# Mapping for individual function parameter types, e.g.
+# Mapping for individual function parameter types and structure member types, e.g.
 # { "SDL_CreateWindow.flags": "WindowFlags" }
+# The argument name is a glob pattern (see fnmatch module).
 gotype_override = {}
+
+# Maps a C enum name to the integer type to be used on the Go side (if not "int").
+enum_types = {}
 
 
 def generate_bindings():
@@ -191,8 +196,7 @@ class BaseTypeinfo(object):
                 except:
                     gotype = argtype_stars + arr + fix(argtype)
 
-        if funcname + "." + argname in gotype_override:
-            gotype = gotype_override[funcname + "." + argname]
+        gotype = apply_gotype_override(funcname, argname, gotype)
 
         package = ""
         for prefix, pkg in cprefix_to_go_package.items():
@@ -346,6 +350,20 @@ class BaseTypeinfo(object):
         if "unsafe." in result["gotype"] or "unsafe" in result["alloc"] or "unsafe" in result["ccast"] or (
                 treat == "out" and "unsafe" in result["gocast"]):
             boilerplate.add('import "unsafe"')
+
+
+def apply_gotype_override(name, subname, gotype):
+    '''
+    If gotype_override contains an override for name.subname (or just name if
+    subname==""), returns it; otherwise  returns gotype.
+    '''
+    if subname != "":
+        name += "." + subname
+    for pattern in gotype_override:
+        if fnmatch.fnmatchcase(name, pattern):
+            return gotype_override[pattern]
+
+    return gotype
 
 
 def typeinfo(funcname, argidx, argname, argtype, argtypeargs):
@@ -901,10 +919,10 @@ def structs():
             first = False
             typ = get_ctype(member.type)
             typargs = ""
+            membname = str(member.find("name").string)
             if member.argsstring is not None:
                 typargs = str("".join(member.argsstring.stripped_strings))
-            ti = typeinfo(name, 0, "", typ, typargs)
-            membname = str(member.find("name").string)
+            ti = typeinfo(name, 0, membname, typ, typargs)
             describe(member)
             out.append("%s%s %s" % (indentation(), fix(membname), ti["gotype"]))
 
@@ -957,10 +975,10 @@ def unions():
             typargs = ""
             if member.argsstring is not None:
                 typargs = str("".join(member.argsstring.stripped_strings))
-            ti = typeinfo(name, 0, "", typ, typargs)
             membname = str(member.find("name").string)
             if name + "." + membname in blacklist:
                 continue
+            ti = typeinfo(name, 0, membname, typ, typargs)
             try:
                 refid = str(member.type.ref["refid"])
                 kindref = str(member.type.ref["kindref"])
@@ -1032,7 +1050,7 @@ def recursive_copy(refid, kindref, ti, dest, source):
                 typargs = ""
                 if member.argsstring is not None:
                     typargs = str("".join(member.argsstring.stripped_strings))
-                ti2 = typeinfo(name, 0, cmembname, typ, typargs)
+                ti2 = typeinfo(name, 0, membname, typ, typargs)
                 recursive_copy(refid2, kindref2, ti2, "%s.%s" % (dest.lstrip("*"), cmembname),
                                "%s.%s" % (source, fix(membname)))
 
@@ -1075,7 +1093,7 @@ def go_copy_of(refid, kindref, ti, value):
                 typargs = ""
                 if member.argsstring is not None:
                     typargs = str("".join(member.argsstring.stripped_strings))
-                ti2 = typeinfo(name, 0, cmembname, typ, typargs)
+                ti2 = typeinfo(name, 0, membname, typ, typargs)
                 s.append(
                     go_copy_of(refid2, kindref2, ti2, "%s.%s" % (value.lstrip("*"), cmembname)))
 
@@ -1132,7 +1150,8 @@ def enum2const(section):
         ti = typeinfo(name, 0, "", name, "")
         goname = ti["gotype"]
         if goname.isidentifier():
-            out.append("%stype %s int" % (indentation(), goname))
+            enum_type = enum_types.get(name, "int")
+            out.append("%stype %s %s" % (indentation(), goname, enum_type))
         else:
             goname = ""
         out.append(indentation() + "const (")
