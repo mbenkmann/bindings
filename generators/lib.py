@@ -26,6 +26,7 @@ import fnmatch
 import urllib.request
 import time
 import os
+import sys
 
 # Set of prefixes that are removed from C names to produce Go names.
 prefixes = []
@@ -654,7 +655,8 @@ def external_link(name):
         if fnmatch.fnmatchcase(name, pattern):
             url = external_link_urls[pattern].replace("$0", name)
             if "CHECK_EXTERNAL_LINKS" in os.environ:
-                time.sleep(1)  # throttling to avoid triggering DDOS protection
+                time.sleep(5)  # throttling to avoid triggering DDOS protection
+                sys.stderr.write("Checking link %s\n" % url)
                 request = urllib.request.Request(url, method='HEAD')
                 try:
                     with urllib.request.urlopen(request) as r:
