@@ -10,24 +10,34 @@ import "unsafe"
  // Include file for SDL mouse event handling.
 
 const (
+     // ↪ https://wiki.libsdl.org/SDL_BUTTON_LEFT
     BUTTON_LEFT = C.SDL_BUTTON_LEFT
 
+     // ↪ https://wiki.libsdl.org/SDL_BUTTON_MIDDLE
     BUTTON_MIDDLE = C.SDL_BUTTON_MIDDLE
 
+     // ↪ https://wiki.libsdl.org/SDL_BUTTON_RIGHT
     BUTTON_RIGHT = C.SDL_BUTTON_RIGHT
 
+     // ↪ https://wiki.libsdl.org/SDL_BUTTON_X1
     BUTTON_X1 = C.SDL_BUTTON_X1
 
+     // ↪ https://wiki.libsdl.org/SDL_BUTTON_X2
     BUTTON_X2 = C.SDL_BUTTON_X2
 
+     // ↪ https://wiki.libsdl.org/SDL_BUTTON_LMASK
     BUTTON_LMASK = C.SDL_BUTTON_LMASK
 
+     // ↪ https://wiki.libsdl.org/SDL_BUTTON_MMASK
     BUTTON_MMASK = C.SDL_BUTTON_MMASK
 
+     // ↪ https://wiki.libsdl.org/SDL_BUTTON_RMASK
     BUTTON_RMASK = C.SDL_BUTTON_RMASK
 
+     // ↪ https://wiki.libsdl.org/SDL_BUTTON_X1MASK
     BUTTON_X1MASK = C.SDL_BUTTON_X1MASK
 
+     // ↪ https://wiki.libsdl.org/SDL_BUTTON_X2MASK
     BUTTON_X2MASK = C.SDL_BUTTON_X2MASK
 )
 
@@ -75,6 +85,7 @@ const (
 )
 
  // Scroll direction types for the Scroll event.
+ // ↪ https://wiki.libsdl.org/SDL_MouseWheelDirection
 type MouseWheelDirection int
 const (
      // The scroll direction is normal

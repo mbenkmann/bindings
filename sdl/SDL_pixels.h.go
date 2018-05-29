@@ -36,8 +36,10 @@ func toCFromColor(s Color) (d C.SDL_Color) {
  // 
  // These define alpha as the opacity of a surface.
 const (
+     // ↪ https://wiki.libsdl.org/SDL_ALPHA_OPAQUE
     ALPHA_OPAQUE = C.SDL_ALPHA_OPAQUE
 
+     // ↪ https://wiki.libsdl.org/SDL_ALPHA_TRANSPARENT
     ALPHA_TRANSPARENT = C.SDL_ALPHA_TRANSPARENT
 )
 

@@ -18,6 +18,7 @@ import "unsafe"
  // SDL_Init(): SDL_HINT_JOYSTICK_ALLOW_BACKGROUND_EVENTS
 
 
+ // ↪ https://wiki.libsdl.org/SDL_GameControllerBindType
 type GameControllerBindType int
 const (
     CONTROLLER_BINDTYPE_NONE GameControllerBindType = C.SDL_CONTROLLER_BINDTYPE_NONE

@@ -813,6 +813,7 @@ const (
      // 
      // See also: SDL_HapticCondition
      // 
+     // ↪ https://wiki.libsdl.org/SDL_HAPTIC_CONSTANT
     HAPTIC_CONSTANT = C.SDL_HAPTIC_CONSTANT
 
      // Sine wave effect supported.
@@ -821,6 +822,7 @@ const (
      // 
      // See also: SDL_HapticPeriodic
      // 
+     // ↪ https://wiki.libsdl.org/SDL_HAPTIC_SINE
     HAPTIC_SINE = C.SDL_HAPTIC_SINE
 
      // Left/Right effect supported.
@@ -832,6 +834,7 @@ const (
      // Warning: this value was SDL_HAPTIC_SQUARE right before 2.0.0 shipped.
      // Sorry, we ran out of bits, and this is important for XInput devices.
      // 
+     // ↪ https://wiki.libsdl.org/SDL_HAPTIC_LEFTRIGHT
     HAPTIC_LEFTRIGHT = C.SDL_HAPTIC_LEFTRIGHT
 
      // Triangle wave effect supported.
@@ -840,6 +843,7 @@ const (
      // 
      // See also: SDL_HapticPeriodic
      // 
+     // ↪ https://wiki.libsdl.org/SDL_HAPTIC_TRIANGLE
     HAPTIC_TRIANGLE = C.SDL_HAPTIC_TRIANGLE
 
      // Sawtoothup wave effect supported.
@@ -848,6 +852,7 @@ const (
      // 
      // See also: SDL_HapticPeriodic
      // 
+     // ↪ https://wiki.libsdl.org/SDL_HAPTIC_SAWTOOTHUP
     HAPTIC_SAWTOOTHUP = C.SDL_HAPTIC_SAWTOOTHUP
 
      // Sawtoothdown wave effect supported.
@@ -856,6 +861,7 @@ const (
      // 
      // See also: SDL_HapticPeriodic
      // 
+     // ↪ https://wiki.libsdl.org/SDL_HAPTIC_SAWTOOTHDOWN
     HAPTIC_SAWTOOTHDOWN = C.SDL_HAPTIC_SAWTOOTHDOWN
 
      // Ramp effect supported.
@@ -864,6 +870,7 @@ const (
      // 
      // See also: SDL_HapticRamp
      // 
+     // ↪ https://wiki.libsdl.org/SDL_HAPTIC_RAMP
     HAPTIC_RAMP = C.SDL_HAPTIC_RAMP
 
      // Spring effect supported - uses axes position.
@@ -873,6 +880,7 @@ const (
      // 
      // See also: SDL_HapticCondition
      // 
+     // ↪ https://wiki.libsdl.org/SDL_HAPTIC_SPRING
     HAPTIC_SPRING = C.SDL_HAPTIC_SPRING
 
      // Damper effect supported - uses axes velocity.
@@ -882,6 +890,7 @@ const (
      // 
      // See also: SDL_HapticCondition
      // 
+     // ↪ https://wiki.libsdl.org/SDL_HAPTIC_DAMPER
     HAPTIC_DAMPER = C.SDL_HAPTIC_DAMPER
 
      // Inertia effect supported - uses axes acceleration.
@@ -891,6 +900,7 @@ const (
      // 
      // See also: SDL_HapticCondition
      // 
+     // ↪ https://wiki.libsdl.org/SDL_HAPTIC_INERTIA
     HAPTIC_INERTIA = C.SDL_HAPTIC_INERTIA
 
      // Friction effect supported - uses axes movement.
@@ -900,11 +910,13 @@ const (
      // 
      // See also: SDL_HapticCondition
      // 
+     // ↪ https://wiki.libsdl.org/SDL_HAPTIC_FRICTION
     HAPTIC_FRICTION = C.SDL_HAPTIC_FRICTION
 
      // Custom effect is supported.
      // 
      // User defined custom haptic effect.
+     // ↪ https://wiki.libsdl.org/SDL_HAPTIC_CUSTOM
     HAPTIC_CUSTOM = C.SDL_HAPTIC_CUSTOM
 )
 
@@ -914,18 +926,21 @@ const (
      // 
      // See also: SDL_HapticDirection
      // 
+     // ↪ https://wiki.libsdl.org/SDL_HAPTIC_POLAR
     HAPTIC_POLAR = C.SDL_HAPTIC_POLAR
 
      // Uses cartesian coordinates for the direction.
      // 
      // See also: SDL_HapticDirection
      // 
+     // ↪ https://wiki.libsdl.org/SDL_HAPTIC_CARTESIAN
     HAPTIC_CARTESIAN = C.SDL_HAPTIC_CARTESIAN
 
      // Uses spherical coordinates for the direction.
      // 
      // See also: SDL_HapticDirection
      // 
+     // ↪ https://wiki.libsdl.org/SDL_HAPTIC_SPHERICAL
     HAPTIC_SPHERICAL = C.SDL_HAPTIC_SPHERICAL
 )
 
@@ -936,6 +951,7 @@ const (
      // 
      // See also: SDL_HapticSetGain
      // 
+     // ↪ https://wiki.libsdl.org/SDL_HAPTIC_GAIN
     HAPTIC_GAIN = C.SDL_HAPTIC_GAIN
 
      // Device can set autocenter.
@@ -944,6 +960,7 @@ const (
      // 
      // See also: SDL_HapticSetAutocenter
      // 
+     // ↪ https://wiki.libsdl.org/SDL_HAPTIC_AUTOCENTER
     HAPTIC_AUTOCENTER = C.SDL_HAPTIC_AUTOCENTER
 
      // Device can be queried for effect status.
@@ -952,6 +969,7 @@ const (
      // 
      // See also: SDL_HapticGetEffectStatus
      // 
+     // ↪ https://wiki.libsdl.org/SDL_HAPTIC_STATUS
     HAPTIC_STATUS = C.SDL_HAPTIC_STATUS
 
      // Device can be paused.
@@ -962,12 +980,14 @@ const (
      // 
      // See also: SDL_HapticUnpause
      // 
+     // ↪ https://wiki.libsdl.org/SDL_HAPTIC_PAUSE
     HAPTIC_PAUSE = C.SDL_HAPTIC_PAUSE
 
      // Used to play a device an infinite number of times.
      // 
      // See also: SDL_HapticRunEffect
      // 
+     // ↪ https://wiki.libsdl.org/SDL_HAPTIC_INFINITY
     HAPTIC_INFINITY = C.SDL_HAPTIC_INFINITY
 )
 
