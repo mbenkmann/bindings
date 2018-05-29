@@ -218,7 +218,7 @@ def sdl():
             clssoup = BeautifulSoup(f, "xml")
             lib.soup.doxygen.append(clssoup.doxygen.compounddef)
 
-    lib.prefixes = ["SDL_"]
+    lib.prefixes = ["SDL_", "SDL"]
     lib.typeinfo_heuristics.append(lib.BaseTypeinfo(SDL_TYPE_MAPPING))
     lib.blacklist = SDL_BLACKLIST
     lib.custom_gocast = SDL_GOCAST
