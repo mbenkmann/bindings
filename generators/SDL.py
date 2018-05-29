@@ -187,6 +187,8 @@ SDL_GOTYPE_OVERRIDE = {
 
 SDL_ENUM_TYPES = {"SDL_EventType": "uint32"}
 
+SDL_EXTERNAL_LINKS = {"SDL_*": "https://wiki.libsdl.org/$0"}
+
 
 def sdl():
     '''
@@ -225,6 +227,7 @@ def sdl():
     lib.free_strings = SDL_FREE_STRINGS
     lib.gotype_override = SDL_GOTYPE_OVERRIDE
     lib.enum_types = SDL_ENUM_TYPES
+    lib.external_link_urls = SDL_EXTERNAL_LINKS
 
 
 if __name__ == "__main__":
