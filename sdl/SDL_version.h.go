@@ -44,13 +44,10 @@ func toCFromVersion(s Version) (d C.SDL_version) {
 }
 
 const (
-     // ↪ https://wiki.libsdl.org/SDL_MAJOR_VERSION
     MAJOR_VERSION = C.SDL_MAJOR_VERSION
 
-     // ↪ https://wiki.libsdl.org/SDL_MINOR_VERSION
     MINOR_VERSION = C.SDL_MINOR_VERSION
 
-     // ↪ https://wiki.libsdl.org/SDL_PATCHLEVEL
     PATCHLEVEL = C.SDL_PATCHLEVEL
 
      // This is the version number macro for the current SDL version.

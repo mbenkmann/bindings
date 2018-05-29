@@ -9,7 +9,6 @@ import "C"
  // Simple error message routines for SDL.
 
  // Internal error functions
- // ↪ https://wiki.libsdl.org/SDL_errorcode
 type Errorcode int
 const (
     ENOMEM Errorcode = C.SDL_ENOMEM
@@ -25,7 +24,6 @@ const (
     LASTERROR Errorcode = C.SDL_LASTERROR
 )
 
- // ↪ https://wiki.libsdl.org/SDL_Error
 func Error(code Errorcode) (retval int) {
     retval = int(C.SDL_Error(C.SDL_errorcode(code)))
     return
