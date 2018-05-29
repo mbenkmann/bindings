@@ -20,6 +20,7 @@ import "C"
  // 
  // See also: SDL_GetVersion
  // 
+ // ↪ https://wiki.libsdl.org/SDL_version
 type Version struct {
      // major version
     Major uint8
@@ -43,13 +44,17 @@ func toCFromVersion(s Version) (d C.SDL_version) {
 }
 
 const (
+     // ↪ https://wiki.libsdl.org/SDL_MAJOR_VERSION
     MAJOR_VERSION = C.SDL_MAJOR_VERSION
 
+     // ↪ https://wiki.libsdl.org/SDL_MINOR_VERSION
     MINOR_VERSION = C.SDL_MINOR_VERSION
 
+     // ↪ https://wiki.libsdl.org/SDL_PATCHLEVEL
     PATCHLEVEL = C.SDL_PATCHLEVEL
 
      // This is the version number macro for the current SDL version.
+     // ↪ https://wiki.libsdl.org/SDL_COMPILEDVERSION
     COMPILEDVERSION = C.SDL_COMPILEDVERSION
 )
 
@@ -77,6 +82,7 @@ const (
  // 
  // See also: SDL_VERSION
  // 
+ // ↪ https://wiki.libsdl.org/SDL_GetVersion
 func GetVersion() (ver *Version) {
     tmp_ver := new(C.SDL_version)
     C.SDL_GetVersion((*C.SDL_version)(tmp_ver))
@@ -89,6 +95,7 @@ func GetVersion() (ver *Version) {
  // Returns an arbitrary string (a hash value) uniquely identifying the
  // exact revision of the SDL library in use, and is only useful in
  // comparing against other revisions. It is NOT an incrementing number.
+ // ↪ https://wiki.libsdl.org/SDL_GetRevision
 func GetRevision() (retval string) {
     retval = C.GoString(C.SDL_GetRevision())
     return
@@ -99,6 +106,7 @@ func GetRevision() (retval string) {
  // Returns a number uniquely identifying the exact revision of the SDL
  // library in use. It is an incrementing number based on commits to
  // hg.libsdl.org.
+ // ↪ https://wiki.libsdl.org/SDL_GetRevisionNumber
 func GetRevisionNumber() (retval int) {
     retval = int(C.SDL_GetRevisionNumber())
     return

@@ -11,6 +11,7 @@ import "unsafe"
 
  // A struct that tags the SDL_WindowShapeParams union with an enum
  // describing the type of its contents.
+ // ↪ https://wiki.libsdl.org/SDL_WindowShapeMode
 type WindowShapeMode struct {
      // The mode of these window-shape parameters.
     Mode ShapeMode
@@ -20,6 +21,7 @@ type WindowShapeMode struct {
 }
 
  // A union containing parameters for shaped windows.
+ // ↪ https://wiki.libsdl.org/SDL_WindowShapeParams
 type WindowShapeParams C.SDL_WindowShapeParams
 
  // a cutoff alpha value for binarization of the window shape's alpha
@@ -48,10 +50,13 @@ func (u *WindowShapeParams) SetColorKey(x Color) {
 }
 
 const (
+     // ↪ https://wiki.libsdl.org/SDL_NONSHAPEABLE_WINDOW
     NONSHAPEABLE_WINDOW = C.SDL_NONSHAPEABLE_WINDOW
 
+     // ↪ https://wiki.libsdl.org/SDL_INVALID_SHAPE_ARGUMENT
     INVALID_SHAPE_ARGUMENT = C.SDL_INVALID_SHAPE_ARGUMENT
 
+     // ↪ https://wiki.libsdl.org/SDL_WINDOW_LACKS_SHAPE
     WINDOW_LACKS_SHAPE = C.SDL_WINDOW_LACKS_SHAPE
 )
 
@@ -105,6 +110,7 @@ const (
  //     SDL_WINDOW_MINIMIZED, SDL_WINDOW_BORDERLESS is always set, and
  //     SDL_WINDOW_FULLSCREEN is always unset.
  //   
+ // ↪ https://wiki.libsdl.org/SDL_CreateShapedWindow
 func CreateShapedWindow(title string, x uint, y uint, w uint, h uint, flags WindowFlags) (retval *Window) {
     tmp_title := C.CString(title); defer C.free(unsafe.Pointer(tmp_title))
     retval = (*Window)(unsafe.Pointer(C.SDL_CreateShapedWindow((*C.char)(tmp_title), C.uint(x), C.uint(y), C.uint(w), C.uint(h), C.Uint32(flags))))
@@ -121,6 +127,7 @@ func CreateShapedWindow(title string, x uint, y uint, w uint, h uint, flags Wind
  //   window
  //     The window to query for being shaped.
  //   
+ // ↪ https://wiki.libsdl.org/SDL_IsShapedWindow
 func (window *Window) IsShaped() (retval bool) {
     retval = C.SDL_TRUE==(C.SDL_IsShapedWindow((*C.SDL_Window)(window)))
     return
@@ -145,6 +152,7 @@ func (window *Window) IsShaped() (retval bool) {
  //   shape_mode
  //     The parameters to set for the shaped window.
  //   
+ // ↪ https://wiki.libsdl.org/SDL_SetWindowShape
 func (window *Window) SetShape(shape *Surface, shape_mode *WindowShapeMode) (retval int) {
     var tmp_shape_mode *C.SDL_WindowShapeMode; if shape_mode != nil { x := toCFromWindowShapeMode(*shape_mode); tmp_shape_mode = &x }
     retval = int(C.SDL_SetWindowShape((*C.SDL_Window)(window), (*C.SDL_Surface)(shape), (*C.SDL_WindowShapeMode)(tmp_shape_mode)))
@@ -170,6 +178,7 @@ func (window *Window) SetShape(shape *Surface, shape_mode *WindowShapeMode) (ret
  //     An empty shape-mode structure to fill, or NULL to check whether the
  //     window has a shape.
  //   
+ // ↪ https://wiki.libsdl.org/SDL_GetShapedWindowMode
 func (window *Window) GetShapedMode() (retval int, shape_mode *WindowShapeMode) {
     tmp_shape_mode := new(C.SDL_WindowShapeMode)
     retval = int(C.SDL_GetShapedWindowMode((*C.SDL_Window)(window), (*C.SDL_WindowShapeMode)(tmp_shape_mode)))

@@ -495,6 +495,7 @@ const (
 )
 
  // Enumeration of valid key mods (possibly OR'd together).
+ // ↪ https://wiki.libsdl.org/SDL_Keymod
 type Keymod int
 const (
     KMOD_NONE Keymod = C.KMOD_NONE

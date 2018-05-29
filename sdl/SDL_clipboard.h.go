@@ -14,6 +14,7 @@ import "unsafe"
  // 
  // See also: SDL_GetClipboardText()
  // 
+ // ↪ https://wiki.libsdl.org/SDL_SetClipboardText
 func SetClipboardText(text string) (retval int) {
     tmp_text := C.CString(text); defer C.free(unsafe.Pointer(tmp_text))
     retval = int(C.SDL_SetClipboardText((*C.char)(tmp_text)))
@@ -24,6 +25,7 @@ func SetClipboardText(text string) (retval int) {
  // 
  // See also: SDL_SetClipboardText()
  // 
+ // ↪ https://wiki.libsdl.org/SDL_GetClipboardText
 func GetClipboardText() (retval string) {
     retval = freeGoString(C.SDL_GetClipboardText())
     return
@@ -34,6 +36,7 @@ func GetClipboardText() (retval string) {
  // 
  // See also: SDL_GetClipboardText()
  // 
+ // ↪ https://wiki.libsdl.org/SDL_HasClipboardText
 func HasClipboardText() (retval bool) {
     retval = C.SDL_TRUE==(C.SDL_HasClipboardText())
     return

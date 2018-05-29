@@ -9,6 +9,7 @@ import "C"
  // Header for the SDL power management routines.
 
  // The basic state for the system's power supply.
+ // ↪ https://wiki.libsdl.org/SDL_PowerState
 type PowerState int
 const (
      // cannot determine power status
@@ -42,6 +43,7 @@ const (
  //     NULL here if you don't care. Will return -1 if we can't determine a
  //     value, or we're not running on a battery.
  //   
+ // ↪ https://wiki.libsdl.org/SDL_GetPowerInfo
 func GetPowerInfo() (retval PowerState, secs int, pct int) {
     tmp_secs := new(C.int)
     tmp_pct := new(C.int)

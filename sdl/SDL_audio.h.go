@@ -11,6 +11,7 @@ import "unsafe"
 
  // The calculated values in this structure are calculated by
  // SDL_OpenAudio().
+ // ↪ https://wiki.libsdl.org/SDL_AudioSpec
 type AudioSpec struct {
      // DSP frequency -- samples per second
     Freq int
@@ -59,12 +60,16 @@ func toCFromAudioSpec(s AudioSpec) (d C.SDL_AudioSpec) {
 
  // Audio flags
 const (
+     // ↪ https://wiki.libsdl.org/SDL_AUDIO_MASK_BITSIZE
     AUDIO_MASK_BITSIZE = C.SDL_AUDIO_MASK_BITSIZE
 
+     // ↪ https://wiki.libsdl.org/SDL_AUDIO_MASK_DATATYPE
     AUDIO_MASK_DATATYPE = C.SDL_AUDIO_MASK_DATATYPE
 
+     // ↪ https://wiki.libsdl.org/SDL_AUDIO_MASK_ENDIAN
     AUDIO_MASK_ENDIAN = C.SDL_AUDIO_MASK_ENDIAN
 
+     // ↪ https://wiki.libsdl.org/SDL_AUDIO_MASK_SIGNED
     AUDIO_MASK_SIGNED = C.SDL_AUDIO_MASK_SIGNED
 )
 
@@ -132,12 +137,16 @@ const (
  // 
  // Which audio format changes are allowed when opening a device.
 const (
+     // ↪ https://wiki.libsdl.org/SDL_AUDIO_ALLOW_FREQUENCY_CHANGE
     AUDIO_ALLOW_FREQUENCY_CHANGE = C.SDL_AUDIO_ALLOW_FREQUENCY_CHANGE
 
+     // ↪ https://wiki.libsdl.org/SDL_AUDIO_ALLOW_FORMAT_CHANGE
     AUDIO_ALLOW_FORMAT_CHANGE = C.SDL_AUDIO_ALLOW_FORMAT_CHANGE
 
+     // ↪ https://wiki.libsdl.org/SDL_AUDIO_ALLOW_CHANNELS_CHANGE
     AUDIO_ALLOW_CHANNELS_CHANGE = C.SDL_AUDIO_ALLOW_CHANNELS_CHANGE
 
+     // ↪ https://wiki.libsdl.org/SDL_AUDIO_ALLOW_ANY_CHANGE
     AUDIO_ALLOW_ANY_CHANGE = C.SDL_AUDIO_ALLOW_ANY_CHANGE
 )
 
@@ -146,11 +155,13 @@ const (
  // These functions return the list of built in audio drivers, in the
  // order that they are normally initialized by default.
 
+ // ↪ https://wiki.libsdl.org/SDL_GetNumAudioDrivers
 func GetNumAudioDrivers() (retval int) {
     retval = int(C.SDL_GetNumAudioDrivers())
     return
 }
 
+ // ↪ https://wiki.libsdl.org/SDL_GetAudioDriver
 func GetAudioDriver(index int) (retval string) {
     retval = C.GoString(C.SDL_GetAudioDriver(C.int(index)))
     return
@@ -158,12 +169,14 @@ func GetAudioDriver(index int) (retval string) {
 
  // Initialization and cleanup
 
+ // ↪ https://wiki.libsdl.org/SDL_AudioInit
 func AudioInit(driver_name string) (retval int) {
     tmp_driver_name := C.CString(driver_name); defer C.free(unsafe.Pointer(tmp_driver_name))
     retval = int(C.SDL_AudioInit((*C.char)(tmp_driver_name)))
     return
 }
 
+ // ↪ https://wiki.libsdl.org/SDL_AudioQuit
 func AudioQuit() {
     C.SDL_AudioQuit()
 }
@@ -171,6 +184,7 @@ func AudioQuit() {
  // Audio state
  // 
  // Get the current audio state.
+ // ↪ https://wiki.libsdl.org/SDL_AudioStatus
 type AudioStatus int
 const (
     AUDIO_STOPPED AudioStatus = C.SDL_AUDIO_STOPPED
@@ -180,11 +194,13 @@ const (
     AUDIO_PAUSED AudioStatus = C.SDL_AUDIO_PAUSED
 )
 
+ // ↪ https://wiki.libsdl.org/SDL_GetAudioStatus
 func GetAudioStatus() (retval AudioStatus) {
     retval = AudioStatus(C.SDL_GetAudioStatus())
     return
 }
 
+ // ↪ https://wiki.libsdl.org/SDL_GetAudioDeviceStatus
 func GetAudioDeviceStatus(dev AudioDeviceID) (retval AudioStatus) {
     retval = AudioStatus(C.SDL_GetAudioDeviceStatus(C.SDL_AudioDeviceID(dev)))
     return
@@ -198,10 +214,12 @@ func GetAudioDeviceStatus(dev AudioDeviceID) (retval AudioStatus) {
  // your callback function after opening the audio device. Silence will be
  // written to the audio device during the pause.
 
+ // ↪ https://wiki.libsdl.org/SDL_PauseAudio
 func PauseAudio(pause_on int) {
     C.SDL_PauseAudio(C.int(pause_on))
 }
 
+ // ↪ https://wiki.libsdl.org/SDL_PauseAudioDevice
 func PauseAudioDevice(dev AudioDeviceID, pause_on int) {
     C.SDL_PauseAudioDevice(C.SDL_AudioDeviceID(dev), C.int(pause_on))
 }
@@ -213,23 +231,28 @@ func PauseAudioDevice(dev AudioDeviceID, pause_on int) {
  // guaranteed that the callback function is not running. Do not call
  // these from the callback function or you will cause deadlock.
 
+ // ↪ https://wiki.libsdl.org/SDL_LockAudio
 func LockAudio() {
     C.SDL_LockAudio()
 }
 
+ // ↪ https://wiki.libsdl.org/SDL_LockAudioDevice
 func LockAudioDevice(dev AudioDeviceID) {
     C.SDL_LockAudioDevice(C.SDL_AudioDeviceID(dev))
 }
 
+ // ↪ https://wiki.libsdl.org/SDL_UnlockAudio
 func UnlockAudio() {
     C.SDL_UnlockAudio()
 }
 
+ // ↪ https://wiki.libsdl.org/SDL_UnlockAudioDevice
 func UnlockAudioDevice(dev AudioDeviceID) {
     C.SDL_UnlockAudioDevice(C.SDL_AudioDeviceID(dev))
 }
 
 const (
+     // ↪ https://wiki.libsdl.org/SDL_MIX_MAXVOLUME
     MIX_MAXVOLUME = C.SDL_MIX_MAXVOLUME
 )
 
@@ -282,6 +305,7 @@ type AudioDeviceID uint32
 
  // This function returns the name of the current audio driver, or NULL if
  // no driver has been initialized.
+ // ↪ https://wiki.libsdl.org/SDL_GetCurrentAudioDriver
 func GetCurrentAudioDriver() (retval string) {
     retval = C.GoString(C.SDL_GetCurrentAudioDriver())
     return
@@ -331,6 +355,7 @@ func GetCurrentAudioDriver() (retval string) {
  // audio driver may modify the requested size of the audio buffer, you
  // should allocate any local mixing buffers after you open the audio
  // device.
+ // ↪ https://wiki.libsdl.org/SDL_OpenAudio
 func OpenAudio(desired *AudioSpec, obtained *AudioSpec) (retval int) {
     var tmp_desired *C.SDL_AudioSpec; if desired != nil { x := toCFromAudioSpec(*desired); tmp_desired = &x }
     var tmp_obtained *C.SDL_AudioSpec; if obtained != nil { x := toCFromAudioSpec(*obtained); tmp_obtained = &x }
@@ -349,6 +374,7 @@ func OpenAudio(desired *AudioSpec, obtained *AudioSpec) (retval int) {
  // In many common cases, when this function returns a value <= 0, it can
  // still successfully open the default device (NULL for first argument of
  // SDL_OpenAudioDevice()).
+ // ↪ https://wiki.libsdl.org/SDL_GetNumAudioDevices
 func GetNumAudioDevices(iscapture int) (retval int) {
     retval = int(C.SDL_GetNumAudioDevices(C.int(iscapture)))
     return
@@ -365,6 +391,7 @@ func GetNumAudioDevices(iscapture int) (retval int) {
  // string for any length of time, you should make your own copy of it, as
  // it will be invalid next time any of several other SDL functions is
  // called.
+ // ↪ https://wiki.libsdl.org/SDL_GetAudioDeviceName
 func GetAudioDeviceName(index int, iscapture int) (retval string) {
     retval = C.GoString(C.SDL_GetAudioDeviceName(C.int(index), C.int(iscapture)))
     return
@@ -382,6 +409,7 @@ func GetAudioDeviceName(index int, iscapture int) (retval string) {
  // Returns: 0 on error, a valid device ID that is >= 2 on success.
  // 
  // SDL_OpenAudio(), unlike this function, always acts on device ID 1.
+ // ↪ https://wiki.libsdl.org/SDL_OpenAudioDevice
 func OpenAudioDevice(device string, iscapture int, desired *AudioSpec, obtained *AudioSpec, allowed_changes int) (retval AudioDeviceID) {
     tmp_device := C.CString(device); defer C.free(unsafe.Pointer(tmp_device))
     var tmp_desired *C.SDL_AudioSpec; if desired != nil { x := toCFromAudioSpec(*desired); tmp_desired = &x }
@@ -400,6 +428,7 @@ func OpenAudioDevice(device string, iscapture int, desired *AudioSpec, obtained 
  // The volume ranges from 0 - 128, and should be set to SDL_MIX_MAXVOLUME
  // for full audio volume. Note this does not change hardware volume. This
  // is provided for convenience -- you can mix your own audio data.
+ // ↪ https://wiki.libsdl.org/SDL_MixAudio
 func MixAudio(dst []byte, src []byte, volume int) {
     var tmp_dst *C.Uint8
     if len(dst) > 0 {
@@ -416,6 +445,7 @@ func MixAudio(dst []byte, src []byte, volume int) {
  // This works like SDL_MixAudio(), but you specify the audio format
  // instead of using the format of audio device 1. Thus it can be used
  // when no audio device is open at all.
+ // ↪ https://wiki.libsdl.org/SDL_MixAudioFormat
 func MixAudioFormat(dst []byte, src []byte, format AudioFormat, volume int) {
     var tmp_dst *C.Uint8
     if len(dst) > 0 {
@@ -471,6 +501,7 @@ func MixAudioFormat(dst []byte, src []byte, format AudioFormat, volume int) {
  //   len
  //     The number of bytes (not samples!) to which (data) points.
  //   
+ // ↪ https://wiki.libsdl.org/SDL_QueueAudio
 func QueueAudio(dev AudioDeviceID, data []byte) (retval int) {
     var tmp_data unsafe.Pointer
     if len(data) > 0 {
@@ -509,6 +540,7 @@ func QueueAudio(dev AudioDeviceID, data []byte) (retval int) {
  //   dev
  //     The device ID of which we will query queued audio size.
  //   
+ // ↪ https://wiki.libsdl.org/SDL_GetQueuedAudioSize
 func GetQueuedAudioSize(dev AudioDeviceID) (retval uint32) {
     retval = uint32(C.SDL_GetQueuedAudioSize(C.SDL_AudioDeviceID(dev)))
     return
@@ -543,15 +575,18 @@ func GetQueuedAudioSize(dev AudioDeviceID) (retval uint32) {
  //   dev
  //     The device ID of which to clear the audio queue.
  //   
+ // ↪ https://wiki.libsdl.org/SDL_ClearQueuedAudio
 func ClearQueuedAudio(dev AudioDeviceID) {
     C.SDL_ClearQueuedAudio(C.SDL_AudioDeviceID(dev))
 }
 
  // This function shuts down audio processing and closes the audio device.
+ // ↪ https://wiki.libsdl.org/SDL_CloseAudio
 func CloseAudio() {
     C.SDL_CloseAudio()
 }
 
+ // ↪ https://wiki.libsdl.org/SDL_CloseAudioDevice
 func CloseAudioDevice(dev AudioDeviceID) {
     C.SDL_CloseAudioDevice(C.SDL_AudioDeviceID(dev))
 }

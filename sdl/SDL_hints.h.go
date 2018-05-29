@@ -35,6 +35,7 @@ const (
      // 
      // By default SDL tries to make a best guess for each platform whether to
      // use acceleration or not.
+     // ↪ https://wiki.libsdl.org/SDL_HINT_FRAMEBUFFER_ACCELERATION
     HINT_FRAMEBUFFER_ACCELERATION = C.SDL_HINT_FRAMEBUFFER_ACCELERATION
 
      // A variable specifying which render driver to use.
@@ -49,6 +50,7 @@ const (
      // 
      // The default varies by platform, but it's the first one in the list
      // that is available on the current platform.
+     // ↪ https://wiki.libsdl.org/SDL_HINT_RENDER_DRIVER
     HINT_RENDER_DRIVER = C.SDL_HINT_RENDER_DRIVER
 
      // A variable controlling whether the OpenGL render driver uses shaders
@@ -58,6 +60,7 @@ const (
      // shaders "1" - Enable shaders
      // 
      // By default shaders are used if OpenGL supports them.
+     // ↪ https://wiki.libsdl.org/SDL_HINT_RENDER_OPENGL_SHADERS
     HINT_RENDER_OPENGL_SHADERS = C.SDL_HINT_RENDER_OPENGL_SHADERS
 
      // A variable controlling whether the Direct3D device is initialized for
@@ -67,6 +70,7 @@ const (
      // is not enabled (faster) "1" - Thread-safety is enabled
      // 
      // By default the Direct3D device is created with thread-safety disabled.
+     // ↪ https://wiki.libsdl.org/SDL_HINT_RENDER_DIRECT3D_THREADSAFE
     HINT_RENDER_DIRECT3D_THREADSAFE = C.SDL_HINT_RENDER_DIRECT3D_THREADSAFE
 
      // A variable controlling whether to enable Direct3D 11+'s Debug Layer.
@@ -78,6 +82,7 @@ const (
      // Layer use "1" - Enable Debug Layer use
      // 
      // By default, SDL does not use Direct3D Debug Layer.
+     // ↪ https://wiki.libsdl.org/SDL_HINT_RENDER_DIRECT3D11_DEBUG
     HINT_RENDER_DIRECT3D11_DEBUG = C.SDL_HINT_RENDER_DIRECT3D11_DEBUG
 
      // A variable controlling the scaling quality.
@@ -88,6 +93,7 @@ const (
      // "linear"
      // 
      // By default nearest pixel sampling is used
+     // ↪ https://wiki.libsdl.org/SDL_HINT_RENDER_SCALE_QUALITY
     HINT_RENDER_SCALE_QUALITY = C.SDL_HINT_RENDER_SCALE_QUALITY
 
      // A variable controlling whether updates to the SDL screen surface
@@ -98,6 +104,7 @@ const (
      // 
      // By default SDL does not sync screen surface updates with vertical
      // refresh.
+     // ↪ https://wiki.libsdl.org/SDL_HINT_RENDER_VSYNC
     HINT_RENDER_VSYNC = C.SDL_HINT_RENDER_VSYNC
 
      // A variable controlling whether the screensaver is enabled.
@@ -106,6 +113,7 @@ const (
      // screensaver "1" - Enable screensaver
      // 
      // By default SDL will disable the screensaver.
+     // ↪ https://wiki.libsdl.org/SDL_HINT_VIDEO_ALLOW_SCREENSAVER
     HINT_VIDEO_ALLOW_SCREENSAVER = C.SDL_HINT_VIDEO_ALLOW_SCREENSAVER
 
      // A variable controlling whether the X11 VidMode extension should be
@@ -115,6 +123,7 @@ const (
      // XVidMode "1" - Enable XVidMode
      // 
      // By default SDL will use XVidMode if it is available.
+     // ↪ https://wiki.libsdl.org/SDL_HINT_VIDEO_X11_XVIDMODE
     HINT_VIDEO_X11_XVIDMODE = C.SDL_HINT_VIDEO_X11_XVIDMODE
 
      // A variable controlling whether the X11 Xinerama extension should be
@@ -124,6 +133,7 @@ const (
      // Xinerama "1" - Enable Xinerama
      // 
      // By default SDL will use Xinerama if it is available.
+     // ↪ https://wiki.libsdl.org/SDL_HINT_VIDEO_X11_XINERAMA
     HINT_VIDEO_X11_XINERAMA = C.SDL_HINT_VIDEO_X11_XINERAMA
 
      // A variable controlling whether the X11 XRandR extension should be
@@ -133,6 +143,7 @@ const (
      // "1" - Enable XRandR
      // 
      // By default SDL will not use XRandR because of window manager issues.
+     // ↪ https://wiki.libsdl.org/SDL_HINT_VIDEO_X11_XRANDR
     HINT_VIDEO_X11_XRANDR = C.SDL_HINT_VIDEO_X11_XRANDR
 
      // A variable controlling whether the X11 _NET_WM_PING protocol should be
@@ -145,6 +156,7 @@ const (
      // they will not always be able to respond to ping requests in a timely
      // manner they can turn it off to avoid the window manager thinking the
      // app is hung. The hint is checked in CreateWindow.
+     // ↪ https://wiki.libsdl.org/SDL_HINT_VIDEO_X11_NET_WM_PING
     HINT_VIDEO_X11_NET_WM_PING = C.SDL_HINT_VIDEO_X11_NET_WM_PING
 
      // A variable controlling whether the window frame and title bar are
@@ -156,6 +168,7 @@ const (
      // 
      // By default SDL will allow interaction with the window frame when the
      // cursor is hidden
+     // ↪ https://wiki.libsdl.org/SDL_HINT_WINDOW_FRAME_USABLE_WHILE_CURSOR_HIDDEN
     HINT_WINDOW_FRAME_USABLE_WHILE_CURSOR_HIDDEN = C.SDL_HINT_WINDOW_FRAME_USABLE_WHILE_CURSOR_HIDDEN
 
      // A variable controlling whether the windows message loop is processed
@@ -166,6 +179,7 @@ const (
      // SDL_PumpEvents()
      // 
      // By default SDL will process the windows message loop
+     // ↪ https://wiki.libsdl.org/SDL_HINT_WINDOWS_ENABLE_MESSAGELOOP
     HINT_WINDOWS_ENABLE_MESSAGELOOP = C.SDL_HINT_WINDOWS_ENABLE_MESSAGELOOP
 
      // A variable controlling whether grabbing input grabs the keyboard.
@@ -175,6 +189,7 @@ const (
      // 
      // By default SDL will not grab the keyboard so system shortcuts still
      // work.
+     // ↪ https://wiki.libsdl.org/SDL_HINT_GRAB_KEYBOARD
     HINT_GRAB_KEYBOARD = C.SDL_HINT_GRAB_KEYBOARD
 
      // A variable controlling whether relative mouse mode is implemented
@@ -184,10 +199,12 @@ const (
      // mode uses raw input "1" - Relative mouse mode uses mouse warping
      // 
      // By default SDL will use raw input for relative mouse mode
+     // ↪ https://wiki.libsdl.org/SDL_HINT_MOUSE_RELATIVE_MODE_WARP
     HINT_MOUSE_RELATIVE_MODE_WARP = C.SDL_HINT_MOUSE_RELATIVE_MODE_WARP
 
      // Minimize your SDL_Window if it loses key focus when in fullscreen
      // mode. Defaults to true.
+     // ↪ https://wiki.libsdl.org/SDL_HINT_VIDEO_MINIMIZE_ON_FOCUS_LOSS
     HINT_VIDEO_MINIMIZE_ON_FOCUS_LOSS = C.SDL_HINT_VIDEO_MINIMIZE_ON_FOCUS_LOSS
 
      // A variable controlling whether the idle timer is disabled on iOS.
@@ -203,6 +220,7 @@ const (
      // 
      // This variable can be set to the following values: "0" - Enable idle
      // timer "1" - Disable idle timer
+     // ↪ https://wiki.libsdl.org/SDL_HINT_IDLE_TIMER_DISABLED
     HINT_IDLE_TIMER_DISABLED = C.SDL_HINT_IDLE_TIMER_DISABLED
 
      // A variable controlling which orientations are allowed on iOS.
@@ -212,6 +230,7 @@ const (
      // 
      // This variable is a space delimited list of the following values:
      // "LandscapeLeft", "LandscapeRight", "Portrait" "PortraitUpsideDown"
+     // ↪ https://wiki.libsdl.org/SDL_HINT_ORIENTATIONS
     HINT_ORIENTATIONS = C.SDL_HINT_ORIENTATIONS
 
      // A variable controlling whether the Android / iOS built-in
@@ -221,6 +240,7 @@ const (
      // This variable can be set to the following values: "0" - List only real
      // joysticks and accept input from them "1" - List real joysticks along
      // with the accelerometer as if it were a 3 axis joystick (the default).
+     // ↪ https://wiki.libsdl.org/SDL_HINT_ACCELEROMETER_AS_JOYSTICK
     HINT_ACCELEROMETER_AS_JOYSTICK = C.SDL_HINT_ACCELEROMETER_AS_JOYSTICK
 
      // A variable that lets you disable the detection and use of Xinput
@@ -229,6 +249,7 @@ const (
      // The variable can be set to the following values: "0" - Disable XInput
      // detection (only uses direct input) "1" - Enable XInput detection (the
      // default)
+     // ↪ https://wiki.libsdl.org/SDL_HINT_XINPUT_ENABLED
     HINT_XINPUT_ENABLED = C.SDL_HINT_XINPUT_ENABLED
 
      // A variable that causes SDL to use the old axis and button mapping for
@@ -238,6 +259,7 @@ const (
      // SDL 2.1
      // 
      // The default value is "0". This hint must be set before SDL_Init()
+     // ↪ https://wiki.libsdl.org/SDL_HINT_XINPUT_USE_OLD_JOYSTICK_MAPPING
     HINT_XINPUT_USE_OLD_JOYSTICK_MAPPING = C.SDL_HINT_XINPUT_USE_OLD_JOYSTICK_MAPPING
 
      // A variable that lets you manually hint extra gamecontroller db
@@ -249,6 +271,7 @@ const (
      // This hint must be set before calling SDL_Init(SDL_INIT_GAMECONTROLLER)
      // You can update mappings after the system is initialized with
      // SDL_GameControllerMappingForGUID() and SDL_GameControllerAddMapping()
+     // ↪ https://wiki.libsdl.org/SDL_HINT_GAMECONTROLLERCONFIG
     HINT_GAMECONTROLLERCONFIG = C.SDL_HINT_GAMECONTROLLERCONFIG
 
      // A variable that lets you enable joystick (and gamecontroller) events
@@ -260,6 +283,7 @@ const (
      // the application is in the background.
      // 
      // The default value is "0". This hint may be set at any time.
+     // ↪ https://wiki.libsdl.org/SDL_HINT_JOYSTICK_ALLOW_BACKGROUND_EVENTS
     HINT_JOYSTICK_ALLOW_BACKGROUND_EVENTS = C.SDL_HINT_JOYSTICK_ALLOW_BACKGROUND_EVENTS
 
      // If set to "0" then never set the top most bit on a SDL Window, even if
@@ -268,6 +292,7 @@ const (
      // 
      // This variable can be set to the following values: "0" - don't allow
      // topmost "1" - allow topmost
+     // ↪ https://wiki.libsdl.org/SDL_HINT_ALLOW_TOPMOST
     HINT_ALLOW_TOPMOST = C.SDL_HINT_ALLOW_TOPMOST
 
      // A variable that controls the timer resolution, in milliseconds.
@@ -284,6 +309,7 @@ const (
      // set.
      // 
      // The default value is "1". This hint may be set at any time.
+     // ↪ https://wiki.libsdl.org/SDL_HINT_TIMER_RESOLUTION
     HINT_TIMER_RESOLUTION = C.SDL_HINT_TIMER_RESOLUTION
 
      // A string specifying SDL's threads stack size in bytes or "0" for the
@@ -295,10 +321,12 @@ const (
      // relatively small default thread stack size (a few kilobytes versus the
      // default 8MB glibc uses). Support for this hint is currently available
      // only in the pthread backend.
+     // ↪ https://wiki.libsdl.org/SDL_HINT_THREAD_STACK_SIZE
     HINT_THREAD_STACK_SIZE = C.SDL_HINT_THREAD_STACK_SIZE
 
      // If set to 1, then do not allow high-DPI windows. ("Retina" on Mac and
      // iOS)
+     // ↪ https://wiki.libsdl.org/SDL_HINT_VIDEO_HIGHDPI_DISABLED
     HINT_VIDEO_HIGHDPI_DISABLED = C.SDL_HINT_VIDEO_HIGHDPI_DISABLED
 
      // A variable that determines whether ctrl+click should generate a right-
@@ -306,6 +334,7 @@ const (
      // 
      // If present, holding ctrl while left clicking will generate a right
      // click event when on Mac.
+     // ↪ https://wiki.libsdl.org/SDL_HINT_MAC_CTRL_CLICK_EMULATE_RIGHT_CLICK
     HINT_MAC_CTRL_CLICK_EMULATE_RIGHT_CLICK = C.SDL_HINT_MAC_CTRL_CLICK_EMULATE_RIGHT_CLICK
 
      // A variable specifying which shader compiler to preload when using the
@@ -321,6 +350,7 @@ const (
      // - default, best for Vista or later. "d3dcompiler_43.dll" - for XP
      // support. "none" - do not load any library, useful if you compiled
      // ANGLE from source and included the compiler in your binaries.
+     // ↪ https://wiki.libsdl.org/SDL_HINT_VIDEO_WIN_D3DCOMPILER
     HINT_VIDEO_WIN_D3DCOMPILER = C.SDL_HINT_VIDEO_WIN_D3DCOMPILER
 
      // A variable that is the address of another SDL_Window* (as a hex string
@@ -343,6 +373,7 @@ const (
      // This variable can be set to the following values: The address (as a
      // string "%p") of the SDL_Window* that new windows created with
      // SDL_CreateWindowFrom() should share a pixel format with.
+     // ↪ https://wiki.libsdl.org/SDL_HINT_VIDEO_WINDOW_SHARE_PIXEL_FORMAT
     HINT_VIDEO_WINDOW_SHARE_PIXEL_FORMAT = C.SDL_HINT_VIDEO_WINDOW_SHARE_PIXEL_FORMAT
 
      // A URL to a WinRT app's privacy policy.
@@ -370,6 +401,7 @@ const (
      // SDL_HINT_WINRT_PRIVACY_POLICY_URL will not get used on that platform.
      // Network-enabled phone apps should display their privacy policy through
      // some other, in-app means.
+     // ↪ https://wiki.libsdl.org/SDL_HINT_WINRT_PRIVACY_POLICY_URL
     HINT_WINRT_PRIVACY_POLICY_URL = C.SDL_HINT_WINRT_PRIVACY_POLICY_URL
 
      // Label text for a WinRT app's privacy policy link.
@@ -391,6 +423,7 @@ const (
      // 
      // For additional information on linking to a privacy policy, see the
      // documentation for SDL_HINT_WINRT_PRIVACY_POLICY_URL.
+     // ↪ https://wiki.libsdl.org/SDL_HINT_WINRT_PRIVACY_POLICY_LABEL
     HINT_WINRT_PRIVACY_POLICY_LABEL = C.SDL_HINT_WINRT_PRIVACY_POLICY_LABEL
 
      // Allows back-button-press events on Windows Phone to be marked as
@@ -445,6 +478,7 @@ const (
      // found at the following page, on Microsoft's developer site:
      // http://msdn.microsoft.com/en-
      // us/library/windowsphone/develop/jj247550(v=vs.105).aspx
+     // ↪ https://wiki.libsdl.org/SDL_HINT_WINRT_HANDLE_BACK_BUTTON
     HINT_WINRT_HANDLE_BACK_BUTTON = C.SDL_HINT_WINRT_HANDLE_BACK_BUTTON
 
      // A variable that dictates policy for fullscreen Spaces on Mac OS X.
@@ -461,11 +495,13 @@ const (
      // The default value is "1". Spaces are disabled regardless of this hint
      // if the OS isn't at least Mac OS X Lion (10.7). This hint must be set
      // before any windows are created.
+     // ↪ https://wiki.libsdl.org/SDL_HINT_VIDEO_MAC_FULLSCREEN_SPACES
     HINT_VIDEO_MAC_FULLSCREEN_SPACES = C.SDL_HINT_VIDEO_MAC_FULLSCREEN_SPACES
 
      // When set don't force the SDL app to become a foreground process.
      // 
      // This hint only applies to Mac OS X.
+     // ↪ https://wiki.libsdl.org/SDL_HINT_MAC_BACKGROUND_APP
     HINT_MAC_BACKGROUND_APP = C.SDL_HINT_MAC_BACKGROUND_APP
 
      // Android APK expansion main file version. Should be a string number
@@ -480,6 +516,7 @@ const (
      // 
      // By default this hint is not set and the APK expansion files are not
      // searched.
+     // ↪ https://wiki.libsdl.org/SDL_HINT_ANDROID_APK_EXPANSION_MAIN_FILE_VERSION
     HINT_ANDROID_APK_EXPANSION_MAIN_FILE_VERSION = C.SDL_HINT_ANDROID_APK_EXPANSION_MAIN_FILE_VERSION
 
      // Android APK expansion patch file version. Should be a string number
@@ -494,6 +531,7 @@ const (
      // 
      // By default this hint is not set and the APK expansion files are not
      // searched.
+     // ↪ https://wiki.libsdl.org/SDL_HINT_ANDROID_APK_EXPANSION_PATCH_FILE_VERSION
     HINT_ANDROID_APK_EXPANSION_PATCH_FILE_VERSION = C.SDL_HINT_ANDROID_APK_EXPANSION_PATCH_FILE_VERSION
 
      // A variable to control whether certain IMEs should handle text editing
@@ -505,6 +543,7 @@ const (
      // text. (default) "1" - If supported by the IME then SDL_TEXTEDITING
      // events are not sent, and text that is being composed will be rendered
      // in its own UI.
+     // ↪ https://wiki.libsdl.org/SDL_HINT_IME_INTERNAL_EDITING
     HINT_IME_INTERNAL_EDITING = C.SDL_HINT_IME_INTERNAL_EDITING
 
      // A variable to control whether mouse and touch events are to be treated
@@ -517,6 +556,7 @@ const (
      // 
      // The value of this hint is used at runtime, so it can be changed at any
      // time.
+     // ↪ https://wiki.libsdl.org/SDL_HINT_ANDROID_SEPARATE_MOUSE_AND_TOUCH
     HINT_ANDROID_SEPARATE_MOUSE_AND_TOUCH = C.SDL_HINT_ANDROID_SEPARATE_MOUSE_AND_TOUCH
 
      // override the binding element for keyboard inputs for Emscripten builds
@@ -528,6 +568,7 @@ const (
      // "#screen" - the javascript window.screen object "#canvas" - the WebGL
      // canvas element any other string without a leading # sign applies to
      // the element on the page with that ID.
+     // ↪ https://wiki.libsdl.org/SDL_HINT_EMSCRIPTEN_KEYBOARD_ELEMENT
     HINT_EMSCRIPTEN_KEYBOARD_ELEMENT = C.SDL_HINT_EMSCRIPTEN_KEYBOARD_ELEMENT
 
      // Tell SDL not to catch the SIGINT or SIGTERM signals.
@@ -538,6 +579,7 @@ const (
      // install a SIGINT and SIGTERM handler, and when it catches a signal,
      // convert it into an SDL_QUIT event. "1" - SDL will not install a signal
      // handler at all.
+     // ↪ https://wiki.libsdl.org/SDL_HINT_NO_SIGNAL_HANDLERS
     HINT_NO_SIGNAL_HANDLERS = C.SDL_HINT_NO_SIGNAL_HANDLERS
 
      // Tell SDL not to generate window-close events for Alt+F4 on Windows.
@@ -545,10 +587,12 @@ const (
      // The variable can be set to the following values: "0" - SDL will
      // generate a window-close event when it sees Alt+F4. "1" - SDL will only
      // do normal key handling for Alt+F4.
+     // ↪ https://wiki.libsdl.org/SDL_HINT_WINDOWS_NO_CLOSE_ON_ALT_F4
     HINT_WINDOWS_NO_CLOSE_ON_ALT_F4 = C.SDL_HINT_WINDOWS_NO_CLOSE_ON_ALT_F4
 )
 
  // An enumeration of hint priorities.
+ // ↪ https://wiki.libsdl.org/SDL_HintPriority
 type HintPriority int
 const (
     HINT_DEFAULT HintPriority = C.SDL_HINT_DEFAULT
@@ -580,6 +624,7 @@ type HintCallback C.SDL_HintCallback
  // 
  // Returns: SDL_TRUE if the hint was set, SDL_FALSE otherwise
  // 
+ // ↪ https://wiki.libsdl.org/SDL_SetHintWithPriority
 func SetHintWithPriority(name string, value string, priority HintPriority) (retval bool) {
     tmp_name := C.CString(name); defer C.free(unsafe.Pointer(tmp_name))
     tmp_value := C.CString(value); defer C.free(unsafe.Pointer(tmp_value))
@@ -591,6 +636,7 @@ func SetHintWithPriority(name string, value string, priority HintPriority) (retv
  // 
  // Returns: SDL_TRUE if the hint was set, SDL_FALSE otherwise
  // 
+ // ↪ https://wiki.libsdl.org/SDL_SetHint
 func SetHint(name string, value string) (retval bool) {
     tmp_name := C.CString(name); defer C.free(unsafe.Pointer(tmp_name))
     tmp_value := C.CString(value); defer C.free(unsafe.Pointer(tmp_value))
@@ -602,12 +648,14 @@ func SetHint(name string, value string) (retval bool) {
  // 
  // Returns: The string value of a hint variable.
  // 
+ // ↪ https://wiki.libsdl.org/SDL_GetHint
 func GetHint(name string) (retval string) {
     tmp_name := C.CString(name); defer C.free(unsafe.Pointer(tmp_name))
     retval = C.GoString(C.SDL_GetHint((*C.char)(tmp_name)))
     return
 }
 
+ // ↪ https://wiki.libsdl.org/SDL_AddHintCallback
 func AddHintCallback(name string, callback HintCallback, userdata uintptr) {
     tmp_name := C.CString(name); defer C.free(unsafe.Pointer(tmp_name))
     C.SDL_AddHintCallback((*C.char)(tmp_name), C.SDL_HintCallback(callback), unsafe.Pointer(userdata))
@@ -624,6 +672,7 @@ func AddHintCallback(name string, callback HintCallback, userdata uintptr) {
  //   userdata
  //     A pointer being passed to the callback function
  //   
+ // ↪ https://wiki.libsdl.org/SDL_DelHintCallback
 func DelHintCallback(name string, callback HintCallback, userdata uintptr) {
     tmp_name := C.CString(name); defer C.free(unsafe.Pointer(tmp_name))
     C.SDL_DelHintCallback((*C.char)(tmp_name), C.SDL_HintCallback(callback), unsafe.Pointer(userdata))
@@ -632,6 +681,7 @@ func DelHintCallback(name string, callback HintCallback, userdata uintptr) {
  // Clear all hints.
  // 
  // This function is called during SDL_Quit() to free stored hints.
+ // ↪ https://wiki.libsdl.org/SDL_ClearHints
 func ClearHints() {
     C.SDL_ClearHints()
 }

@@ -14,6 +14,7 @@ import "C"
  // 
  // See also: SDL_PointInRect
  // 
+ // ↪ https://wiki.libsdl.org/SDL_Point
 type Point struct {
     X int
 
@@ -44,6 +45,7 @@ func toCFromPoint(s Point) (d C.SDL_Point) {
  // 
  // See also: SDL_EnclosePoints
  // 
+ // ↪ https://wiki.libsdl.org/SDL_Rect
 type Rect struct {
     X int
 
@@ -68,6 +70,7 @@ func toCFromRect(s Rect) (d C.SDL_Rect) {
 
 
  // Returns true if point resides inside a rectangle.
+ // ↪ https://wiki.libsdl.org/SDL_PointInRect
 func PointInRect(p Point, r Rect) (retval bool) {
     tmp_p := toCFromPoint(p)
     tmp_r := toCFromRect(r)
@@ -76,6 +79,7 @@ func PointInRect(p Point, r Rect) (retval bool) {
 }
 
  // Returns true if the rectangle has no area.
+ // ↪ https://wiki.libsdl.org/SDL_RectEmpty
 func RectEmpty(r Rect) (retval bool) {
     tmp_r := toCFromRect(r)
     retval = C.SDL_TRUE==(C.SDL_RectEmpty((*C.SDL_Rect)(&tmp_r)))
@@ -83,6 +87,7 @@ func RectEmpty(r Rect) (retval bool) {
 }
 
  // Returns true if the two rectangles are equal.
+ // ↪ https://wiki.libsdl.org/SDL_RectEquals
 func RectEquals(a Rect, b Rect) (retval bool) {
     tmp_a := toCFromRect(a)
     tmp_b := toCFromRect(b)
@@ -94,6 +99,7 @@ func RectEquals(a Rect, b Rect) (retval bool) {
  // 
  // Returns: SDL_TRUE if there is an intersection, SDL_FALSE otherwise.
  // 
+ // ↪ https://wiki.libsdl.org/SDL_HasIntersection
 func HasIntersection(A Rect, B Rect) (retval bool) {
     tmp_A := toCFromRect(A)
     tmp_B := toCFromRect(B)
@@ -105,6 +111,7 @@ func HasIntersection(A Rect, B Rect) (retval bool) {
  // 
  // Returns: SDL_TRUE if there is an intersection, SDL_FALSE otherwise.
  // 
+ // ↪ https://wiki.libsdl.org/SDL_IntersectRect
 func IntersectRect(A Rect, B Rect) (retval bool, result Rect) {
     tmp_A := toCFromRect(A)
     tmp_B := toCFromRect(B)
@@ -115,6 +122,7 @@ func IntersectRect(A Rect, B Rect) (retval bool, result Rect) {
 }
 
  // Calculate the union of two rectangles.
+ // ↪ https://wiki.libsdl.org/SDL_UnionRect
 func UnionRect(A Rect, B Rect) (result Rect) {
     tmp_A := toCFromRect(A)
     tmp_B := toCFromRect(B)
@@ -128,6 +136,7 @@ func UnionRect(A Rect, B Rect) (result Rect) {
  // 
  // Returns: SDL_TRUE if any points were within the clipping rect
  // 
+ // ↪ https://wiki.libsdl.org/SDL_EnclosePoints
 func EnclosePoints(points []Point, clip Rect) (retval bool, result Rect) {
     var tmp_points *C.SDL_Point
     if len(points) > 0 {

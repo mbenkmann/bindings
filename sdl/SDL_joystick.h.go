@@ -31,6 +31,7 @@ import "unsafe"
  // in the background, you should set the following hint before calling
  // SDL_Init(): SDL_HINT_JOYSTICK_ALLOW_BACKGROUND_EVENTS
 
+ // ↪ https://wiki.libsdl.org/SDL_JoystickGUID
 type JoystickGUID struct {
     Data [16]uint8
 }
@@ -46,25 +47,35 @@ func toCFromJoystickGUID(s JoystickGUID) (d C.SDL_JoystickGUID) {
 
  // Hat positions
 const (
+     // ↪ https://wiki.libsdl.org/SDL_HAT_CENTERED
     HAT_CENTERED = C.SDL_HAT_CENTERED
 
+     // ↪ https://wiki.libsdl.org/SDL_HAT_UP
     HAT_UP = C.SDL_HAT_UP
 
+     // ↪ https://wiki.libsdl.org/SDL_HAT_RIGHT
     HAT_RIGHT = C.SDL_HAT_RIGHT
 
+     // ↪ https://wiki.libsdl.org/SDL_HAT_DOWN
     HAT_DOWN = C.SDL_HAT_DOWN
 
+     // ↪ https://wiki.libsdl.org/SDL_HAT_LEFT
     HAT_LEFT = C.SDL_HAT_LEFT
 
+     // ↪ https://wiki.libsdl.org/SDL_HAT_RIGHTUP
     HAT_RIGHTUP = C.SDL_HAT_RIGHTUP
 
+     // ↪ https://wiki.libsdl.org/SDL_HAT_RIGHTDOWN
     HAT_RIGHTDOWN = C.SDL_HAT_RIGHTDOWN
 
+     // ↪ https://wiki.libsdl.org/SDL_HAT_LEFTUP
     HAT_LEFTUP = C.SDL_HAT_LEFTUP
 
+     // ↪ https://wiki.libsdl.org/SDL_HAT_LEFTDOWN
     HAT_LEFTDOWN = C.SDL_HAT_LEFTDOWN
 )
 
+ // ↪ https://wiki.libsdl.org/SDL_JoystickPowerLevel
 type JoystickPowerLevel int
 const (
     JOYSTICK_POWER_UNKNOWN JoystickPowerLevel = C.SDL_JOYSTICK_POWER_UNKNOWN
@@ -87,6 +98,7 @@ type JoystickID int32
 
 
  // Count the number of joysticks attached to the system right now
+ // ↪ https://wiki.libsdl.org/SDL_NumJoysticks
 func NumJoysticks() (retval int) {
     retval = int(C.SDL_NumJoysticks())
     return
@@ -95,6 +107,7 @@ func NumJoysticks() (retval int) {
  // Get the implementation dependent name of a joystick. This can be
  // called before any joysticks are opened. If no name can be found, this
  // function returns NULL.
+ // ↪ https://wiki.libsdl.org/SDL_JoystickNameForIndex
 func JoystickNameForIndex(device_index int) (retval string) {
     retval = C.GoString(C.SDL_JoystickNameForIndex(C.int(device_index)))
     return
@@ -107,12 +120,14 @@ func JoystickNameForIndex(device_index int) (retval string) {
  // 
  // Returns: A joystick identifier, or NULL if an error occurred.
  // 
+ // ↪ https://wiki.libsdl.org/SDL_JoystickOpen
 func JoystickOpen(device_index int) (retval *Joystick) {
     retval = (*Joystick)(unsafe.Pointer(C.SDL_JoystickOpen(C.int(device_index))))
     return
 }
 
  // Return the SDL_Joystick associated with an instance id.
+ // ↪ https://wiki.libsdl.org/SDL_JoystickFromInstanceID
 func JoystickFromInstanceID(joyid JoystickID) (retval *Joystick) {
     retval = (*Joystick)(unsafe.Pointer(C.SDL_JoystickFromInstanceID(C.SDL_JoystickID(joyid))))
     return
@@ -120,18 +135,21 @@ func JoystickFromInstanceID(joyid JoystickID) (retval *Joystick) {
 
  // Return the name for this currently opened joystick. If no name can be
  // found, this function returns NULL.
+ // ↪ https://wiki.libsdl.org/SDL_JoystickName
 func (joystick *Joystick) Name() (retval string) {
     retval = C.GoString(C.SDL_JoystickName((*C.SDL_Joystick)(joystick)))
     return
 }
 
  // Return the GUID for the joystick at this index
+ // ↪ https://wiki.libsdl.org/SDL_JoystickGetDeviceGUID
 func JoystickGetDeviceGUID(device_index int) (retval JoystickGUID) {
     retval = fromC2JoystickGUID(C.SDL_JoystickGetDeviceGUID(C.int(device_index)))
     return
 }
 
  // Return the GUID for this opened joystick
+ // ↪ https://wiki.libsdl.org/SDL_JoystickGetGUID
 func (joystick *Joystick) GetGUID() (retval JoystickGUID) {
     retval = fromC2JoystickGUID(C.SDL_JoystickGetGUID((*C.SDL_Joystick)(joystick)))
     return
@@ -139,6 +157,7 @@ func (joystick *Joystick) GetGUID() (retval JoystickGUID) {
 
 
  // convert a string into a joystick formatted guid
+ // ↪ https://wiki.libsdl.org/SDL_JoystickGetGUIDFromString
 func JoystickGetGUIDFromString(pchGUID string) (retval JoystickGUID) {
     tmp_pchGUID := C.CString(pchGUID); defer C.free(unsafe.Pointer(tmp_pchGUID))
     retval = fromC2JoystickGUID(C.SDL_JoystickGetGUIDFromString((*C.char)(tmp_pchGUID)))
@@ -147,6 +166,7 @@ func JoystickGetGUIDFromString(pchGUID string) (retval JoystickGUID) {
 
  // Returns SDL_TRUE if the joystick has been opened and currently
  // connected, or SDL_FALSE if it has not.
+ // ↪ https://wiki.libsdl.org/SDL_JoystickGetAttached
 func (joystick *Joystick) GetAttached() (retval bool) {
     retval = C.SDL_TRUE==(C.SDL_JoystickGetAttached((*C.SDL_Joystick)(joystick)))
     return
@@ -154,12 +174,14 @@ func (joystick *Joystick) GetAttached() (retval bool) {
 
  // Get the instance ID of an opened joystick or -1 if the joystick is
  // invalid.
+ // ↪ https://wiki.libsdl.org/SDL_JoystickInstanceID
 func (joystick *Joystick) InstanceID() (retval JoystickID) {
     retval = JoystickID(C.SDL_JoystickInstanceID((*C.SDL_Joystick)(joystick)))
     return
 }
 
  // Get the number of general axis controls on a joystick.
+ // ↪ https://wiki.libsdl.org/SDL_JoystickNumAxes
 func (joystick *Joystick) NumAxes() (retval int) {
     retval = int(C.SDL_JoystickNumAxes((*C.SDL_Joystick)(joystick)))
     return
@@ -169,18 +191,21 @@ func (joystick *Joystick) NumAxes() (retval int) {
  // 
  // Joystick trackballs have only relative motion events associated with
  // them and their state cannot be polled.
+ // ↪ https://wiki.libsdl.org/SDL_JoystickNumBalls
 func (joystick *Joystick) NumBalls() (retval int) {
     retval = int(C.SDL_JoystickNumBalls((*C.SDL_Joystick)(joystick)))
     return
 }
 
  // Get the number of POV hats on a joystick.
+ // ↪ https://wiki.libsdl.org/SDL_JoystickNumHats
 func (joystick *Joystick) NumHats() (retval int) {
     retval = int(C.SDL_JoystickNumHats((*C.SDL_Joystick)(joystick)))
     return
 }
 
  // Get the number of buttons on a joystick.
+ // ↪ https://wiki.libsdl.org/SDL_JoystickNumButtons
 func (joystick *Joystick) NumButtons() (retval int) {
     retval = int(C.SDL_JoystickNumButtons((*C.SDL_Joystick)(joystick)))
     return
@@ -190,6 +215,7 @@ func (joystick *Joystick) NumButtons() (retval int) {
  // 
  // This is called automatically by the event loop if any joystick events
  // are enabled.
+ // ↪ https://wiki.libsdl.org/SDL_JoystickUpdate
 func JoystickUpdate() {
     C.SDL_JoystickUpdate()
 }
@@ -201,6 +227,7 @@ func JoystickUpdate() {
  // information.
  // 
  // The state can be one of SDL_QUERY, SDL_ENABLE or SDL_IGNORE.
+ // ↪ https://wiki.libsdl.org/SDL_JoystickEventState
 func JoystickEventState(state int) (retval int) {
     retval = int(C.SDL_JoystickEventState(C.int(state)))
     return
@@ -211,6 +238,7 @@ func JoystickEventState(state int) (retval int) {
  // The state is a value ranging from -32768 to 32767.
  // 
  // The axis indices start at index 0.
+ // ↪ https://wiki.libsdl.org/SDL_JoystickGetAxis
 func (joystick *Joystick) GetAxis(axis int) (retval int16) {
     retval = int16(C.SDL_JoystickGetAxis((*C.SDL_Joystick)(joystick), C.int(axis)))
     return
@@ -232,6 +260,7 @@ func (joystick *Joystick) GetAxis(axis int) (retval int16) {
  //   - SDL_HAT_LEFTUP
  //   - SDL_HAT_LEFTDOWN
  // 
+ // ↪ https://wiki.libsdl.org/SDL_JoystickGetHat
 func (joystick *Joystick) GetHat(hat int) (retval uint8) {
     retval = uint8(C.SDL_JoystickGetHat((*C.SDL_Joystick)(joystick), C.int(hat)))
     return
@@ -242,6 +271,7 @@ func (joystick *Joystick) GetHat(hat int) (retval uint8) {
  // Returns: 0, or -1 if you passed it invalid parameters.
  // 
  // The ball indices start at index 0.
+ // ↪ https://wiki.libsdl.org/SDL_JoystickGetBall
 func (joystick *Joystick) GetBall(ball int) (retval int, dx int, dy int) {
     tmp_dx := new(C.int)
     tmp_dy := new(C.int)
@@ -254,17 +284,20 @@ func (joystick *Joystick) GetBall(ball int) (retval int, dx int, dy int) {
  // Get the current state of a button on a joystick.
  // 
  // The button indices start at index 0.
+ // ↪ https://wiki.libsdl.org/SDL_JoystickGetButton
 func (joystick *Joystick) GetButton(button int) (retval uint8) {
     retval = uint8(C.SDL_JoystickGetButton((*C.SDL_Joystick)(joystick), C.int(button)))
     return
 }
 
  // Close a joystick previously opened with SDL_JoystickOpen().
+ // ↪ https://wiki.libsdl.org/SDL_JoystickClose
 func (joystick *Joystick) Close() {
     C.SDL_JoystickClose((*C.SDL_Joystick)(joystick))
 }
 
  // Return the battery level of this joystick
+ // ↪ https://wiki.libsdl.org/SDL_JoystickCurrentPowerLevel
 func (joystick *Joystick) CurrentPowerLevel() (retval JoystickPowerLevel) {
     retval = JoystickPowerLevel(C.SDL_JoystickCurrentPowerLevel((*C.SDL_Joystick)(joystick)))
     return

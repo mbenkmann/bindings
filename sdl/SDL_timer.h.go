@@ -25,24 +25,28 @@ type TimerID int
  // 
  // Note: This value wraps if the program runs for more than ~49 days.
  // 
+ // ↪ https://wiki.libsdl.org/SDL_GetTicks
 func GetTicks() (retval uint32) {
     retval = uint32(C.SDL_GetTicks())
     return
 }
 
  // Get the current value of the high resolution counter.
+ // ↪ https://wiki.libsdl.org/SDL_GetPerformanceCounter
 func GetPerformanceCounter() (retval uint64) {
     retval = uint64(C.SDL_GetPerformanceCounter())
     return
 }
 
  // Get the count per second of the high resolution counter.
+ // ↪ https://wiki.libsdl.org/SDL_GetPerformanceFrequency
 func GetPerformanceFrequency() (retval uint64) {
     retval = uint64(C.SDL_GetPerformanceFrequency())
     return
 }
 
  // Wait a specified number of milliseconds before returning.
+ // ↪ https://wiki.libsdl.org/SDL_Delay
 func Delay(ms uint32) {
     C.SDL_Delay(C.Uint32(ms))
 }
@@ -51,6 +55,7 @@ func Delay(ms uint32) {
  // 
  // Returns: A timer ID, or 0 when an error occurs.
  // 
+ // ↪ https://wiki.libsdl.org/SDL_AddTimer
 func AddTimer(interval uint32, callback TimerCallback, param uintptr) (retval TimerID) {
     retval = TimerID(C.SDL_AddTimer(C.Uint32(interval), C.SDL_TimerCallback(callback), unsafe.Pointer(param)))
     return
@@ -62,6 +67,7 @@ func AddTimer(interval uint32, callback TimerCallback, param uintptr) (retval Ti
  // 
  // Warning: It is not safe to remove a timer multiple times.
  // 
+ // ↪ https://wiki.libsdl.org/SDL_RemoveTimer
 func RemoveTimer(id TimerID) (retval bool) {
     retval = C.SDL_TRUE==(C.SDL_RemoveTimer(C.SDL_TimerID(id)))
     return

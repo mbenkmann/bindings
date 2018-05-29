@@ -27,6 +27,7 @@ import "C"
  // 
  // The values in this enumeration are based on the USB usage page
  // standard: http://www.usb.org/developers/devclass_docs/Hut1_12v2.pdf
+ // ↪ https://wiki.libsdl.org/SDL_Scancode
 type Scancode int
 const (
     SCANCODE_UNKNOWN Scancode = C.SDL_SCANCODE_UNKNOWN
