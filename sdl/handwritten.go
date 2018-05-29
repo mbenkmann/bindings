@@ -59,11 +59,21 @@ func toCFromWindowShapeMode(s WindowShapeMode) (d C.SDL_WindowShapeMode) {
     return
 }
 
+// ↪ https://wiki.libsdl.org/SDL_RWops
 type RWops C.SDL_RWops
+
+// ↪ https://wiki.libsdl.org/SDL_Surface
 type Surface C.SDL_Surface
+
+// ↪ https://wiki.libsdl.org/SDL_PixelFormat
 type PixelFormat C.SDL_PixelFormat
+
+// ↪ https://wiki.libsdl.org/SDL_Palette
 type Palette C.SDL_Palette
+
 type GameControllerButtonBind C.SDL_GameControllerButtonBind
+
+// ↪ https://wiki.libsdl.org/SDL_HapticCustom
 type HapticCustom C.SDL_HapticCustom
 
 // Performs a fast blit from the source surface to the destination surface.
@@ -120,11 +130,13 @@ type HapticCustom C.SDL_HapticCustom
 //
 // You should call SDL_BlitSurface() unless you know exactly how SDL
 // blitting works internally and how to use the other blit functions.
+// ↪ https://wiki.libsdl.org/SDL_BlitSurface
 func BlitSurface(src *Surface, srcrect Rect, dst *Surface, dstrect Rect) (retval int) {
     return UpperBlit(src, srcrect, dst, dstrect)
 }
 
 // Like BlitSurface() but srcrect and dstrect need not be the same size.
+// ↪ https://wiki.libsdl.org/SDL_BlitScaled
 func BlitScaled(src *Surface, srcrect Rect, dst *Surface, dstrect Rect) (retval int) {
     return UpperBlitScaled(src, srcrect, dst, dstrect)
 }
@@ -141,6 +153,7 @@ func LoadWAV(fpath string) (retval *AudioSpec, audio_buf []byte) {
 
 // SDL_SetError supports extra parameters. At present these are not supported.
 // If you have a use case, file an issue.
+// ↪ https://wiki.libsdl.org/SDL_SetError
 func SetError(fo string) int {
     st := C.CString(fo)
     defer C.free(unsafe.Pointer(st))
@@ -170,6 +183,8 @@ func SetError(fo string) int {
 // error.
 //
 // This function is thread-safe.
+//
+// ↪ https://wiki.libsdl.org/SDL_PeepEvents
 func PeepEvents(events []Event, numevents int, action Eventaction, minType uint32, maxType uint32) int {
     if numevents > len(events) {
         numevents = len(events)
@@ -184,6 +199,7 @@ func PeepEvents(events []Event, numevents int, action Eventaction, minType uint3
 //
 // Returns: SDL_TRUE if there is an intersection, SDL_FALSE otherwise.
 //
+// ↪ https://wiki.libsdl.org/SDL_IntersectRectAndLine
 func IntersectRectAndLine(rect Rect, lineX1 int, lineY1 int, lineX2 int, lineY2 int) (retval bool, X1 int, Y1 int, X2 int, Y2 int) {
     tmp_rect := toCFromRect(rect)
     tmp_X1 := C.int(lineX1)
@@ -223,6 +239,7 @@ func IntersectRectAndLine(rect Rect, lineX1 int, lineY1 int, lineX2 int, lineY2 
 //
 // See also: SDL_GetWindowGammaRamp()
 //
+// ↪ https://wiki.libsdl.org/SDL_SetWindowGammaRamp
 func (window *Window) SetGammaRamp(red *[256]uint16, green *[256]uint16, blue *[256]uint16) (retval int) {
     retval = int(C.SDL_SetWindowGammaRamp((*C.SDL_Window)(window), (*C.Uint16)(unsafe.Pointer(red)), (*C.Uint16)(unsafe.Pointer(green)), (*C.Uint16)(unsafe.Pointer(blue))))
     return
@@ -249,12 +266,14 @@ func (window *Window) SetGammaRamp(red *[256]uint16, green *[256]uint16, blue *[
 //     A pointer to a 256 element array of 16-bit quantities to hold the
 //     translation table for the blue channel, or NULL.
 //
+// ↪ https://wiki.libsdl.org/SDL_GetWindowGammaRamp
 func (window *Window) GetGammaRamp(red *[256]uint16, green *[256]uint16, blue *[256]uint16) (retval int) {
     retval = int(C.SDL_SetWindowGammaRamp((*C.SDL_Window)(window), (*C.Uint16)(unsafe.Pointer(red)), (*C.Uint16)(unsafe.Pointer(green)), (*C.Uint16)(unsafe.Pointer(blue))))
     return
 }
 
 // Calculate a 256 entry gamma ramp for a gamma value.
+// ↪ https://wiki.libsdl.org/SDL_CalculateGammaRamp
 func CalculateGammaRamp(gamma float32, ramp *[256]uint16) {
     C.SDL_CalculateGammaRamp(C.float(gamma), (*C.Uint16)(unsafe.Pointer(ramp)))
     return
@@ -279,6 +298,7 @@ func CalculateGammaRamp(gamma float32, ramp *[256]uint16) {
 //   renderer
 //     A pointer filled with the renderer, or NULL on error
 //
+// ↪ https://wiki.libsdl.org/SDL_CreateWindowAndRenderer
 func CreateWindowAndRenderer(width int, height int, window_flags uint32) (retval int, window *Window, renderer *Renderer) {
     var tmp_window *C.SDL_Window
     var tmp_renderer *C.SDL_Renderer
@@ -310,6 +330,7 @@ func CreateWindowAndRenderer(width int, height int, window_flags uint32) (retval
 //   pitch
 //     This is filled in with the pitch of the locked pixels.
 //
+// ↪ https://wiki.libsdl.org/SDL_LockTexture
 func (texture *Texture) Lock(rect *Rect) (retval int, pixels *[999999999]byte, pitch int) {
     var tmp_rect *C.SDL_Rect
     if rect != nil {
@@ -325,6 +346,7 @@ func (texture *Texture) Lock(rect *Rect) (retval int, pixels *[999999999]byte, p
 }
 
 // MessageBox structure containing title, text, window, etc.
+// ↪ https://wiki.libsdl.org/SDL_MessageBoxData
 type MessageBoxData struct {
     // SDL_MessageBoxFlags
     Flags uint32
@@ -360,6 +382,7 @@ type MessageBoxData struct {
 //   buttonid
 //     The pointer to which user id of hit button should be copied.
 //
+// ↪ https://wiki.libsdl.org/SDL_ShowMessageBox
 func ShowMessageBox(messageboxdata *MessageBoxData) (retval int, buttonid int) {
     if messageboxdata == nil { return -1, -1 }
     mbox := new(C.SDL_MessageBoxData)
@@ -395,6 +418,7 @@ func ShowMessageBox(messageboxdata *MessageBoxData) (retval int, buttonid int) {
 }
 
 // A structure to hold a set of audio conversion filters and buffers.
+// ↪ https://wiki.libsdl.org/SDL_AudioCVT
 type AudioCVT struct {
     // Set to 1 if conversion possible
     Needed int
@@ -422,6 +446,7 @@ type AudioCVT struct {
 // Returns: -1 if the format conversion is not supported, 0 if there's no
 // conversion needed, or 1 if the audio filter is set up.
 //
+// ↪ https://wiki.libsdl.org/SDL_BuildAudioCVT
 func BuildAudioCVT(src_format AudioFormat, src_channels uint8, src_rate int, dst_format AudioFormat, dst_channels uint8, dst_rate int) (retval int, cvt *AudioCVT) {
     cvt = new(AudioCVT)
     retval = int(C.SDL_BuildAudioCVT((*C.SDL_AudioCVT)(&cvt.cvt), C.SDL_AudioFormat(src_format), C.Uint8(src_channels), C.int(src_rate), C.SDL_AudioFormat(dst_format), C.Uint8(dst_channels), C.int(dst_rate)))
@@ -438,6 +463,8 @@ func BuildAudioCVT(src_format AudioFormat, src_channels uint8, src_rate int, dst
 //
 // The data conversion may expand or shrink the size of the audio data in
 // cvt.Buf.
+//
+// ↪ https://wiki.libsdl.org/SDL_ConvertAudio
 func ConvertAudio(cvt *AudioCVT) (retval int) {
     cvt.cvt.len = C.int(len(cvt.Buf))
     if cvt.cvt.len_mult > 1 {
@@ -464,6 +491,8 @@ func ConvertAudio(cvt *AudioCVT) (retval int) {
 // This function returns NULL and sets the SDL error message if the wave
 // file cannot be opened, uses an unknown data format, or is corrupt.
 // Currently raw and MS-ADPCM WAVE files are supported.
+//
+// ↪ https://wiki.libsdl.org/SDL_LoadWAV_RW
 func LoadWAV_RW(src *RWops, freesrc int) (retval *AudioSpec, audio_buf []byte) {
     tmp_spec := new(C.SDL_AudioSpec)
     tmp_audio_buf := new(C.Uint8)
@@ -491,6 +520,8 @@ func LoadWAV_RW(src *RWops, freesrc int) (retval *AudioSpec, audio_buf []byte) {
 //   if state[sdl.SCANCODE_RETURN] != 0   {
 //       fmt.Printf("<RETURN> is pressed.\n");
 //   }
+//
+// ↪ https://wiki.libsdl.org/SDL_GetKeyboardState
 func GetKeyboardState() []byte {
     tmp_numkeys := new(C.int)
     states := C.SDL_GetKeyboardState((*C.int)(tmp_numkeys))
@@ -593,6 +624,7 @@ func checkParametersForSDL_ConvertPixels(width int, height int, src_format uint3
 //
 // See also: SDL_FreeCursor()
 //
+//  ↪ https://wiki.libsdl.org/SDL_CreateCursor
 func CreateCursor(data []byte, mask []byte, width int, height int, hot_x int, hot_y int) (retval *Cursor) {
     width = (width + 7) &^ 7
     wb := width >> 3
