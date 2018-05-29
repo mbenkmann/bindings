@@ -13,26 +13,35 @@ import "C"
  // These are the flags which may be passed to SDL_Init(). You should
  // specify the subsystems which you will be using in your application.
 const (
+     // ↪ https://wiki.libsdl.org/SDL_INIT_TIMER
     INIT_TIMER = C.SDL_INIT_TIMER
 
+     // ↪ https://wiki.libsdl.org/SDL_INIT_AUDIO
     INIT_AUDIO = C.SDL_INIT_AUDIO
 
      // SDL_INIT_VIDEO implies SDL_INIT_EVENTS
+     // ↪ https://wiki.libsdl.org/SDL_INIT_VIDEO
     INIT_VIDEO = C.SDL_INIT_VIDEO
 
      // SDL_INIT_JOYSTICK implies SDL_INIT_EVENTS
+     // ↪ https://wiki.libsdl.org/SDL_INIT_JOYSTICK
     INIT_JOYSTICK = C.SDL_INIT_JOYSTICK
 
+     // ↪ https://wiki.libsdl.org/SDL_INIT_HAPTIC
     INIT_HAPTIC = C.SDL_INIT_HAPTIC
 
      // SDL_INIT_GAMECONTROLLER implies SDL_INIT_JOYSTICK
+     // ↪ https://wiki.libsdl.org/SDL_INIT_GAMECONTROLLER
     INIT_GAMECONTROLLER = C.SDL_INIT_GAMECONTROLLER
 
+     // ↪ https://wiki.libsdl.org/SDL_INIT_EVENTS
     INIT_EVENTS = C.SDL_INIT_EVENTS
 
      // compatibility; this flag is ignored.
+     // ↪ https://wiki.libsdl.org/SDL_INIT_NOPARACHUTE
     INIT_NOPARACHUTE = C.SDL_INIT_NOPARACHUTE
 
+     // ↪ https://wiki.libsdl.org/SDL_INIT_EVERYTHING
     INIT_EVERYTHING = C.SDL_INIT_EVERYTHING
 )
 

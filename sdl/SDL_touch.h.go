@@ -32,6 +32,7 @@ func toCFromFinger(s Finger) (d C.SDL_Finger) {
 }
 
 const (
+     // ↪ https://wiki.libsdl.org/SDL_TOUCH_MOUSEID
     TOUCH_MOUSEID = C.SDL_TOUCH_MOUSEID
 )
 
