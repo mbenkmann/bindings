@@ -79,7 +79,7 @@ func sdlmain() int {
 
     for {
         for retval, event := sdl.PollEvent(); retval > 0; retval, event = sdl.PollEvent() {
-            if sdl.EventType(event.Type()) == sdl.QUIT {
+            if event.Type() == sdl.QUIT {
                 fmt.Println("Window closed by user")
                 return 0
             }

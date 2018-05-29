@@ -180,8 +180,12 @@ SDL_FREE_STRINGS = frozenset(("SDL_GetBasePath", "SDL_GetPrefPath", "SDL_GetClip
 SDL_GOTYPE_OVERRIDE = {
     "SDL_CreateWindow.flags": "WindowFlags",
     "SDL_CreateShapedWindow.flags": "WindowFlags",
-    "SDL_CreateRenderer.flags": "RendererFlags"
+    "SDL_CreateRenderer.flags": "RendererFlags",
+    "SDL_*Event.type": "EventType",
+    "SDL_FlushEvents.*Type": "EventType",
 }
+
+SDL_ENUM_TYPES = {"SDL_EventType": "uint32"}
 
 
 def sdl():
@@ -220,6 +224,7 @@ def sdl():
     lib.receiver_aliases = SDL_RECEIVER_ALIASES
     lib.free_strings = SDL_FREE_STRINGS
     lib.gotype_override = SDL_GOTYPE_OVERRIDE
+    lib.enum_types = SDL_ENUM_TYPES
 
 
 if __name__ == "__main__":
