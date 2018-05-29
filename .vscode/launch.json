@@ -58,6 +58,17 @@
       "output": "${workspaceRoot}/bin/debug-temp"
     },
     {
+      "name": "Go: Lesson 4",
+      "type": "go",
+      "request": "launch",
+      "mode": "debug",
+      "program": "${workspaceRoot}/examples/sdl-lesson4/lesson4.go",
+      "args": [],
+      "internalConsoleOptions": "openOnSessionStart",
+      "showLog": false,
+      "output": "${workspaceRoot}/bin/debug-temp"
+    },
+    {
       "name": "Go: Shaped Window",
       "type": "go",
       "request": "launch",
