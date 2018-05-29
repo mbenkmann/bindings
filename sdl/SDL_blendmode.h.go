@@ -9,6 +9,7 @@ import "C"
  // Header file declaring the SDL_BlendMode enumeration
 
  // The blend mode used in SDL_RenderCopy() and drawing operations.
+ // ↪ https://wiki.libsdl.org/SDL_BlendMode
 type BlendMode int
 const (
      // no blending dstRGBA = srcRGBA

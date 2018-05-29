@@ -10,6 +10,7 @@ import "unsafe"
  // Include file for SDL event handling.
 
  // Fields shared by every event.
+ // ↪ https://wiki.libsdl.org/SDL_CommonEvent
 type CommonEvent struct {
     Type EventType
 
@@ -28,6 +29,7 @@ func toCFromCommonEvent(s CommonEvent) (d C.SDL_CommonEvent) {
 }
 
  // Window state change event data (event.window.*)
+ // ↪ https://wiki.libsdl.org/SDL_WindowEvent
 type WindowEvent struct {
      // SDL_WINDOWEVENT
     Type EventType
@@ -72,6 +74,7 @@ func toCFromWindowEvent(s WindowEvent) (d C.SDL_WindowEvent) {
 }
 
  // Keyboard button event structure (event.key.*)
+ // ↪ https://wiki.libsdl.org/SDL_KeyboardEvent
 type KeyboardEvent struct {
      // SDL_KEYDOWN or SDL_KEYUP
     Type EventType
@@ -116,6 +119,7 @@ func toCFromKeyboardEvent(s KeyboardEvent) (d C.SDL_KeyboardEvent) {
 }
 
  // Keyboard text editing event structure (event.edit.*)
+ // ↪ https://wiki.libsdl.org/SDL_TextEditingEvent
 type TextEditingEvent struct {
      // SDL_TEXTEDITING
     Type EventType
@@ -151,6 +155,7 @@ func toCFromTextEditingEvent(s TextEditingEvent) (d C.SDL_TextEditingEvent) {
 }
 
  // Keyboard text input event structure (event.text.*)
+ // ↪ https://wiki.libsdl.org/SDL_TextInputEvent
 type TextInputEvent struct {
      // SDL_TEXTINPUT
     Type EventType
@@ -178,6 +183,7 @@ func toCFromTextInputEvent(s TextInputEvent) (d C.SDL_TextInputEvent) {
 }
 
  // Mouse motion event structure (event.motion.*)
+ // ↪ https://wiki.libsdl.org/SDL_MouseMotionEvent
 type MouseMotionEvent struct {
      // SDL_MOUSEMOTION
     Type EventType
@@ -225,6 +231,7 @@ func toCFromMouseMotionEvent(s MouseMotionEvent) (d C.SDL_MouseMotionEvent) {
 }
 
  // Mouse button event structure (event.button.*)
+ // ↪ https://wiki.libsdl.org/SDL_MouseButtonEvent
 type MouseButtonEvent struct {
      // SDL_MOUSEBUTTONDOWN or SDL_MOUSEBUTTONUP
     Type EventType
@@ -275,6 +282,7 @@ func toCFromMouseButtonEvent(s MouseButtonEvent) (d C.SDL_MouseButtonEvent) {
 }
 
  // Mouse wheel event structure (event.wheel.*)
+ // ↪ https://wiki.libsdl.org/SDL_MouseWheelEvent
 type MouseWheelEvent struct {
      // SDL_MOUSEWHEEL
     Type EventType
@@ -317,6 +325,7 @@ func toCFromMouseWheelEvent(s MouseWheelEvent) (d C.SDL_MouseWheelEvent) {
 }
 
  // Joystick axis motion event structure (event.jaxis.*)
+ // ↪ https://wiki.libsdl.org/SDL_JoyAxisEvent
 type JoyAxisEvent struct {
      // SDL_JOYAXISMOTION
     Type EventType
@@ -360,6 +369,7 @@ func toCFromJoyAxisEvent(s JoyAxisEvent) (d C.SDL_JoyAxisEvent) {
 }
 
  // Joystick trackball motion event structure (event.jball.*)
+ // ↪ https://wiki.libsdl.org/SDL_JoyBallEvent
 type JoyBallEvent struct {
      // SDL_JOYBALLMOTION
     Type EventType
@@ -404,6 +414,7 @@ func toCFromJoyBallEvent(s JoyBallEvent) (d C.SDL_JoyBallEvent) {
 }
 
  // Joystick hat position change event structure (event.jhat.*)
+ // ↪ https://wiki.libsdl.org/SDL_JoyHatEvent
 type JoyHatEvent struct {
      // SDL_JOYHATMOTION
     Type EventType
@@ -447,6 +458,7 @@ func toCFromJoyHatEvent(s JoyHatEvent) (d C.SDL_JoyHatEvent) {
 }
 
  // Joystick button event structure (event.jbutton.*)
+ // ↪ https://wiki.libsdl.org/SDL_JoyButtonEvent
 type JoyButtonEvent struct {
      // SDL_JOYBUTTONDOWN or SDL_JOYBUTTONUP
     Type EventType
@@ -484,6 +496,7 @@ func toCFromJoyButtonEvent(s JoyButtonEvent) (d C.SDL_JoyButtonEvent) {
 }
 
  // Joystick device event structure (event.jdevice.*)
+ // ↪ https://wiki.libsdl.org/SDL_JoyDeviceEvent
 type JoyDeviceEvent struct {
      // SDL_JOYDEVICEADDED or SDL_JOYDEVICEREMOVED
     Type EventType
@@ -508,6 +521,7 @@ func toCFromJoyDeviceEvent(s JoyDeviceEvent) (d C.SDL_JoyDeviceEvent) {
 }
 
  // Game controller axis motion event structure (event.caxis.*)
+ // ↪ https://wiki.libsdl.org/SDL_ControllerAxisEvent
 type ControllerAxisEvent struct {
      // SDL_CONTROLLERAXISMOTION
     Type EventType
@@ -551,6 +565,7 @@ func toCFromControllerAxisEvent(s ControllerAxisEvent) (d C.SDL_ControllerAxisEv
 }
 
  // Game controller button event structure (event.cbutton.*)
+ // ↪ https://wiki.libsdl.org/SDL_ControllerButtonEvent
 type ControllerButtonEvent struct {
      // SDL_CONTROLLERBUTTONDOWN or SDL_CONTROLLERBUTTONUP
     Type EventType
@@ -588,6 +603,7 @@ func toCFromControllerButtonEvent(s ControllerButtonEvent) (d C.SDL_ControllerBu
 }
 
  // Controller device event structure (event.cdevice.*)
+ // ↪ https://wiki.libsdl.org/SDL_ControllerDeviceEvent
 type ControllerDeviceEvent struct {
      // SDL_CONTROLLERDEVICEADDED, SDL_CONTROLLERDEVICEREMOVED, or
      // SDL_CONTROLLERDEVICEREMAPPED
@@ -613,6 +629,7 @@ func toCFromControllerDeviceEvent(s ControllerDeviceEvent) (d C.SDL_ControllerDe
 }
 
  // Audio device event structure (event.adevice.*)
+ // ↪ https://wiki.libsdl.org/SDL_AudioDeviceEvent
 type AudioDeviceEvent struct {
      // SDL_AUDIODEVICEADDED, or SDL_AUDIODEVICEREMOVED
     Type EventType
@@ -651,6 +668,7 @@ func toCFromAudioDeviceEvent(s AudioDeviceEvent) (d C.SDL_AudioDeviceEvent) {
 }
 
  // Touch finger event structure (event.tfinger.*)
+ // ↪ https://wiki.libsdl.org/SDL_TouchFingerEvent
 type TouchFingerEvent struct {
      // SDL_FINGERMOTION or SDL_FINGERDOWN or SDL_FINGERUP
     Type EventType
@@ -697,6 +715,7 @@ func toCFromTouchFingerEvent(s TouchFingerEvent) (d C.SDL_TouchFingerEvent) {
 }
 
  // Multiple Finger Gesture Event (event.mgesture.*)
+ // ↪ https://wiki.libsdl.org/SDL_MultiGestureEvent
 type MultiGestureEvent struct {
      // SDL_MULTIGESTURE
     Type EventType
@@ -738,6 +757,7 @@ func toCFromMultiGestureEvent(s MultiGestureEvent) (d C.SDL_MultiGestureEvent) {
 }
 
  // Dollar Gesture Event (event.dgesture.*)
+ // ↪ https://wiki.libsdl.org/SDL_DollarGestureEvent
 type DollarGestureEvent struct {
      // SDL_DOLLARGESTURE or SDL_DOLLARRECORD
     Type EventType
@@ -783,6 +803,7 @@ func toCFromDollarGestureEvent(s DollarGestureEvent) (d C.SDL_DollarGestureEvent
  // Note: If this event is enabled, you must free the filename in the
  // event.
  // 
+ // ↪ https://wiki.libsdl.org/SDL_DropEvent
 type DropEvent struct {
      // SDL_DROPBEGIN or SDL_DROPFILE or SDL_DROPTEXT or SDL_DROPCOMPLETE
     Type uint32
@@ -803,6 +824,7 @@ func fromC2DropEvent(s C.SDL_DropEvent) DropEvent {
 }
 
  // The "quit requested" event.
+ // ↪ https://wiki.libsdl.org/SDL_QuitEvent
 type QuitEvent struct {
      // SDL_QUIT
     Type EventType
@@ -822,6 +844,7 @@ func toCFromQuitEvent(s QuitEvent) (d C.SDL_QuitEvent) {
 }
 
  // OS Specific event.
+ // ↪ https://wiki.libsdl.org/SDL_OSEvent
 type OSEvent struct {
      // SDL_QUIT
     Type EventType
@@ -841,6 +864,7 @@ func toCFromOSEvent(s OSEvent) (d C.SDL_OSEvent) {
 }
 
  // A user-defined event type (event.user.*)
+ // ↪ https://wiki.libsdl.org/SDL_UserEvent
 type UserEvent struct {
      // SDL_USEREVENT through SDL_LASTEVENT-1
     Type EventType
@@ -876,6 +900,7 @@ func toCFromUserEvent(s UserEvent) (d C.SDL_UserEvent) {
 }
 
  // General event structure.
+ // ↪ https://wiki.libsdl.org/SDL_Event
 type Event C.SDL_Event
 
  // Event type, shared with all events
@@ -1277,6 +1302,7 @@ func (u *Event) SetPadding(x [56]uint8) {
     *p = *(*[56]C.Uint8)(unsafe.Pointer(&(x)))
 }
 
+ // ↪ https://wiki.libsdl.org/SDL_eventaction
 type Eventaction int
 const (
     ADDEVENT Eventaction = C.SDL_ADDEVENT
@@ -1288,12 +1314,16 @@ const (
 
 
 const (
+     // ↪ https://wiki.libsdl.org/SDL_QUERY
     QUERY = C.SDL_QUERY
 
+     // ↪ https://wiki.libsdl.org/SDL_IGNORE
     IGNORE = C.SDL_IGNORE
 
+     // ↪ https://wiki.libsdl.org/SDL_DISABLE
     DISABLE = C.SDL_DISABLE
 
+     // ↪ https://wiki.libsdl.org/SDL_ENABLE
     ENABLE = C.SDL_ENABLE
 )
 
@@ -1305,22 +1335,28 @@ const (
  //   - If state is set to SDL_ENABLE, that event will be processed normally.
  //   - If state is set to SDL_QUERY, SDL_EventState() will return the current
  //     processing state of the specified event.
+ // ↪ https://wiki.libsdl.org/SDL_EventState
 func EventState(_type uint32, state int) (retval uint8) {
     retval = uint8(C.SDL_EventState(C.Uint32(_type), C.int(state)))
     return
 }
 
 const (
+     // ↪ https://wiki.libsdl.org/SDL_RELEASED
     RELEASED = C.SDL_RELEASED
 
+     // ↪ https://wiki.libsdl.org/SDL_PRESSED
     PRESSED = C.SDL_PRESSED
 
+     // ↪ https://wiki.libsdl.org/SDL_TEXTEDITINGEVENT_TEXT_SIZE
     TEXTEDITINGEVENT_TEXT_SIZE = C.SDL_TEXTEDITINGEVENT_TEXT_SIZE
 
+     // ↪ https://wiki.libsdl.org/SDL_TEXTINPUTEVENT_TEXT_SIZE
     TEXTINPUTEVENT_TEXT_SIZE = C.SDL_TEXTINPUTEVENT_TEXT_SIZE
 )
 
  // The types of events that can be delivered.
+ // ↪ https://wiki.libsdl.org/SDL_EventType
 type EventType uint32
 const (
      // Unused (do not remove)
@@ -1486,16 +1522,19 @@ type EventFilter C.SDL_EventFilter
  // This function updates the event queue and internal input device state.
  // 
  // This should only be run in the thread that sets the video mode.
+ // ↪ https://wiki.libsdl.org/SDL_PumpEvents
 func PumpEvents() {
     C.SDL_PumpEvents()
 }
 
  // Checks to see if certain event types are in the event queue.
+ // ↪ https://wiki.libsdl.org/SDL_HasEvent
 func HasEvent(_type EventType) (retval bool) {
     retval = C.SDL_TRUE==(C.SDL_HasEvent(C.Uint32(_type)))
     return
 }
 
+ // ↪ https://wiki.libsdl.org/SDL_HasEvents
 func HasEvents(minType uint32, maxType uint32) (retval bool) {
     retval = C.SDL_TRUE==(C.SDL_HasEvents(C.Uint32(minType), C.Uint32(maxType)))
     return
@@ -1505,10 +1544,12 @@ func HasEvents(minType uint32, maxType uint32) (retval bool) {
  // affects currently queued events. If you want to make sure that all
  // pending OS events are flushed, you can call SDL_PumpEvents() on the
  // main thread immediately before the flush call.
+ // ↪ https://wiki.libsdl.org/SDL_FlushEvent
 func FlushEvent(_type EventType) {
     C.SDL_FlushEvent(C.Uint32(_type))
 }
 
+ // ↪ https://wiki.libsdl.org/SDL_FlushEvents
 func FlushEvents(minType EventType, maxType EventType) {
     C.SDL_FlushEvents(C.Uint32(minType), C.Uint32(maxType))
 }
@@ -1522,6 +1563,7 @@ func FlushEvents(minType EventType, maxType EventType) {
  //     If not NULL, the next event is removed from the queue and stored in
  //     that area.
  //   
+ // ↪ https://wiki.libsdl.org/SDL_PollEvent
 func PollEvent() (retval int, event *Event) {
     tmp_event := new(C.SDL_Event)
     retval = int(C.SDL_PollEvent((*C.SDL_Event)(tmp_event)))
@@ -1537,6 +1579,7 @@ func PollEvent() (retval int, event *Event) {
  //     If not NULL, the next event is removed from the queue and stored in
  //     that area.
  //   
+ // ↪ https://wiki.libsdl.org/SDL_WaitEvent
 func WaitEvent() (retval int, event *Event) {
     tmp_event := new(C.SDL_Event)
     retval = int(C.SDL_WaitEvent((*C.SDL_Event)(tmp_event)))
@@ -1556,6 +1599,7 @@ func WaitEvent() (retval int, event *Event) {
  //   timeout
  //     The timeout (in milliseconds) to wait for next event.
  //   
+ // ↪ https://wiki.libsdl.org/SDL_WaitEventTimeout
 func WaitEventTimeout(timeout int) (retval int, event *Event) {
     tmp_event := new(C.SDL_Event)
     retval = int(C.SDL_WaitEventTimeout((*C.SDL_Event)(tmp_event), C.int(timeout)))
@@ -1568,6 +1612,7 @@ func WaitEventTimeout(timeout int) (retval int, event *Event) {
  // Returns: 1 on success, 0 if the event was filtered, or -1 if the event
  // queue was full or there was some other error.
  // 
+ // ↪ https://wiki.libsdl.org/SDL_PushEvent
 func (event *Event) Push() (retval int) {
     retval = int(C.SDL_PushEvent((*C.SDL_Event)(event)))
     return
@@ -1583,6 +1628,7 @@ func (event *Event) Push() (retval int) {
  // 
  // If there aren't enough user-defined events left, this function returns
  // (Uint32)-1
+ // ↪ https://wiki.libsdl.org/SDL_RegisterEvents
 func RegisterEvents(numevents int) (retval uint32) {
     retval = uint32(C.SDL_RegisterEvents(C.int(numevents)))
     return

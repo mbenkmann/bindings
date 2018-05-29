@@ -11,10 +11,13 @@ import "unsafe"
 
 
 const (
+     // ↪ https://wiki.libsdl.org/SDL_IMAGE_MAJOR_VERSION
     IMAGE_MAJOR_VERSION = C.SDL_IMAGE_MAJOR_VERSION
 
+     // ↪ https://wiki.libsdl.org/SDL_IMAGE_MINOR_VERSION
     IMAGE_MINOR_VERSION = C.SDL_IMAGE_MINOR_VERSION
 
+     // ↪ https://wiki.libsdl.org/SDL_IMAGE_PATCHLEVEL
     IMAGE_PATCHLEVEL = C.SDL_IMAGE_PATCHLEVEL
 
      // This is the version number macro for the current SDL_image version.

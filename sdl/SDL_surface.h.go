@@ -14,15 +14,19 @@ import "unsafe"
  // These are the currently supported flags for the SDL_Surface.
 const (
      // Just here for compatibility
+     // ↪ https://wiki.libsdl.org/SDL_SWSURFACE
     SWSURFACE = C.SDL_SWSURFACE
 
      // Surface uses preallocated memory
+     // ↪ https://wiki.libsdl.org/SDL_PREALLOC
     PREALLOC = C.SDL_PREALLOC
 
      // Surface is RLE encoded
+     // ↪ https://wiki.libsdl.org/SDL_RLEACCEL
     RLEACCEL = C.SDL_RLEACCEL
 
      // Surface is referenced internally
+     // ↪ https://wiki.libsdl.org/SDL_DONTFREE
     DONTFREE = C.SDL_DONTFREE
 )
 
@@ -79,6 +83,7 @@ type Blit C.SDL_blit
  //   Amask
  //     The alpha mask of the surface to create.
  //   
+ // ↪ https://wiki.libsdl.org/SDL_CreateRGBSurface
 func CreateRGBSurface(flags uint32, width int, height int, depth int, Rmask uint32, Gmask uint32, Bmask uint32, Amask uint32) (retval *Surface) {
     retval = (*Surface)(unsafe.Pointer(C.SDL_CreateRGBSurface(C.Uint32(flags), C.int(width), C.int(height), C.int(depth), C.Uint32(Rmask), C.Uint32(Gmask), C.Uint32(Bmask), C.Uint32(Amask))))
     return
@@ -119,6 +124,7 @@ func (surface *Surface) Free() {
  // 
  // Note: A single palette can be shared with many surfaces.
  // 
+ // ↪ https://wiki.libsdl.org/SDL_SetSurfacePalette
 func (surface *Surface) SetPalette(palette *Palette) (retval int) {
     retval = int(C.SDL_SetSurfacePalette((*C.SDL_Surface)(surface), (*C.SDL_Palette)(palette)))
     return
@@ -143,6 +149,7 @@ func (surface *Surface) SetPalette(palette *Palette) (retval int) {
  // 
  // See also: SDL_UnlockSurface()
  // 
+ // ↪ https://wiki.libsdl.org/SDL_LockSurface
 func (surface *Surface) Lock() (retval int) {
     retval = int(C.SDL_LockSurface((*C.SDL_Surface)(surface)))
     return
@@ -150,6 +157,7 @@ func (surface *Surface) Lock() (retval int) {
 
  // See also: SDL_LockSurface()
  // 
+ // ↪ https://wiki.libsdl.org/SDL_UnlockSurface
 func (surface *Surface) Unlock() {
     C.SDL_UnlockSurface((*C.SDL_Surface)(surface))
 }
@@ -162,6 +170,7 @@ func (surface *Surface) Unlock() {
  // 
  // Returns: the new surface, or NULL if there was an error.
  // 
+ // ↪ https://wiki.libsdl.org/SDL_LoadBMP_RW
 func LoadBMP_RW(src *RWops, freesrc int) (retval *Surface) {
     retval = (*Surface)(unsafe.Pointer(C.SDL_LoadBMP_RW((*C.SDL_RWops)(src), C.int(freesrc))))
     return
@@ -179,6 +188,7 @@ func LoadBMP_RW(src *RWops, freesrc int) (retval *Surface) {
  // 
  // Returns: 0 if successful or -1 if there was an error.
  // 
+ // ↪ https://wiki.libsdl.org/SDL_SaveBMP_RW
 func SaveBMP_RW(surface *Surface, dst *RWops, freedst int) (retval int) {
     retval = int(C.SDL_SaveBMP_RW((*C.SDL_Surface)(surface), (*C.SDL_RWops)(dst), C.int(freedst)))
     return
@@ -192,6 +202,7 @@ func SaveBMP_RW(surface *Surface, dst *RWops, freedst int) (retval int) {
  // faster, but the surface must be locked before directly accessing the
  // pixels.
  // 
+ // ↪ https://wiki.libsdl.org/SDL_SetSurfaceRLE
 func (surface *Surface) SetRLE(flag int) (retval int) {
     retval = int(C.SDL_SetSurfaceRLE((*C.SDL_Surface)(surface), C.int(flag)))
     return
@@ -211,6 +222,7 @@ func (surface *Surface) SetRLE(flag int) (retval int) {
  //     The transparent pixel in the native surface format
  //   
  // You can pass SDL_RLEACCEL to enable RLE accelerated blits.
+ // ↪ https://wiki.libsdl.org/SDL_SetColorKey
 func (surface *Surface) SetColorKey(flag int, key uint32) (retval int) {
     retval = int(C.SDL_SetColorKey((*C.SDL_Surface)(surface), C.int(flag), C.Uint32(key)))
     return
@@ -228,6 +240,7 @@ func (surface *Surface) SetColorKey(flag int, key uint32) (retval int) {
  //     A pointer filled in with the transparent pixel in the native surface
  //     format
  //   
+ // ↪ https://wiki.libsdl.org/SDL_GetColorKey
 func (surface *Surface) GetColorKey() (retval int, key uint32) {
     tmp_key := new(C.Uint32)
     retval = int(C.SDL_GetColorKey((*C.SDL_Surface)(surface), (*C.Uint32)(tmp_key)))
@@ -253,6 +266,7 @@ func (surface *Surface) GetColorKey() (retval int, key uint32) {
  //   b
  //     The blue color value multiplied into blit operations.
  //   
+ // ↪ https://wiki.libsdl.org/SDL_SetSurfaceColorMod
 func (surface *Surface) SetColorMod(r uint8, g uint8, b uint8) (retval int) {
     retval = int(C.SDL_SetSurfaceColorMod((*C.SDL_Surface)(surface), C.Uint8(r), C.Uint8(g), C.Uint8(b)))
     return
@@ -276,6 +290,7 @@ func (surface *Surface) SetColorMod(r uint8, g uint8, b uint8) (retval int) {
  //   b
  //     A pointer filled in with the current blue color value.
  //   
+ // ↪ https://wiki.libsdl.org/SDL_GetSurfaceColorMod
 func (surface *Surface) GetColorMod() (retval int, r byte, g byte, b byte) {
     tmp_r := new(C.Uint8)
     tmp_g := new(C.Uint8)
@@ -299,6 +314,7 @@ func (surface *Surface) GetColorMod() (retval int, r byte, g byte, b byte) {
  //   alpha
  //     The alpha value multiplied into blit operations.
  //   
+ // ↪ https://wiki.libsdl.org/SDL_SetSurfaceAlphaMod
 func (surface *Surface) SetAlphaMod(alpha uint8) (retval int) {
     retval = int(C.SDL_SetSurfaceAlphaMod((*C.SDL_Surface)(surface), C.Uint8(alpha)))
     return
@@ -316,6 +332,7 @@ func (surface *Surface) SetAlphaMod(alpha uint8) (retval int) {
  //   alpha
  //     A pointer filled in with the current alpha value.
  //   
+ // ↪ https://wiki.libsdl.org/SDL_GetSurfaceAlphaMod
 func (surface *Surface) GetAlphaMod() (retval int, alpha byte) {
     tmp_alpha := new(C.Uint8)
     retval = int(C.SDL_GetSurfaceAlphaMod((*C.SDL_Surface)(surface), (*C.Uint8)(tmp_alpha)))
@@ -335,6 +352,7 @@ func (surface *Surface) GetAlphaMod() (retval int, alpha byte) {
  //   blendMode
  //     SDL_BlendMode to use for blit blending.
  //   
+ // ↪ https://wiki.libsdl.org/SDL_SetSurfaceBlendMode
 func (surface *Surface) SetBlendMode(blendMode BlendMode) (retval int) {
     retval = int(C.SDL_SetSurfaceBlendMode((*C.SDL_Surface)(surface), C.SDL_BlendMode(blendMode)))
     return
@@ -352,6 +370,7 @@ func (surface *Surface) SetBlendMode(blendMode BlendMode) (retval int) {
  //   blendMode
  //     A pointer filled in with the current blend mode.
  //   
+ // ↪ https://wiki.libsdl.org/SDL_GetSurfaceBlendMode
 func (surface *Surface) GetBlendMode() (retval int, blendMode *BlendMode) {
     tmp_blendMode := new(C.SDL_BlendMode)
     retval = int(C.SDL_GetSurfaceBlendMode((*C.SDL_Surface)(surface), (*C.SDL_BlendMode)(tmp_blendMode)))
@@ -370,6 +389,7 @@ func (surface *Surface) GetBlendMode() (retval int, blendMode *BlendMode) {
  // 
  // Note that blits are automatically clipped to the edges of the source
  // and destination surfaces.
+ // ↪ https://wiki.libsdl.org/SDL_SetClipRect
 func (surface *Surface) SetClipRect(rect Rect) (retval bool) {
     tmp_rect := toCFromRect(rect)
     retval = C.SDL_TRUE==(C.SDL_SetClipRect((*C.SDL_Surface)(surface), (*C.SDL_Rect)(&tmp_rect)))
@@ -380,6 +400,7 @@ func (surface *Surface) SetClipRect(rect Rect) (retval bool) {
  // 
  // rect must be a pointer to a valid rectangle which will be filled with
  // the correct values.
+ // ↪ https://wiki.libsdl.org/SDL_GetClipRect
 func (surface *Surface) GetClipRect() (rect Rect) {
     tmp_rect := new(C.SDL_Rect)
     C.SDL_GetClipRect((*C.SDL_Surface)(surface), (*C.SDL_Rect)(tmp_rect))
@@ -400,11 +421,13 @@ func (surface *Surface) Duplicate() (retval *Surface) {
  // semantics. You can also pass SDL_RLEACCEL in the flags parameter and
  // SDL will try to RLE accelerate colorkey and alpha blits in the
  // resulting surface.
+ // ↪ https://wiki.libsdl.org/SDL_ConvertSurface
 func (src *Surface) Convert(fmt *PixelFormat, flags uint32) (retval *Surface) {
     retval = (*Surface)(unsafe.Pointer(C.SDL_ConvertSurface((*C.SDL_Surface)(src), (*C.SDL_PixelFormat)(fmt), C.Uint32(flags))))
     return
 }
 
+ // ↪ https://wiki.libsdl.org/SDL_ConvertSurfaceFormat
 func (src *Surface) ConvertFormat(pixel_format uint32, flags uint32) (retval *Surface) {
     retval = (*Surface)(unsafe.Pointer(C.SDL_ConvertSurfaceFormat((*C.SDL_Surface)(src), C.Uint32(pixel_format), C.Uint32(flags))))
     return
@@ -414,6 +437,7 @@ func (src *Surface) ConvertFormat(pixel_format uint32, flags uint32) (retval *Su
  // 
  // Returns: 0 on success, or -1 if there was an error
  // 
+ // ↪ https://wiki.libsdl.org/SDL_ConvertPixels
 func ConvertPixels(width int, height int, src_format uint32, src []byte, src_pitch int, dst_format uint32, dst []byte, dst_pitch int) (retval int) {
     checkParametersForSDL_ConvertPixels(width, height, src_format, src, src_pitch, dst_format, dst, dst_pitch)
     var tmp_src unsafe.Pointer
@@ -437,12 +461,14 @@ func ConvertPixels(width int, height int, src_format uint32, src []byte, src_pit
  // 
  // Returns: 0 on success, or -1 on error.
  // 
+ // ↪ https://wiki.libsdl.org/SDL_FillRect
 func (dst *Surface) FillRect(rect Rect, color uint32) (retval int) {
     tmp_rect := toCFromRect(rect)
     retval = int(C.SDL_FillRect((*C.SDL_Surface)(dst), (*C.SDL_Rect)(&tmp_rect), C.Uint32(color)))
     return
 }
 
+ // ↪ https://wiki.libsdl.org/SDL_FillRects
 func (dst *Surface) FillRects(rects []Rect, color uint32) (retval int) {
     var tmp_rects *C.SDL_Rect
     if len(rects) > 0 {
@@ -459,6 +485,7 @@ func (dst *Surface) FillRects(rects []Rect, color uint32) (retval int) {
 
  // This is the public blit function, SDL_BlitSurface(), and it performs
  // rectangle validation and clipping before passing it to SDL_LowerBlit()
+ // ↪ https://wiki.libsdl.org/SDL_UpperBlit
 func UpperBlit(src *Surface, srcrect Rect, dst *Surface, dstrect Rect) (retval int) {
     tmp_srcrect := toCFromRect(srcrect)
     tmp_dstrect := toCFromRect(dstrect)
@@ -468,6 +495,7 @@ func UpperBlit(src *Surface, srcrect Rect, dst *Surface, dstrect Rect) (retval i
 
  // This is a semi-private blit function and it performs low-level surface
  // blitting only.
+ // ↪ https://wiki.libsdl.org/SDL_LowerBlit
 func LowerBlit(src *Surface, srcrect Rect, dst *Surface, dstrect Rect) (retval int) {
     tmp_srcrect := toCFromRect(srcrect)
     tmp_dstrect := toCFromRect(dstrect)
@@ -480,6 +508,7 @@ func LowerBlit(src *Surface, srcrect Rect, dst *Surface, dstrect Rect) (retval i
  // 
  // Note: This function uses a static buffer, and is not thread-safe.
  // 
+ // ↪ https://wiki.libsdl.org/SDL_SoftStretch
 func SoftStretch(src *Surface, srcrect Rect, dst *Surface, dstrect Rect) (retval int) {
     tmp_srcrect := toCFromRect(srcrect)
     tmp_dstrect := toCFromRect(dstrect)
@@ -490,6 +519,7 @@ func SoftStretch(src *Surface, srcrect Rect, dst *Surface, dstrect Rect) (retval
  // This is the public scaled blit function, SDL_BlitScaled(), and it
  // performs rectangle validation and clipping before passing it to
  // SDL_LowerBlitScaled()
+ // ↪ https://wiki.libsdl.org/SDL_UpperBlitScaled
 func UpperBlitScaled(src *Surface, srcrect Rect, dst *Surface, dstrect Rect) (retval int) {
     tmp_srcrect := toCFromRect(srcrect)
     tmp_dstrect := toCFromRect(dstrect)
@@ -499,6 +529,7 @@ func UpperBlitScaled(src *Surface, srcrect Rect, dst *Surface, dstrect Rect) (re
 
  // This is a semi-private blit function and it performs low-level surface
  // scaled blitting only.
+ // ↪ https://wiki.libsdl.org/SDL_LowerBlitScaled
 func LowerBlitScaled(src *Surface, srcrect Rect, dst *Surface, dstrect Rect) (retval int) {
     tmp_srcrect := toCFromRect(srcrect)
     tmp_dstrect := toCFromRect(dstrect)

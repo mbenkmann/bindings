@@ -10,24 +10,34 @@ import "unsafe"
  // Include file for SDL mouse event handling.
 
 const (
+     // ↪ https://wiki.libsdl.org/SDL_BUTTON_LEFT
     BUTTON_LEFT = C.SDL_BUTTON_LEFT
 
+     // ↪ https://wiki.libsdl.org/SDL_BUTTON_MIDDLE
     BUTTON_MIDDLE = C.SDL_BUTTON_MIDDLE
 
+     // ↪ https://wiki.libsdl.org/SDL_BUTTON_RIGHT
     BUTTON_RIGHT = C.SDL_BUTTON_RIGHT
 
+     // ↪ https://wiki.libsdl.org/SDL_BUTTON_X1
     BUTTON_X1 = C.SDL_BUTTON_X1
 
+     // ↪ https://wiki.libsdl.org/SDL_BUTTON_X2
     BUTTON_X2 = C.SDL_BUTTON_X2
 
+     // ↪ https://wiki.libsdl.org/SDL_BUTTON_LMASK
     BUTTON_LMASK = C.SDL_BUTTON_LMASK
 
+     // ↪ https://wiki.libsdl.org/SDL_BUTTON_MMASK
     BUTTON_MMASK = C.SDL_BUTTON_MMASK
 
+     // ↪ https://wiki.libsdl.org/SDL_BUTTON_RMASK
     BUTTON_RMASK = C.SDL_BUTTON_RMASK
 
+     // ↪ https://wiki.libsdl.org/SDL_BUTTON_X1MASK
     BUTTON_X1MASK = C.SDL_BUTTON_X1MASK
 
+     // ↪ https://wiki.libsdl.org/SDL_BUTTON_X2MASK
     BUTTON_X2MASK = C.SDL_BUTTON_X2MASK
 )
 
@@ -74,6 +84,7 @@ const (
 )
 
  // Scroll direction types for the Scroll event.
+ // ↪ https://wiki.libsdl.org/SDL_MouseWheelDirection
 type MouseWheelDirection int
 const (
      // The scroll direction is normal
@@ -88,6 +99,7 @@ type Cursor C.SDL_Cursor
 
 
  // Get the window which currently has mouse focus.
+ // ↪ https://wiki.libsdl.org/SDL_GetMouseFocus
 func GetMouseFocus() (retval *Window) {
     retval = (*Window)(unsafe.Pointer(C.SDL_GetMouseFocus()))
     return
@@ -99,6 +111,7 @@ func GetMouseFocus() (retval *Window) {
  // tested using the SDL_BUTTON(X) macros, and x and y are set to the
  // mouse cursor position relative to the focus window for the currently
  // selected mouse. You can pass NULL for either x or y.
+ // ↪ https://wiki.libsdl.org/SDL_GetMouseState
 func GetMouseState() (retval uint32, x int, y int) {
     tmp_x := new(C.int)
     tmp_y := new(C.int)
@@ -135,6 +148,7 @@ func GetMouseState() (retval uint32, x int, y int) {
  //   y
  //     Returns the current Y coord, relative to the desktop. Can be NULL.
  //   
+ // ↪ https://wiki.libsdl.org/SDL_GetGlobalMouseState
 func GetGlobalMouseState() (retval uint32, x int, y int) {
     tmp_x := new(C.int)
     tmp_y := new(C.int)
@@ -149,6 +163,7 @@ func GetGlobalMouseState() (retval uint32, x int, y int) {
  // The current button state is returned as a button bitmask, which can be
  // tested using the SDL_BUTTON(X) macros, and x and y are set to the
  // mouse deltas since the last call to SDL_GetRelativeMouseState().
+ // ↪ https://wiki.libsdl.org/SDL_GetRelativeMouseState
 func GetRelativeMouseState() (retval uint32, x int, y int) {
     tmp_x := new(C.int)
     tmp_y := new(C.int)
@@ -171,6 +186,7 @@ func GetRelativeMouseState() (retval uint32, x int, y int) {
  //   y
  //     The y coordinate within the window
  //   
+ // ↪ https://wiki.libsdl.org/SDL_WarpMouseInWindow
 func WarpMouseInWindow(window *Window, x int, y int) {
     C.SDL_WarpMouseInWindow((*C.SDL_Window)(window), C.int(x), C.int(y))
 }
@@ -188,6 +204,7 @@ func WarpMouseInWindow(window *Window, x int, y int) {
  //   y
  //     The y coordinate
  //   
+ // ↪ https://wiki.libsdl.org/SDL_WarpMouseGlobal
 func WarpMouseGlobal(x int, y int) (retval int) {
     retval = int(C.SDL_WarpMouseGlobal(C.int(x), C.int(y)))
     return
@@ -209,6 +226,7 @@ func WarpMouseGlobal(x int, y int) (retval int) {
  // 
  // See also: SDL_GetRelativeMouseMode()
  // 
+ // ↪ https://wiki.libsdl.org/SDL_SetRelativeMouseMode
 func SetRelativeMouseMode(enabled bool) (retval int) {
     retval = int(C.SDL_SetRelativeMouseMode(bool2bool(enabled)))
     return
@@ -244,6 +262,7 @@ func SetRelativeMouseMode(enabled bool) (retval int) {
  // 
  // Returns: 0 on success, or -1 if not supported.
  // 
+ // ↪ https://wiki.libsdl.org/SDL_CaptureMouse
 func CaptureMouse(enabled bool) (retval int) {
     retval = int(C.SDL_CaptureMouse(bool2bool(enabled)))
     return
@@ -253,6 +272,7 @@ func CaptureMouse(enabled bool) (retval int) {
  // 
  // See also: SDL_SetRelativeMouseMode()
  // 
+ // ↪ https://wiki.libsdl.org/SDL_GetRelativeMouseMode
 func GetRelativeMouseMode() (retval bool) {
     retval = C.SDL_TRUE==(C.SDL_GetRelativeMouseMode())
     return
@@ -263,6 +283,7 @@ func GetRelativeMouseMode() (retval bool) {
  // 
  // See also: SDL_FreeCursor()
  // 
+ // ↪ https://wiki.libsdl.org/SDL_CreateColorCursor
 func CreateColorCursor(surface *Surface, hot_x int, hot_y int) (retval *Cursor) {
     retval = (*Cursor)(unsafe.Pointer(C.SDL_CreateColorCursor((*C.SDL_Surface)(surface), C.int(hot_x), C.int(hot_y))))
     return
@@ -272,23 +293,27 @@ func CreateColorCursor(surface *Surface, hot_x int, hot_y int) (retval *Cursor) 
  // 
  // See also: SDL_FreeCursor()
  // 
+ // ↪ https://wiki.libsdl.org/SDL_CreateSystemCursor
 func CreateSystemCursor(id SystemCursor) (retval *Cursor) {
     retval = (*Cursor)(unsafe.Pointer(C.SDL_CreateSystemCursor(C.SDL_SystemCursor(id))))
     return
 }
 
  // Set the active cursor.
+ // ↪ https://wiki.libsdl.org/SDL_SetCursor
 func SetCursor(cursor *Cursor) {
     C.SDL_SetCursor((*C.SDL_Cursor)(cursor))
 }
 
  // Return the active cursor.
+ // ↪ https://wiki.libsdl.org/SDL_GetCursor
 func GetCursor() (retval *Cursor) {
     retval = (*Cursor)(unsafe.Pointer(C.SDL_GetCursor()))
     return
 }
 
  // Return the default cursor.
+ // ↪ https://wiki.libsdl.org/SDL_GetDefaultCursor
 func GetDefaultCursor() (retval *Cursor) {
     retval = (*Cursor)(unsafe.Pointer(C.SDL_GetDefaultCursor()))
     return
@@ -313,6 +338,7 @@ func (cursor *Cursor) Free() {
  //   toggle
  //     1 to show the cursor, 0 to hide it, -1 to query the current state.
  //   
+ // ↪ https://wiki.libsdl.org/SDL_ShowCursor
 func ShowCursor(toggle int) (retval int) {
     retval = int(C.SDL_ShowCursor(C.int(toggle)))
     return

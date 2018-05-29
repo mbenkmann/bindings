@@ -32,6 +32,7 @@ import "unsafe"
  // 
  // See also: SDL_GetPrefPath
  // 
+ // ↪ https://wiki.libsdl.org/SDL_GetBasePath
 func GetBasePath() (retval string) {
     retval = freeGoString(C.SDL_GetBasePath())
     return
@@ -103,6 +104,7 @@ func GetBasePath() (retval string) {
  //   app
  //     The name of your application.
  //   
+ // ↪ https://wiki.libsdl.org/SDL_GetPrefPath
 func GetPrefPath(org string, app string) (retval string) {
     tmp_org := C.CString(org); defer C.free(unsafe.Pointer(tmp_org))
     tmp_app := C.CString(app); defer C.free(unsafe.Pointer(tmp_app))

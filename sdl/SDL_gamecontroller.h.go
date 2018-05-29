@@ -18,6 +18,7 @@ import "unsafe"
  // SDL_Init(): SDL_HINT_JOYSTICK_ALLOW_BACKGROUND_EVENTS
 
 
+ // ↪ https://wiki.libsdl.org/SDL_GameControllerBindType
 type GameControllerBindType int
 const (
     CONTROLLER_BINDTYPE_NONE GameControllerBindType = C.SDL_CONTROLLER_BINDTYPE_NONE
@@ -57,6 +58,7 @@ const (
 )
 
  // The list of buttons available from a controller
+ // ↪ https://wiki.libsdl.org/SDL_GameControllerButton
 type GameControllerButton int
 const (
     CONTROLLER_BUTTON_INVALID GameControllerButton = C.SDL_CONTROLLER_BUTTON_INVALID
@@ -129,6 +131,7 @@ type GameController C.SDL_GameController
  // 
  // Returns: number of mappings added, -1 on error
  // 
+ // ↪ https://wiki.libsdl.org/SDL_GameControllerAddMappingsFromRW
 func GameControllerAddMappingsFromRW(rw *RWops, freerw int) (retval int) {
     retval = int(C.SDL_GameControllerAddMappingsFromRW((*C.SDL_RWops)(rw), C.int(freerw)))
     return
@@ -138,6 +141,7 @@ func GameControllerAddMappingsFromRW(rw *RWops, freerw int) (retval int) {
  // 
  // Returns: 1 if mapping is added, 0 if updated, -1 on error
  // 
+ // ↪ https://wiki.libsdl.org/SDL_GameControllerAddMapping
 func GameControllerAddMapping(mappingString string) (retval int) {
     tmp_mappingString := C.CString(mappingString); defer C.free(unsafe.Pointer(tmp_mappingString))
     retval = int(C.SDL_GameControllerAddMapping((*C.char)(tmp_mappingString)))
@@ -168,6 +172,7 @@ func GameControllerMappingForIndex(mapping_index int) (retval string) {
  // Returns: the mapping string. Must be freed with SDL_free(). Returns
  // NULL if no mapping is available
  // 
+ // ↪ https://wiki.libsdl.org/SDL_GameControllerMappingForGUID
 func GameControllerMappingForGUID(guid JoystickGUID) (retval string) {
     tmp_guid := toCFromJoystickGUID(guid)
     retval = C.GoString(C.SDL_GameControllerMappingForGUID(C.SDL_JoystickGUID(tmp_guid)))
@@ -179,6 +184,7 @@ func GameControllerMappingForGUID(guid JoystickGUID) (retval string) {
  // Returns: the mapping string. Must be freed with SDL_free(). Returns
  // NULL if no mapping is available
  // 
+ // ↪ https://wiki.libsdl.org/SDL_GameControllerMapping
 func (gamecontroller *GameController) Mapping() (retval string) {
     retval = freeGoString(C.SDL_GameControllerMapping((*C.SDL_GameController)(gamecontroller)))
     return
@@ -186,6 +192,7 @@ func (gamecontroller *GameController) Mapping() (retval string) {
 
  // Is the joystick on this index supported by the game controller
  // interface?
+ // ↪ https://wiki.libsdl.org/SDL_IsGameController
 func IsGameController(joystick_index int) (retval bool) {
     retval = C.SDL_TRUE==(C.SDL_IsGameController(C.int(joystick_index)))
     return
@@ -194,6 +201,7 @@ func IsGameController(joystick_index int) (retval bool) {
  // Get the implementation dependent name of a game controller. This can
  // be called before any controllers are opened. If no name can be found,
  // this function returns NULL.
+ // ↪ https://wiki.libsdl.org/SDL_GameControllerNameForIndex
 func GameControllerNameForIndex(joystick_index int) (retval string) {
     retval = C.GoString(C.SDL_GameControllerNameForIndex(C.int(joystick_index)))
     return
@@ -206,18 +214,21 @@ func GameControllerNameForIndex(joystick_index int) (retval string) {
  // 
  // Returns: A controller identifier, or NULL if an error occurred.
  // 
+ // ↪ https://wiki.libsdl.org/SDL_GameControllerOpen
 func GameControllerOpen(joystick_index int) (retval *GameController) {
     retval = (*GameController)(unsafe.Pointer(C.SDL_GameControllerOpen(C.int(joystick_index))))
     return
 }
 
  // Return the SDL_GameController associated with an instance id.
+ // ↪ https://wiki.libsdl.org/SDL_GameControllerFromInstanceID
 func GameControllerFromInstanceID(joyid JoystickID) (retval *GameController) {
     retval = (*GameController)(unsafe.Pointer(C.SDL_GameControllerFromInstanceID(C.SDL_JoystickID(joyid))))
     return
 }
 
  // Return the name for this currently opened controller
+ // ↪ https://wiki.libsdl.org/SDL_GameControllerName
 func (gamecontroller *GameController) Name() (retval string) {
     retval = C.GoString(C.SDL_GameControllerName((*C.SDL_GameController)(gamecontroller)))
     return
@@ -246,12 +257,14 @@ func (gamecontroller *GameController) GetProductVersion() (retval uint16) {
 
  // Returns SDL_TRUE if the controller has been opened and currently
  // connected, or SDL_FALSE if it has not.
+ // ↪ https://wiki.libsdl.org/SDL_GameControllerGetAttached
 func (gamecontroller *GameController) GetAttached() (retval bool) {
     retval = C.SDL_TRUE==(C.SDL_GameControllerGetAttached((*C.SDL_GameController)(gamecontroller)))
     return
 }
 
  // Get the underlying joystick object used by a controller
+ // ↪ https://wiki.libsdl.org/SDL_GameControllerGetJoystick
 func (gamecontroller *GameController) GetJoystick() (retval *Joystick) {
     retval = (*Joystick)(unsafe.Pointer(C.SDL_GameControllerGetJoystick((*C.SDL_GameController)(gamecontroller))))
     return
@@ -264,6 +277,7 @@ func (gamecontroller *GameController) GetJoystick() (retval *Joystick) {
  // controller when you want controller information.
  // 
  // The state can be one of SDL_QUERY, SDL_ENABLE or SDL_IGNORE.
+ // ↪ https://wiki.libsdl.org/SDL_GameControllerEventState
 func GameControllerEventState(state int) (retval int) {
     retval = int(C.SDL_GameControllerEventState(C.int(state)))
     return
@@ -273,11 +287,13 @@ func GameControllerEventState(state int) (retval int) {
  // 
  // This is called automatically by the event loop if any game controller
  // events are enabled.
+ // ↪ https://wiki.libsdl.org/SDL_GameControllerUpdate
 func GameControllerUpdate() {
     C.SDL_GameControllerUpdate()
 }
 
  // turn this string into a axis mapping
+ // ↪ https://wiki.libsdl.org/SDL_GameControllerGetAxisFromString
 func GameControllerGetAxisFromString(pchString string) (retval GameControllerAxis) {
     tmp_pchString := C.CString(pchString); defer C.free(unsafe.Pointer(tmp_pchString))
     retval = GameControllerAxis(C.SDL_GameControllerGetAxisFromString((*C.char)(tmp_pchString)))
@@ -285,12 +301,14 @@ func GameControllerGetAxisFromString(pchString string) (retval GameControllerAxi
 }
 
  // turn this axis enum into a string mapping
+ // ↪ https://wiki.libsdl.org/SDL_GameControllerGetStringForAxis
 func GameControllerGetStringForAxis(axis GameControllerAxis) (retval string) {
     retval = C.GoString(C.SDL_GameControllerGetStringForAxis(C.SDL_GameControllerAxis(axis)))
     return
 }
 
  // Get the SDL joystick layer binding for this controller button mapping
+ // ↪ https://wiki.libsdl.org/SDL_GameControllerGetBindForAxis
 func (gamecontroller *GameController) GetBindForAxis(axis GameControllerAxis) (retval GameControllerButtonBind) {
     retval = GameControllerButtonBind(C.SDL_GameControllerGetBindForAxis((*C.SDL_GameController)(gamecontroller), C.SDL_GameControllerAxis(axis)))
     return
@@ -302,12 +320,14 @@ func (gamecontroller *GameController) GetBindForAxis(axis GameControllerAxis) (r
  // triggers, which range from 0 to 32767).
  // 
  // The axis indices start at index 0.
+ // ↪ https://wiki.libsdl.org/SDL_GameControllerGetAxis
 func (gamecontroller *GameController) GetAxis(axis GameControllerAxis) (retval int16) {
     retval = int16(C.SDL_GameControllerGetAxis((*C.SDL_GameController)(gamecontroller), C.SDL_GameControllerAxis(axis)))
     return
 }
 
  // turn this string into a button mapping
+ // ↪ https://wiki.libsdl.org/SDL_GameControllerGetButtonFromString
 func GameControllerGetButtonFromString(pchString string) (retval GameControllerButton) {
     tmp_pchString := C.CString(pchString); defer C.free(unsafe.Pointer(tmp_pchString))
     retval = GameControllerButton(C.SDL_GameControllerGetButtonFromString((*C.char)(tmp_pchString)))
@@ -315,12 +335,14 @@ func GameControllerGetButtonFromString(pchString string) (retval GameControllerB
 }
 
  // turn this button enum into a string mapping
+ // ↪ https://wiki.libsdl.org/SDL_GameControllerGetStringForButton
 func GameControllerGetStringForButton(button GameControllerButton) (retval string) {
     retval = C.GoString(C.SDL_GameControllerGetStringForButton(C.SDL_GameControllerButton(button)))
     return
 }
 
  // Get the SDL joystick layer binding for this controller button mapping
+ // ↪ https://wiki.libsdl.org/SDL_GameControllerGetBindForButton
 func (gamecontroller *GameController) GetBindForButton(button GameControllerButton) (retval GameControllerButtonBind) {
     retval = GameControllerButtonBind(C.SDL_GameControllerGetBindForButton((*C.SDL_GameController)(gamecontroller), C.SDL_GameControllerButton(button)))
     return
@@ -329,12 +351,14 @@ func (gamecontroller *GameController) GetBindForButton(button GameControllerButt
  // Get the current state of a button on a game controller.
  // 
  // The button indices start at index 0.
+ // ↪ https://wiki.libsdl.org/SDL_GameControllerGetButton
 func (gamecontroller *GameController) GetButton(button GameControllerButton) (retval uint8) {
     retval = uint8(C.SDL_GameControllerGetButton((*C.SDL_GameController)(gamecontroller), C.SDL_GameControllerButton(button)))
     return
 }
 
  // Close a controller previously opened with SDL_GameControllerOpen().
+ // ↪ https://wiki.libsdl.org/SDL_GameControllerClose
 func (gamecontroller *GameController) Close() {
     C.SDL_GameControllerClose((*C.SDL_GameController)(gamecontroller))
 }

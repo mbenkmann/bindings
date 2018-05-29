@@ -9,6 +9,7 @@ import "unsafe"
 
 
  // Individual button data.
+ // ↪ https://wiki.libsdl.org/SDL_MessageBoxButtonData
 type MessageBoxButtonData struct {
      // SDL_MessageBoxButtonFlags
     Flags uint32
@@ -28,6 +29,7 @@ func toCFromMessageBoxButtonData(s MessageBoxButtonData) (d C.SDL_MessageBoxButt
 }
 
  // RGB value used in a message box color scheme.
+ // ↪ https://wiki.libsdl.org/SDL_MessageBoxColor
 type MessageBoxColor struct {
     R uint8
 
@@ -48,11 +50,13 @@ func toCFromMessageBoxColor(s MessageBoxColor) (d C.SDL_MessageBoxColor) {
 }
 
  // A set of colors to use for message box dialogs.
+ // ↪ https://wiki.libsdl.org/SDL_MessageBoxColorScheme
 type MessageBoxColorScheme struct {
     Colors [MESSAGEBOX_COLOR_MAX]MessageBoxColor
 }
 
  // SDL_MessageBox flags. If supported will display warning icon, etc.
+ // ↪ https://wiki.libsdl.org/SDL_MessageBoxFlags
 type MessageBoxFlags int
 const (
      // error dialog
@@ -66,6 +70,7 @@ const (
 )
 
  // Flags for SDL_MessageBoxButtonData.
+ // ↪ https://wiki.libsdl.org/SDL_MessageBoxButtonFlags
 type MessageBoxButtonFlags int
 const (
      // Marks the default button when return is hit
@@ -75,6 +80,7 @@ const (
     MESSAGEBOX_BUTTON_ESCAPEKEY_DEFAULT MessageBoxButtonFlags = C.SDL_MESSAGEBOX_BUTTON_ESCAPEKEY_DEFAULT
 )
 
+ // ↪ https://wiki.libsdl.org/SDL_MessageBoxColorType
 type MessageBoxColorType int
 const (
     MESSAGEBOX_COLOR_BACKGROUND MessageBoxColorType = C.SDL_MESSAGEBOX_COLOR_BACKGROUND
@@ -110,6 +116,7 @@ const (
  //   window
  //     The parent window, or NULL for no parent
  //   
+ // ↪ https://wiki.libsdl.org/SDL_ShowSimpleMessageBox
 func ShowSimpleMessageBox(flags uint32, title string, message string, window *Window) (retval int) {
     tmp_title := C.CString(title); defer C.free(unsafe.Pointer(tmp_title))
     tmp_message := C.CString(message); defer C.free(unsafe.Pointer(tmp_message))

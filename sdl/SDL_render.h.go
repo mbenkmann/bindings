@@ -31,6 +31,7 @@ import "unsafe"
  // details: http://bugzilla.libsdl.org/show_bug.cgi?id=1995
 
  // Information on the capabilities of a render driver or context.
+ // ↪ https://wiki.libsdl.org/SDL_RendererInfo
 type RendererInfo struct {
      // The name of the renderer
     Name string
@@ -56,6 +57,7 @@ func fromC2RendererInfo(s C.SDL_RendererInfo) RendererInfo {
 }
 
  // Flags used when creating a rendering context.
+ // ↪ https://wiki.libsdl.org/SDL_RendererFlags
 type RendererFlags int
 const (
      // The renderer is a software fallback
@@ -72,6 +74,7 @@ const (
 )
 
  // The access pattern allowed for a texture.
+ // ↪ https://wiki.libsdl.org/SDL_TextureAccess
 type TextureAccess int
 const (
      // Changes rarely, not lockable
@@ -85,6 +88,7 @@ const (
 )
 
  // The texture channel modulation used in SDL_RenderCopy().
+ // ↪ https://wiki.libsdl.org/SDL_TextureModulate
 type TextureModulate int
 const (
      // No modulation
@@ -98,6 +102,7 @@ const (
 )
 
  // Flip constants for SDL_RenderCopyEx.
+ // ↪ https://wiki.libsdl.org/SDL_RendererFlip
 type RendererFlip int
 const (
      // Do not flip
@@ -126,6 +131,7 @@ type Texture C.SDL_Texture
  // 
  // See also: SDL_CreateRenderer()
  // 
+ // ↪ https://wiki.libsdl.org/SDL_GetNumRenderDrivers
 func GetNumRenderDrivers() (retval int) {
     retval = int(C.SDL_GetNumRenderDrivers())
     return
@@ -145,6 +151,7 @@ func GetNumRenderDrivers() (retval int) {
  //     A pointer to an SDL_RendererInfo struct to be filled with information
  //     on the rendering driver.
  //   
+ // ↪ https://wiki.libsdl.org/SDL_GetRenderDriverInfo
 func GetRenderDriverInfo(index int) (retval int, info *RendererInfo) {
     tmp_info := new(C.SDL_RendererInfo)
     retval = int(C.SDL_GetRenderDriverInfo(C.int(index), (*C.SDL_RendererInfo)(tmp_info)))
@@ -173,6 +180,7 @@ func GetRenderDriverInfo(index int) (retval int, info *RendererInfo) {
  //   flags
  //     SDL_RendererFlags.
  //   
+ // ↪ https://wiki.libsdl.org/SDL_CreateRenderer
 func (window *Window) CreateRenderer(index int, flags RendererFlags) (retval *Renderer) {
     retval = (*Renderer)(unsafe.Pointer(C.SDL_CreateRenderer((*C.SDL_Window)(window), C.int(index), C.Uint32(flags))))
     return
@@ -189,18 +197,21 @@ func (window *Window) CreateRenderer(index int, flags RendererFlags) (retval *Re
  //   surface
  //     The surface where rendering is done.
  //   
+ // ↪ https://wiki.libsdl.org/SDL_CreateSoftwareRenderer
 func (surface *Surface) CreateSoftwareRenderer() (retval *Renderer) {
     retval = (*Renderer)(unsafe.Pointer(C.SDL_CreateSoftwareRenderer((*C.SDL_Surface)(surface))))
     return
 }
 
  // Get the renderer associated with a window.
+ // ↪ https://wiki.libsdl.org/SDL_GetRenderer
 func (window *Window) GetRenderer() (retval *Renderer) {
     retval = (*Renderer)(unsafe.Pointer(C.SDL_GetRenderer((*C.SDL_Window)(window))))
     return
 }
 
  // Get information about a rendering context.
+ // ↪ https://wiki.libsdl.org/SDL_GetRendererInfo
 func (renderer *Renderer) GetInfo() (retval int, info *RendererInfo) {
     tmp_info := new(C.SDL_RendererInfo)
     retval = int(C.SDL_GetRendererInfo((*C.SDL_Renderer)(renderer), (*C.SDL_RendererInfo)(tmp_info)))
@@ -209,6 +220,7 @@ func (renderer *Renderer) GetInfo() (retval int, info *RendererInfo) {
 }
 
  // Get the output size in pixels of a rendering context.
+ // ↪ https://wiki.libsdl.org/SDL_GetRendererOutputSize
 func (renderer *Renderer) GetOutputSize() (retval int, w int, h int) {
     tmp_w := new(C.int)
     tmp_h := new(C.int)
@@ -247,6 +259,7 @@ func (renderer *Renderer) GetOutputSize() (retval int, w int, h int) {
  //   h
  //     The height of the texture in pixels.
  //   
+ // ↪ https://wiki.libsdl.org/SDL_CreateTexture
 func (renderer *Renderer) CreateTexture(format uint32, access int, w int, h int) (retval *Texture) {
     retval = (*Texture)(unsafe.Pointer(C.SDL_CreateTexture((*C.SDL_Renderer)(renderer), C.Uint32(format), C.int(access), C.int(w), C.int(h))))
     return
@@ -268,6 +281,7 @@ func (renderer *Renderer) CreateTexture(format uint32, access int, w int, h int)
  //   surface
  //     The surface containing pixel data used to fill the texture.
  //   
+ // ↪ https://wiki.libsdl.org/SDL_CreateTextureFromSurface
 func (renderer *Renderer) CreateTextureFromSurface(surface *Surface) (retval *Texture) {
     retval = (*Texture)(unsafe.Pointer(C.SDL_CreateTextureFromSurface((*C.SDL_Renderer)(renderer), (*C.SDL_Surface)(surface))))
     return
@@ -293,6 +307,7 @@ func (renderer *Renderer) CreateTextureFromSurface(surface *Surface) (retval *Te
  //   h
  //     A pointer filled in with the height of the texture in pixels.
  //   
+ // ↪ https://wiki.libsdl.org/SDL_QueryTexture
 func (texture *Texture) Query() (retval int, format uint32, access int, w int, h int) {
     tmp_format := new(C.Uint32)
     tmp_access := new(C.int)
@@ -325,6 +340,7 @@ func (texture *Texture) Query() (retval int, format uint32, access int, w int, h
  //   b
  //     The blue color value multiplied into copy operations.
  //   
+ // ↪ https://wiki.libsdl.org/SDL_SetTextureColorMod
 func (texture *Texture) SetColorMod(r uint8, g uint8, b uint8) (retval int) {
     retval = int(C.SDL_SetTextureColorMod((*C.SDL_Texture)(texture), C.Uint8(r), C.Uint8(g), C.Uint8(b)))
     return
@@ -348,6 +364,7 @@ func (texture *Texture) SetColorMod(r uint8, g uint8, b uint8) (retval int) {
  //   b
  //     A pointer filled in with the current blue color value.
  //   
+ // ↪ https://wiki.libsdl.org/SDL_GetTextureColorMod
 func (texture *Texture) GetColorMod() (retval int, r byte, g byte, b byte) {
     tmp_r := new(C.Uint8)
     tmp_g := new(C.Uint8)
@@ -372,6 +389,7 @@ func (texture *Texture) GetColorMod() (retval int, r byte, g byte, b byte) {
  //   alpha
  //     The alpha value multiplied into copy operations.
  //   
+ // ↪ https://wiki.libsdl.org/SDL_SetTextureAlphaMod
 func (texture *Texture) SetAlphaMod(alpha uint8) (retval int) {
     retval = int(C.SDL_SetTextureAlphaMod((*C.SDL_Texture)(texture), C.Uint8(alpha)))
     return
@@ -389,6 +407,7 @@ func (texture *Texture) SetAlphaMod(alpha uint8) (retval int) {
  //   alpha
  //     A pointer filled in with the current alpha value.
  //   
+ // ↪ https://wiki.libsdl.org/SDL_GetTextureAlphaMod
 func (texture *Texture) GetAlphaMod() (retval int, alpha byte) {
     tmp_alpha := new(C.Uint8)
     retval = int(C.SDL_GetTextureAlphaMod((*C.SDL_Texture)(texture), (*C.Uint8)(tmp_alpha)))
@@ -412,6 +431,7 @@ func (texture *Texture) GetAlphaMod() (retval int, alpha byte) {
  //   blendMode
  //     SDL_BlendMode to use for texture blending.
  //   
+ // ↪ https://wiki.libsdl.org/SDL_SetTextureBlendMode
 func (texture *Texture) SetBlendMode(blendMode BlendMode) (retval int) {
     retval = int(C.SDL_SetTextureBlendMode((*C.SDL_Texture)(texture), C.SDL_BlendMode(blendMode)))
     return
@@ -429,6 +449,7 @@ func (texture *Texture) SetBlendMode(blendMode BlendMode) (retval int) {
  //   blendMode
  //     A pointer filled in with the current blend mode.
  //   
+ // ↪ https://wiki.libsdl.org/SDL_GetTextureBlendMode
 func (texture *Texture) GetBlendMode() (retval int, blendMode *BlendMode) {
     tmp_blendMode := new(C.SDL_BlendMode)
     retval = int(C.SDL_GetTextureBlendMode((*C.SDL_Texture)(texture), (*C.SDL_BlendMode)(tmp_blendMode)))
@@ -504,6 +525,7 @@ func (texture *Texture) Update(rect *Rect, pixels []byte, pitch int) (retval int
  //   Vpitch
  //     The number of bytes between rows of pixel data for the V plane.
  //   
+ // ↪ https://wiki.libsdl.org/SDL_UpdateYUVTexture
 func (texture *Texture) UpdateYUV(rect *Rect, Yplane []byte, Ypitch int, Uplane []byte, Upitch int, Vplane []byte, Vpitch int) (retval int) {
     var tmp_rect *C.SDL_Rect; if rect != nil { x := toCFromRect(*rect); tmp_rect = &x }
     checkParametersForSDL_UpdateYUVTexture(texture, rect, Yplane, Ypitch, Uplane, Upitch, Vplane, Vpitch)
@@ -528,6 +550,7 @@ func (texture *Texture) UpdateYUV(rect *Rect, Yplane []byte, Ypitch int, Uplane 
  // 
  // See also: SDL_LockTexture()
  // 
+ // ↪ https://wiki.libsdl.org/SDL_UnlockTexture
 func (texture *Texture) Unlock() {
     C.SDL_UnlockTexture((*C.SDL_Texture)(texture))
 }
@@ -539,6 +562,7 @@ func (texture *Texture) Unlock() {
  //   renderer
  //     The renderer that will be checked
  //   
+ // ↪ https://wiki.libsdl.org/SDL_RenderTargetSupported
 func (renderer *Renderer) TargetSupported() (retval bool) {
     retval = C.SDL_TRUE==(C.SDL_RenderTargetSupported((*C.SDL_Renderer)(renderer)))
     return
@@ -557,6 +581,7 @@ func (renderer *Renderer) TargetSupported() (retval bool) {
  //     The targeted texture, which must be created with the
  //     SDL_TEXTUREACCESS_TARGET flag, or NULL for the default render target
  //   
+ // ↪ https://wiki.libsdl.org/SDL_SetRenderTarget
 func (renderer *Renderer) SetTarget(texture *Texture) (retval int) {
     retval = int(C.SDL_SetRenderTarget((*C.SDL_Renderer)(renderer), (*C.SDL_Texture)(texture)))
     return
@@ -568,6 +593,7 @@ func (renderer *Renderer) SetTarget(texture *Texture) (retval int) {
  // 
  // See also: SDL_SetRenderTarget()
  // 
+ // ↪ https://wiki.libsdl.org/SDL_GetRenderTarget
 func (renderer *Renderer) GetTarget() (retval *Texture) {
     retval = (*Texture)(unsafe.Pointer(C.SDL_GetRenderTarget((*C.SDL_Renderer)(renderer))))
     return
@@ -604,6 +630,7 @@ func (renderer *Renderer) GetTarget() (retval *Texture) {
  // 
  // See also: SDL_RenderSetViewport()
  // 
+ // ↪ https://wiki.libsdl.org/SDL_RenderSetLogicalSize
 func (renderer *Renderer) SetLogicalSize(w int, h int) (retval int) {
     retval = int(C.SDL_RenderSetLogicalSize((*C.SDL_Renderer)(renderer), C.int(w), C.int(h)))
     return
@@ -622,6 +649,7 @@ func (renderer *Renderer) SetLogicalSize(w int, h int) (retval int) {
  //   h
  //     A pointer filled with the height of the logical resolution
  //   
+ // ↪ https://wiki.libsdl.org/SDL_RenderGetLogicalSize
 func (renderer *Renderer) GetLogicalSize() (w int, h int) {
     tmp_w := new(C.int)
     tmp_h := new(C.int)
@@ -684,6 +712,7 @@ func (renderer *Renderer) GetIntegerScale() (retval bool) {
  // 
  // See also: SDL_RenderSetLogicalSize()
  // 
+ // ↪ https://wiki.libsdl.org/SDL_RenderSetViewport
 func (renderer *Renderer) SetViewport(rect Rect) (retval int) {
     tmp_rect := toCFromRect(rect)
     retval = int(C.SDL_RenderSetViewport((*C.SDL_Renderer)(renderer), (*C.SDL_Rect)(&tmp_rect)))
@@ -694,6 +723,7 @@ func (renderer *Renderer) SetViewport(rect Rect) (retval int) {
  // 
  // See also: SDL_RenderSetViewport()
  // 
+ // ↪ https://wiki.libsdl.org/SDL_RenderGetViewport
 func (renderer *Renderer) GetViewport() (rect Rect) {
     tmp_rect := new(C.SDL_Rect)
     C.SDL_RenderGetViewport((*C.SDL_Renderer)(renderer), (*C.SDL_Rect)(tmp_rect))
@@ -714,6 +744,7 @@ func (renderer *Renderer) GetViewport() (rect Rect) {
  //     A pointer to the rectangle to set as the clip rectangle, or NULL to
  //     disable clipping.
  //   
+ // ↪ https://wiki.libsdl.org/SDL_RenderSetClipRect
 func (renderer *Renderer) SetClipRect(rect Rect) (retval int) {
     tmp_rect := toCFromRect(rect)
     retval = int(C.SDL_RenderSetClipRect((*C.SDL_Renderer)(renderer), (*C.SDL_Rect)(&tmp_rect)))
@@ -731,6 +762,7 @@ func (renderer *Renderer) SetClipRect(rect Rect) (retval int) {
  //     A pointer filled in with the current clip rectangle, or an empty
  //     rectangle if clipping is disabled.
  //   
+ // ↪ https://wiki.libsdl.org/SDL_RenderGetClipRect
 func (renderer *Renderer) GetClipRect() (rect Rect) {
     tmp_rect := new(C.SDL_Rect)
     C.SDL_RenderGetClipRect((*C.SDL_Renderer)(renderer), (*C.SDL_Rect)(tmp_rect))
@@ -745,6 +777,7 @@ func (renderer *Renderer) GetClipRect() (rect Rect) {
  //   renderer
  //     The renderer from which clip state should be queried.
  //   
+ // ↪ https://wiki.libsdl.org/SDL_RenderIsClipEnabled
 func (renderer *Renderer) IsClipEnabled() (retval bool) {
     retval = C.SDL_TRUE==(C.SDL_RenderIsClipEnabled((*C.SDL_Renderer)(renderer)))
     return
@@ -773,6 +806,7 @@ func (renderer *Renderer) IsClipEnabled() (retval bool) {
  // 
  // See also: SDL_RenderSetLogicalSize()
  // 
+ // ↪ https://wiki.libsdl.org/SDL_RenderSetScale
 func (renderer *Renderer) SetScale(scaleX float32, scaleY float32) (retval int) {
     retval = int(C.SDL_RenderSetScale((*C.SDL_Renderer)(renderer), C.float(scaleX), C.float(scaleY)))
     return
@@ -791,6 +825,7 @@ func (renderer *Renderer) SetScale(scaleX float32, scaleY float32) (retval int) 
  //   scaleY
  //     A pointer filled in with the vertical scaling factor
  //   
+ // ↪ https://wiki.libsdl.org/SDL_RenderGetScale
 func (renderer *Renderer) GetScale() (scaleX float32, scaleY float32) {
     tmp_scaleX := new(C.float)
     tmp_scaleY := new(C.float)
@@ -820,6 +855,7 @@ func (renderer *Renderer) GetScale() (scaleX float32, scaleY float32) {
  //     The alpha value used to draw on the rendering target, usually
  //     SDL_ALPHA_OPAQUE (255).
  //   
+ // ↪ https://wiki.libsdl.org/SDL_SetRenderDrawColor
 func (renderer *Renderer) SetDrawColor(r uint8, g uint8, b uint8, a uint8) (retval int) {
     retval = int(C.SDL_SetRenderDrawColor((*C.SDL_Renderer)(renderer), C.Uint8(r), C.Uint8(g), C.Uint8(b), C.Uint8(a)))
     return
@@ -845,6 +881,7 @@ func (renderer *Renderer) SetDrawColor(r uint8, g uint8, b uint8, a uint8) (retv
  //     A pointer to the alpha value used to draw on the rendering target,
  //     usually SDL_ALPHA_OPAQUE (255).
  //   
+ // ↪ https://wiki.libsdl.org/SDL_GetRenderDrawColor
 func (renderer *Renderer) GetDrawColor() (retval int, r byte, g byte, b byte, a byte) {
     tmp_r := new(C.Uint8)
     tmp_g := new(C.Uint8)
@@ -873,6 +910,7 @@ func (renderer *Renderer) GetDrawColor() (retval int, r byte, g byte, b byte, a 
  //   blendMode
  //     SDL_BlendMode to use for blending.
  //   
+ // ↪ https://wiki.libsdl.org/SDL_SetRenderDrawBlendMode
 func (renderer *Renderer) SetDrawBlendMode(blendMode BlendMode) (retval int) {
     retval = int(C.SDL_SetRenderDrawBlendMode((*C.SDL_Renderer)(renderer), C.SDL_BlendMode(blendMode)))
     return
@@ -890,6 +928,7 @@ func (renderer *Renderer) SetDrawBlendMode(blendMode BlendMode) (retval int) {
  //   blendMode
  //     A pointer filled in with the current blend mode.
  //   
+ // ↪ https://wiki.libsdl.org/SDL_GetRenderDrawBlendMode
 func (renderer *Renderer) GetDrawBlendMode() (retval int, blendMode *BlendMode) {
     tmp_blendMode := new(C.SDL_BlendMode)
     retval = int(C.SDL_GetRenderDrawBlendMode((*C.SDL_Renderer)(renderer), (*C.SDL_BlendMode)(tmp_blendMode)))
@@ -904,6 +943,7 @@ func (renderer *Renderer) GetDrawBlendMode() (retval int, blendMode *BlendMode) 
  // 
  // Returns: 0 on success, or -1 on error
  // 
+ // ↪ https://wiki.libsdl.org/SDL_RenderClear
 func (renderer *Renderer) Clear() (retval int) {
     retval = int(C.SDL_RenderClear((*C.SDL_Renderer)(renderer)))
     return
@@ -922,6 +962,7 @@ func (renderer *Renderer) Clear() (retval int) {
  //   y
  //     The y coordinate of the point.
  //   
+ // ↪ https://wiki.libsdl.org/SDL_RenderDrawPoint
 func (renderer *Renderer) DrawPoint(x int, y int) (retval int) {
     retval = int(C.SDL_RenderDrawPoint((*C.SDL_Renderer)(renderer), C.int(x), C.int(y)))
     return
@@ -940,6 +981,7 @@ func (renderer *Renderer) DrawPoint(x int, y int) (retval int) {
  //   count
  //     The number of points to draw
  //   
+ // ↪ https://wiki.libsdl.org/SDL_RenderDrawPoints
 func (renderer *Renderer) DrawPoints(points []Point) (retval int) {
     var tmp_points *C.SDL_Point
     if len(points) > 0 {
@@ -973,6 +1015,7 @@ func (renderer *Renderer) DrawPoints(points []Point) (retval int) {
  //   y2
  //     The y coordinate of the end point.
  //   
+ // ↪ https://wiki.libsdl.org/SDL_RenderDrawLine
 func (renderer *Renderer) DrawLine(x1 int, y1 int, x2 int, y2 int) (retval int) {
     retval = int(C.SDL_RenderDrawLine((*C.SDL_Renderer)(renderer), C.int(x1), C.int(y1), C.int(x2), C.int(y2)))
     return
@@ -991,6 +1034,7 @@ func (renderer *Renderer) DrawLine(x1 int, y1 int, x2 int, y2 int) (retval int) 
  //   count
  //     The number of points, drawing count-1 lines
  //   
+ // ↪ https://wiki.libsdl.org/SDL_RenderDrawLines
 func (renderer *Renderer) DrawLines(points []Point) (retval int) {
     var tmp_points *C.SDL_Point
     if len(points) > 0 {
@@ -1016,6 +1060,7 @@ func (renderer *Renderer) DrawLines(points []Point) (retval int) {
  //     A pointer to the destination rectangle, or NULL to outline the entire
  //     rendering target.
  //   
+ // ↪ https://wiki.libsdl.org/SDL_RenderDrawRect
 func (renderer *Renderer) DrawRect(rect Rect) (retval int) {
     tmp_rect := toCFromRect(rect)
     retval = int(C.SDL_RenderDrawRect((*C.SDL_Renderer)(renderer), (*C.SDL_Rect)(&tmp_rect)))
@@ -1035,6 +1080,7 @@ func (renderer *Renderer) DrawRect(rect Rect) (retval int) {
  //   count
  //     The number of rectangles.
  //   
+ // ↪ https://wiki.libsdl.org/SDL_RenderDrawRects
 func (renderer *Renderer) DrawRects(rects []Rect) (retval int) {
     var tmp_rects *C.SDL_Rect
     if len(rects) > 0 {
@@ -1061,6 +1107,7 @@ func (renderer *Renderer) DrawRects(rects []Rect) (retval int) {
  //     A pointer to the destination rectangle, or NULL for the entire
  //     rendering target.
  //   
+ // ↪ https://wiki.libsdl.org/SDL_RenderFillRect
 func (renderer *Renderer) FillRect(rect Rect) (retval int) {
     tmp_rect := toCFromRect(rect)
     retval = int(C.SDL_RenderFillRect((*C.SDL_Renderer)(renderer), (*C.SDL_Rect)(&tmp_rect)))
@@ -1081,6 +1128,7 @@ func (renderer *Renderer) FillRect(rect Rect) (retval int) {
  //   count
  //     The number of rectangles.
  //   
+ // ↪ https://wiki.libsdl.org/SDL_RenderFillRects
 func (renderer *Renderer) FillRects(rects []Rect) (retval int) {
     var tmp_rects *C.SDL_Rect
     if len(rects) > 0 {
@@ -1112,6 +1160,7 @@ func (renderer *Renderer) FillRects(rects []Rect) (retval int) {
  //     A pointer to the destination rectangle, or NULL for the entire
  //     rendering target.
  //   
+ // ↪ https://wiki.libsdl.org/SDL_RenderCopy
 func (renderer *Renderer) Copy(texture *Texture, srcrect *Rect, dstrect *Rect) (retval int) {
     var tmp_srcrect *C.SDL_Rect; if srcrect != nil { x := toCFromRect(*srcrect); tmp_srcrect = &x }
     var tmp_dstrect *C.SDL_Rect; if dstrect != nil { x := toCFromRect(*dstrect); tmp_dstrect = &x }
@@ -1150,6 +1199,7 @@ func (renderer *Renderer) Copy(texture *Texture, srcrect *Rect, dstrect *Rect) (
  //     An SDL_RendererFlip value stating which flipping actions should be
  //     performed on the texture
  //   
+ // ↪ https://wiki.libsdl.org/SDL_RenderCopyEx
 func (renderer *Renderer) CopyEx(texture *Texture, srcrect Rect, dstrect Rect, angle float64, center Point, flip RendererFlip) (retval int) {
     tmp_srcrect := toCFromRect(srcrect)
     tmp_dstrect := toCFromRect(dstrect)
@@ -1182,6 +1232,7 @@ func (renderer *Renderer) CopyEx(texture *Texture, srcrect Rect, dstrect Rect, a
  //   pitch
  //     The pitch of the pixels parameter.
  //   
+ // ↪ https://wiki.libsdl.org/SDL_RenderReadPixels
 func (renderer *Renderer) ReadPixels(rect *Rect, format uint32, pixels []byte, pitch int) (retval int) {
     var tmp_rect *C.SDL_Rect; if rect != nil { x := toCFromRect(*rect); tmp_rect = &x }
     checkParametersForSDL_RenderReadPixels(renderer, rect, format, pixels, pitch)
@@ -1194,6 +1245,7 @@ func (renderer *Renderer) ReadPixels(rect *Rect, format uint32, pixels []byte, p
 }
 
  // Update the screen with rendering performed.
+ // ↪ https://wiki.libsdl.org/SDL_RenderPresent
 func (renderer *Renderer) Present() {
     C.SDL_RenderPresent((*C.SDL_Renderer)(renderer))
 }
@@ -1204,6 +1256,7 @@ func (renderer *Renderer) Present() {
  // 
  // See also: SDL_CreateTextureFromSurface()
  // 
+ // ↪ https://wiki.libsdl.org/SDL_DestroyTexture
 func (texture *Texture) Destroy() {
     C.SDL_DestroyTexture((*C.SDL_Texture)(texture))
 }
@@ -1213,6 +1266,7 @@ func (texture *Texture) Destroy() {
  // 
  // See also: SDL_CreateRenderer()
  // 
+ // ↪ https://wiki.libsdl.org/SDL_DestroyRenderer
 func (renderer *Renderer) Destroy() {
     C.SDL_DestroyRenderer((*C.SDL_Renderer)(renderer))
 }
@@ -1231,6 +1285,7 @@ func (renderer *Renderer) Destroy() {
  //   texh
  //     A pointer to a float that will be filled with the texture height
  //   
+ // ↪ https://wiki.libsdl.org/SDL_GL_BindTexture
 func (texture *Texture) GL_Bind() (retval int, texw float32, texh float32) {
     tmp_texw := new(C.float)
     tmp_texh := new(C.float)
@@ -1247,6 +1302,7 @@ func (texture *Texture) GL_Bind() (retval int, texw float32, texh float32) {
  //   texture
  //     The SDL texture to unbind
  //   
+ // ↪ https://wiki.libsdl.org/SDL_GL_UnbindTexture
 func (texture *Texture) GL_Unbind() (retval int) {
     retval = int(C.SDL_GL_UnbindTexture((*C.SDL_Texture)(texture)))
     return

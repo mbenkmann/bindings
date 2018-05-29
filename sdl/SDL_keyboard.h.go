@@ -14,6 +14,7 @@ import "unsafe"
  // Note: If you are looking for translated character input, see the
  // SDL_TEXTINPUT event.
  // 
+ // ↪ https://wiki.libsdl.org/SDL_Keysym
 type Keysym struct {
      // SDL physical key code - see SDL_Scancode for details
     Scancode Scancode
@@ -41,6 +42,7 @@ func toCFromKeysym(s Keysym) (d C.SDL_Keysym) {
 
 
  // Get the window which currently has keyboard focus.
+ // ↪ https://wiki.libsdl.org/SDL_GetKeyboardFocus
 func GetKeyboardFocus() (retval *Window) {
     retval = (*Window)(unsafe.Pointer(C.SDL_GetKeyboardFocus()))
     return
@@ -48,6 +50,7 @@ func GetKeyboardFocus() (retval *Window) {
 
 
  // Get the current key modifier state for the keyboard.
+ // ↪ https://wiki.libsdl.org/SDL_GetModState
 func GetModState() (retval Keymod) {
     retval = Keymod(C.SDL_GetModState())
     return
@@ -58,6 +61,7 @@ func GetModState() (retval Keymod) {
  // Note: This does not change the keyboard state, only the key modifier
  // flags.
  // 
+ // ↪ https://wiki.libsdl.org/SDL_SetModState
 func SetModState(modstate Keymod) {
     C.SDL_SetModState(C.SDL_Keymod(modstate))
 }
@@ -69,6 +73,7 @@ func SetModState(modstate Keymod) {
  // 
  // See also: SDL_GetKeyName()
  // 
+ // ↪ https://wiki.libsdl.org/SDL_GetKeyFromScancode
 func GetKeyFromScancode(scancode Scancode) (retval Keycode) {
     retval = Keycode(C.SDL_GetKeyFromScancode(C.SDL_Scancode(scancode)))
     return
@@ -81,6 +86,7 @@ func GetKeyFromScancode(scancode Scancode) (retval Keycode) {
  // 
  // See also: SDL_GetScancodeName()
  // 
+ // ↪ https://wiki.libsdl.org/SDL_GetScancodeFromKey
 func GetScancodeFromKey(key Keycode) (retval Scancode) {
     retval = Scancode(C.SDL_GetScancodeFromKey(C.SDL_Keycode(key)))
     return
@@ -93,6 +99,7 @@ func GetScancodeFromKey(key Keycode) (retval Scancode) {
  // 
  // See also: SDL_Scancode
  // 
+ // ↪ https://wiki.libsdl.org/SDL_GetScancodeName
 func GetScancodeName(scancode Scancode) (retval string) {
     retval = C.GoString(C.SDL_GetScancodeName(C.SDL_Scancode(scancode)))
     return
@@ -105,6 +112,7 @@ func GetScancodeName(scancode Scancode) (retval string) {
  // 
  // See also: SDL_Scancode
  // 
+ // ↪ https://wiki.libsdl.org/SDL_GetScancodeFromName
 func GetScancodeFromName(name string) (retval Scancode) {
     tmp_name := C.CString(name); defer C.free(unsafe.Pointer(tmp_name))
     retval = Scancode(C.SDL_GetScancodeFromName((*C.char)(tmp_name)))
@@ -120,6 +128,7 @@ func GetScancodeFromName(name string) (retval Scancode) {
  // 
  // See also: SDL_Keycode
  // 
+ // ↪ https://wiki.libsdl.org/SDL_GetKeyName
 func GetKeyName(key Keycode) (retval string) {
     retval = C.GoString(C.SDL_GetKeyName(C.SDL_Keycode(key)))
     return
@@ -131,6 +140,7 @@ func GetKeyName(key Keycode) (retval string) {
  // 
  // See also: SDL_Keycode
  // 
+ // ↪ https://wiki.libsdl.org/SDL_GetKeyFromName
 func GetKeyFromName(name string) (retval Keycode) {
     tmp_name := C.CString(name); defer C.free(unsafe.Pointer(tmp_name))
     retval = Keycode(C.SDL_GetKeyFromName((*C.char)(tmp_name)))
@@ -146,6 +156,7 @@ func GetKeyFromName(name string) (retval Keycode) {
  // 
  // See also: SDL_HasScreenKeyboardSupport()
  // 
+ // ↪ https://wiki.libsdl.org/SDL_StartTextInput
 func StartTextInput() {
     C.SDL_StartTextInput()
 }
@@ -156,6 +167,7 @@ func StartTextInput() {
  // 
  // See also: SDL_StopTextInput()
  // 
+ // ↪ https://wiki.libsdl.org/SDL_IsTextInputActive
 func IsTextInputActive() (retval bool) {
     retval = C.SDL_TRUE==(C.SDL_IsTextInputActive())
     return
@@ -168,6 +180,7 @@ func IsTextInputActive() (retval bool) {
  // 
  // See also: SDL_HasScreenKeyboardSupport()
  // 
+ // ↪ https://wiki.libsdl.org/SDL_StopTextInput
 func StopTextInput() {
     C.SDL_StopTextInput()
 }
@@ -177,6 +190,7 @@ func StopTextInput() {
  // 
  // See also: SDL_StartTextInput()
  // 
+ // ↪ https://wiki.libsdl.org/SDL_SetTextInputRect
 func SetTextInputRect(rect Rect) {
     tmp_rect := toCFromRect(rect)
     C.SDL_SetTextInputRect((*C.SDL_Rect)(&tmp_rect))
@@ -192,6 +206,7 @@ func SetTextInputRect(rect Rect) {
  // 
  // See also: SDL_IsScreenKeyboardShown()
  // 
+ // ↪ https://wiki.libsdl.org/SDL_HasScreenKeyboardSupport
 func HasScreenKeyboardSupport() (retval bool) {
     retval = C.SDL_TRUE==(C.SDL_HasScreenKeyboardSupport())
     return
@@ -206,6 +221,7 @@ func HasScreenKeyboardSupport() (retval bool) {
  //   window
  //     The window for which screen keyboard should be queried.
  //   
+ // ↪ https://wiki.libsdl.org/SDL_IsScreenKeyboardShown
 func (window *Window) IsScreenKeyboardShown() (retval bool) {
     retval = C.SDL_TRUE==(C.SDL_IsScreenKeyboardShown((*C.SDL_Window)(window)))
     return
