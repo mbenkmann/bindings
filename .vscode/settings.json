@@ -1,6 +1,6 @@
 {
   "go.buildOnSave": "workspace",
-  "go.formatTool": "goformat", 
+  "go.formatTool": "goformat",
   "go.formatFlags": [
     "--style=indent=4 enter=1 inlineblocks=keep"
   ],
@@ -9,6 +9,11 @@
     "editor.formatOnSave": true
   },
   "go.toolsEnvVars": {
-    "PWD":"" // prevent confusion from symlinked directories
+    "PWD": "" // prevent confusion from symlinked directories
   },
+  "python.formatting.provider": "yapf",
+  "python.formatting.yapfArgs": [
+    "--style",
+    "{based_on_style: pep8, column_limit: 100}"
+  ],
 }
