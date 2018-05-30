@@ -23,6 +23,7 @@ SDL_TYPE_MAPPING = {
     "Uint32": "uint32",
     "Sint64": "int64",
     "Uint64": "uint64",
+    "long": "int64",
     "size_t": "uint64",
     "int": "int",
     "char": "int8",
