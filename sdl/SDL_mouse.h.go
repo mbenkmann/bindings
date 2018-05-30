@@ -32,6 +32,7 @@ const (
 )
 
  // Cursor types for SDL_CreateSystemCursor().
+ // ↪ https://wiki.libsdl.org/SDL_SystemCursor
 type SystemCursor int
 const (
      // Arrow
@@ -316,6 +317,7 @@ func GetDefaultCursor() (retval *Cursor) {
  // 
  // See also: SDL_CreateSystemCursor()
  // 
+ // ↪ https://wiki.libsdl.org/SDL_FreeCursor
 func (cursor *Cursor) Free() {
     C.SDL_FreeCursor((*C.SDL_Cursor)(cursor))
 }

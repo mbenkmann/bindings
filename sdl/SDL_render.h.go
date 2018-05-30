@@ -480,6 +480,7 @@ func (texture *Texture) GetBlendMode() (retval int, blendMode *BlendMode) {
  // 
  // Note: This is a fairly slow function.
  // 
+ // ↪ https://wiki.libsdl.org/SDL_UpdateTexture
 func (texture *Texture) Update(rect *Rect, pixels []byte, pitch int) (retval int) {
     var tmp_rect *C.SDL_Rect; if rect != nil { x := toCFromRect(*rect); tmp_rect = &x }
     checkParametersForSDL_UpdateTexture(texture, rect, pixels, pitch)
@@ -674,6 +675,7 @@ func (renderer *Renderer) GetLogicalSize() (w int, h int) {
  // 
  // See also: SDL_RenderSetLogicalSize()
  // 
+ // ↪ https://wiki.libsdl.org/SDL_RenderSetIntegerScale
 func (renderer *Renderer) SetIntegerScale(enable bool) (retval int) {
     retval = int(C.SDL_RenderSetIntegerScale((*C.SDL_Renderer)(renderer), bool2bool(enable)))
     return
@@ -687,6 +689,7 @@ func (renderer *Renderer) SetIntegerScale(enable bool) (retval int) {
  //   renderer
  //     The renderer from which integer scaling should be queried.
  //   
+ // ↪ https://wiki.libsdl.org/SDL_RenderGetIntegerScale
 func (renderer *Renderer) GetIntegerScale() (retval bool) {
     retval = C.SDL_TRUE==(C.SDL_RenderGetIntegerScale((*C.SDL_Renderer)(renderer)))
     return

@@ -805,7 +805,7 @@ func toCFromDollarGestureEvent(s DollarGestureEvent) (d C.SDL_DollarGestureEvent
  // ↪ https://wiki.libsdl.org/SDL_DropEvent
 type DropEvent struct {
      // SDL_DROPBEGIN or SDL_DROPFILE or SDL_DROPTEXT or SDL_DROPCOMPLETE
-    Type uint32
+    Type EventType
 
      // In milliseconds, populated using SDL_GetTicks()
     Timestamp uint32
@@ -819,7 +819,7 @@ type DropEvent struct {
 }
 
 func fromC2DropEvent(s C.SDL_DropEvent) DropEvent {
-    return DropEvent{uint32(s._type), uint32(s.timestamp), C.GoString(s.file), uint32(s.windowID)}
+    return DropEvent{EventType(s._type), uint32(s.timestamp), C.GoString(s.file), uint32(s.windowID)}
 }
 
  // The "quit requested" event.
@@ -1288,7 +1288,7 @@ func (u *Event) SetDgesture(x DollarGestureEvent) {
  // Drag and drop event data
 func (u *Event) Drop() DropEvent {
     p := (*C.SDL_DropEvent)(unsafe.Pointer(u))
-    return DropEvent{uint32(p._type), uint32(p.timestamp), C.GoString(p.file), uint32(p.windowID)}
+    return DropEvent{EventType(p._type), uint32(p.timestamp), C.GoString(p.file), uint32(p.windowID)}
 }
 
 func (u *Event) Padding() [56]uint8 {

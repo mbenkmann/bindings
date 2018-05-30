@@ -94,6 +94,7 @@ const (
     JOYSTICK_TYPE_THROTTLE JoystickType = C.SDL_JOYSTICK_TYPE_THROTTLE
 )
 
+ // ↪ https://wiki.libsdl.org/SDL_JoystickPowerLevel
 type JoystickPowerLevel int
 const (
     JOYSTICK_POWER_UNKNOWN JoystickPowerLevel = C.SDL_JOYSTICK_POWER_UNKNOWN
@@ -156,6 +157,7 @@ func JoystickNameForIndex(device_index int) (retval string) {
 
  // Return the GUID for the joystick at this index This can be called
  // before any joysticks are opened.
+ // ↪ https://wiki.libsdl.org/SDL_JoystickGetDeviceGUID
 func JoystickGetDeviceGUID(device_index int) (retval JoystickGUID) {
     retval = fromC2JoystickGUID(C.SDL_JoystickGetDeviceGUID(C.int(device_index)))
     return
@@ -264,6 +266,7 @@ func (joystick *Joystick) GetType() (retval JoystickType) {
 
 
  // Convert a string into a joystick guid
+ // ↪ https://wiki.libsdl.org/SDL_JoystickGetGUIDFromString
 func JoystickGetGUIDFromString(pchGUID string) (retval JoystickGUID) {
     tmp_pchGUID := C.CString(pchGUID); defer C.free(unsafe.Pointer(tmp_pchGUID))
     retval = fromC2JoystickGUID(C.SDL_JoystickGetGUIDFromString((*C.char)(tmp_pchGUID)))

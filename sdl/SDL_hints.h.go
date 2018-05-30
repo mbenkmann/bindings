@@ -243,6 +243,7 @@ const (
      // that activate a window
      // 
      // By default SDL will ignore mouse clicks that activate a window
+     // ↪ https://wiki.libsdl.org/SDL_HINT_MOUSE_FOCUS_CLICKTHROUGH
     HINT_MOUSE_FOCUS_CLICKTHROUGH = C.SDL_HINT_MOUSE_FOCUS_CLICKTHROUGH
 
      // A variable controlling whether touch events should generate synthetic
@@ -300,6 +301,7 @@ const (
      // This variable can be set to the following values: "0" - Controller
      // input does not generate UI events (the default). "1" - Controller
      // input generates UI events.
+     // ↪ https://wiki.libsdl.org/SDL_HINT_APPLE_TV_CONTROLLER_UI_EVENTS
     HINT_APPLE_TV_CONTROLLER_UI_EVENTS = C.SDL_HINT_APPLE_TV_CONTROLLER_UI_EVENTS
 
      // A variable controlling whether the Apple TV remote's joystick axes
@@ -308,6 +310,7 @@ const (
      // This variable can be set to the following values: "0" - Remote
      // orientation does not affect joystick axes (the default). "1" -
      // Joystick axes are based on the orientation of the remote.
+     // ↪ https://wiki.libsdl.org/SDL_HINT_APPLE_TV_REMOTE_ALLOW_ROTATION
     HINT_APPLE_TV_REMOTE_ALLOW_ROTATION = C.SDL_HINT_APPLE_TV_REMOTE_ALLOW_ROTATION
 
      // A variable controlling whether the home indicator bar on iPhone X
@@ -327,6 +330,7 @@ const (
      // This variable can be set to the following values: "0" - The
      // accelerometer is not listed as a joystick "1" - The accelerometer is
      // available as a 3 axis joystick (the default).
+     // ↪ https://wiki.libsdl.org/SDL_HINT_ACCELEROMETER_AS_JOYSTICK
     HINT_ACCELEROMETER_AS_JOYSTICK = C.SDL_HINT_ACCELEROMETER_AS_JOYSTICK
 
      // A variable controlling whether the Android / tvOS remotes should be
@@ -447,6 +451,7 @@ const (
      // relatively small default thread stack size (a few kilobytes versus the
      // default 8MB glibc uses). Support for this hint is currently available
      // only in the pthread, Windows, and PSP backend.
+     // ↪ https://wiki.libsdl.org/SDL_HINT_THREAD_STACK_SIZE
     HINT_THREAD_STACK_SIZE = C.SDL_HINT_THREAD_STACK_SIZE
 
      // If set to 1, then do not allow high-DPI windows. ("Retina" on Mac and
@@ -743,6 +748,7 @@ const (
      // it.
      // 
      // The default value is "0".
+     // ↪ https://wiki.libsdl.org/SDL_HINT_BMP_SAVE_LEGACY_FORMAT
     HINT_BMP_SAVE_LEGACY_FORMAT = C.SDL_HINT_BMP_SAVE_LEGACY_FORMAT
 
      // Tell SDL not to name threads on Windows with the 0x406D1388 Exception.
@@ -757,12 +763,14 @@ const (
      // of SDL <= 2.0.4. "1" - SDL will not raise this exception, and threads
      // will be unnamed. (default) This is necessary with .NET languages or
      // debuggers that aren't Visual Studio.
+     // ↪ https://wiki.libsdl.org/SDL_HINT_WINDOWS_DISABLE_THREAD_NAMING
     HINT_WINDOWS_DISABLE_THREAD_NAMING = C.SDL_HINT_WINDOWS_DISABLE_THREAD_NAMING
 
      // Tell SDL which Dispmanx layer to use on a Raspberry PI.
      // 
      // Also known as Z-order. The variable can take a negative or positive
      // value. The default is 10000.
+     // ↪ https://wiki.libsdl.org/SDL_HINT_RPI_VIDEO_LAYER
     HINT_RPI_VIDEO_LAYER = C.SDL_HINT_RPI_VIDEO_LAYER
 
      // Tell the video driver that we only want a double buffer.
@@ -911,6 +919,7 @@ func GetHint(name string) (retval string) {
  // 
  // Returns: The boolean value of a hint variable.
  // 
+ // ↪ https://wiki.libsdl.org/SDL_GetHintBoolean
 func GetHintBoolean(name string, default_value bool) (retval bool) {
     tmp_name := C.CString(name); defer C.free(unsafe.Pointer(tmp_name))
     retval = C.SDL_TRUE==(C.SDL_GetHintBoolean((*C.char)(tmp_name), bool2bool(default_value)))
@@ -928,6 +937,7 @@ func GetHintBoolean(name string, default_value bool) (retval bool) {
  //   userdata
  //     A pointer to pass to the callback function
  //   
+ // ↪ https://wiki.libsdl.org/SDL_AddHintCallback
 func AddHintCallback(name string, callback HintCallback, userdata uintptr) {
     tmp_name := C.CString(name); defer C.free(unsafe.Pointer(tmp_name))
     C.SDL_AddHintCallback((*C.char)(tmp_name), C.SDL_HintCallback(callback), unsafe.Pointer(userdata))

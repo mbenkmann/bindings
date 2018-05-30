@@ -37,6 +37,7 @@ const (
  // varies between controllers.
  // 
  // Trigger axis values range from 0 to SDL_JOYSTICK_AXIS_MAX.
+ // ↪ https://wiki.libsdl.org/SDL_GameControllerAxis
 type GameControllerAxis int
 const (
     CONTROLLER_AXIS_INVALID GameControllerAxis = C.SDL_CONTROLLER_AXIS_INVALID

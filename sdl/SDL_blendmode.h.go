@@ -30,6 +30,7 @@ const (
 
  // The blend operation used when combining source and destination pixel
  // components.
+ // ↪ https://wiki.libsdl.org/SDL_BlendOperation
 type BlendOperation int
 const (
      // dst + src: supported by all renderers
@@ -49,6 +50,7 @@ const (
 )
 
  // The normalized factor used to multiply pixel components.
+ // ↪ https://wiki.libsdl.org/SDL_BlendFactor
 type BlendFactor int
 const (
      // 0, 0, 0, 0
@@ -106,6 +108,7 @@ const (
  //     dstColorFactor colorOperation srcRGB * srcColorFactor and dstA = dstA
  //     * dstAlphaFactor alphaOperation srcA * srcAlphaFactor
  //   
+ // ↪ https://wiki.libsdl.org/SDL_ComposeCustomBlendMode
 func ComposeCustomBlendMode(srcColorFactor BlendFactor, dstColorFactor BlendFactor, colorOperation BlendOperation, srcAlphaFactor BlendFactor, dstAlphaFactor BlendFactor, alphaOperation BlendOperation) (retval BlendMode) {
     retval = BlendMode(C.SDL_ComposeCustomBlendMode(C.SDL_BlendFactor(srcColorFactor), C.SDL_BlendFactor(dstColorFactor), C.SDL_BlendOperation(colorOperation), C.SDL_BlendFactor(srcAlphaFactor), C.SDL_BlendFactor(dstAlphaFactor), C.SDL_BlendOperation(alphaOperation)))
     return

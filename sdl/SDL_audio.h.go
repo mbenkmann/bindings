@@ -17,6 +17,7 @@ import "unsafe"
  // BL BR (quad + center) 6: FL FR FC LFE SL SR (5.1 surround - last two
  // can also be BL BR) 7: FL FR FC LFE BC SL SR (6.1 surround) 8: FL FR FC
  // LFE BL BR SL SR (7.1 surround)
+ // ↪ https://wiki.libsdl.org/SDL_AudioSpec
 type AudioSpec struct {
      // DSP frequency -- samples per second
     Freq int
@@ -764,6 +765,7 @@ func QueueAudio(dev AudioDeviceID, data []byte) (retval int) {
  //   len
  //     The number of bytes (not samples!) to which (data) points.
  //   
+ // ↪ https://wiki.libsdl.org/SDL_DequeueAudio
 func DequeueAudio(dev AudioDeviceID, data []byte) (retval uint32) {
     var tmp_data unsafe.Pointer
     if len(data) > 0 {

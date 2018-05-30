@@ -123,6 +123,7 @@ func GL_ResetAttributes() {
  // 
  // Returns: 0 on success, or -1 if the attribute could not be set.
  // 
+ // ↪ https://wiki.libsdl.org/SDL_GL_SetAttribute
 func GL_SetAttribute(attr GLattr, value int) (retval int) {
     retval = int(C.SDL_GL_SetAttribute(C.SDL_GLattr(attr), C.int(value)))
     return
@@ -133,6 +134,7 @@ func GL_SetAttribute(attr GLattr, value int) (retval int) {
  // Returns: 0 on success, or -1 if the attribute could not be retrieved.
  // The integer at value will be modified in either case.
  // 
+ // ↪ https://wiki.libsdl.org/SDL_GL_GetAttribute
 func GL_GetAttribute(attr GLattr) (retval int, value int) {
     tmp_value := new(C.int)
     retval = int(C.SDL_GL_GetAttribute(C.SDL_GLattr(attr), (*C.int)(tmp_value)))
@@ -734,6 +736,7 @@ func GetDisplayDPI(displayIndex int) (retval int, ddpi float32, hdpi float32, vd
  // 
  // See also: SDL_GetNumVideoDisplays()
  // 
+ // ↪ https://wiki.libsdl.org/SDL_GetDisplayUsableBounds
 func GetDisplayUsableBounds(displayIndex int) (retval int, rect Rect) {
     tmp_rect := new(C.SDL_Rect)
     retval = int(C.SDL_GetDisplayUsableBounds(C.int(displayIndex), (*C.SDL_Rect)(tmp_rect)))
@@ -940,6 +943,7 @@ func (window *Window) GetPixelFormat() (retval uint32) {
  // 
  // See also: SDL_Vulkan_LoadLibrary()
  // 
+ // ↪ https://wiki.libsdl.org/SDL_CreateWindow
 func CreateWindow(title string, x int, y int, w int, h int, flags WindowFlags) (retval *Window) {
     tmp_title := C.CString(title); defer C.free(unsafe.Pointer(tmp_title))
     retval = (*Window)(unsafe.Pointer(C.SDL_CreateWindow((*C.char)(tmp_title), C.int(x), C.int(y), C.int(w), C.int(h), C.Uint32(flags))))
@@ -1130,6 +1134,7 @@ func (window *Window) GetPosition() (x int, y int) {
  // 
  // See also: SDL_SetWindowDisplayMode()
  // 
+ // ↪ https://wiki.libsdl.org/SDL_SetWindowSize
 func (window *Window) SetSize(w int, h int) {
     C.SDL_SetWindowSize((*C.SDL_Window)(window), C.int(w), C.int(h))
 }
@@ -1194,6 +1199,7 @@ func (window *Window) GetSize() (w int, h int) {
  //     Pointer to variable for storing the size of the right border. NULL is
  //     permitted.
  //   
+ // ↪ https://wiki.libsdl.org/SDL_GetWindowBordersSize
 func (window *Window) GetBordersSize() (retval int, top int, left int, bottom int, right int) {
     tmp_top := new(C.int)
     tmp_left := new(C.int)
@@ -1340,6 +1346,7 @@ func (window *Window) SetBordered(bordered bool) {
  //   resizable
  //     SDL_TRUE to allow resizing, SDL_FALSE to disallow.
  //   
+ // ↪ https://wiki.libsdl.org/SDL_SetWindowResizable
 func (window *Window) SetResizable(resizable bool) {
     C.SDL_SetWindowResizable((*C.SDL_Window)(window), bool2bool(resizable))
 }
@@ -1553,6 +1560,7 @@ func (window *Window) GetBrightness() (retval float32) {
  //     Opacity (0.0f - transparent, 1.0f - opaque) This will be clamped
  //     internally between 0.0f and 1.0f.
  //   
+ // ↪ https://wiki.libsdl.org/SDL_SetWindowOpacity
 func (window *Window) SetOpacity(opacity float32) (retval int) {
     retval = int(C.SDL_SetWindowOpacity((*C.SDL_Window)(window), C.float(opacity)))
     return
@@ -1573,6 +1581,7 @@ func (window *Window) SetOpacity(opacity float32) (retval int) {
  //   out_opacity
  //     Opacity (0.0f - transparent, 1.0f - opaque)
  //   
+ // ↪ https://wiki.libsdl.org/SDL_GetWindowOpacity
 func (window *Window) GetOpacity() (retval int, out_opacity float32) {
     tmp_out_opacity := new(C.float)
     retval = int(C.SDL_GetWindowOpacity((*C.SDL_Window)(window), (*C.float)(tmp_out_opacity)))
@@ -1591,6 +1600,7 @@ func (window *Window) GetOpacity() (retval int, out_opacity float32) {
  //   parent_window
  //     The parent window
  //   
+ // ↪ https://wiki.libsdl.org/SDL_SetWindowModalFor
 func (modal_window *Window) SetModalFor(parent_window *Window) (retval int) {
     retval = int(C.SDL_SetWindowModalFor((*C.SDL_Window)(modal_window), (*C.SDL_Window)(parent_window)))
     return
@@ -1609,6 +1619,7 @@ func (modal_window *Window) SetModalFor(parent_window *Window) (retval int) {
  //   window
  //     The window that should get the input focus
  //   
+ // ↪ https://wiki.libsdl.org/SDL_SetWindowInputFocus
 func (window *Window) SetInputFocus() (retval int) {
     retval = int(C.SDL_SetWindowInputFocus((*C.SDL_Window)(window)))
     return

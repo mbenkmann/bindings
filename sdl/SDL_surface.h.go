@@ -85,11 +85,13 @@ func CreateRGBSurface(flags uint32, width int, height int, depth int, Rmask uint
     return
 }
 
+ // ↪ https://wiki.libsdl.org/SDL_CreateRGBSurfaceWithFormat
 func CreateRGBSurfaceWithFormat(flags uint32, width int, height int, depth int, format uint32) (retval *Surface) {
     retval = (*Surface)(unsafe.Pointer(C.SDL_CreateRGBSurfaceWithFormat(C.Uint32(flags), C.int(width), C.int(height), C.int(depth), C.Uint32(format))))
     return
 }
 
+ // ↪ https://wiki.libsdl.org/SDL_CreateRGBSurfaceFrom
 func CreateRGBSurfaceFrom(pixels []byte, width int, height int, depth int, pitch int, Rmask uint32, Gmask uint32, Bmask uint32, Amask uint32) (retval *Surface) {
     checkParametersForSDL_CreateRGBSurfaceFrom(pixels, width, height, depth, pitch, Rmask, Gmask, Bmask, Amask)
     var tmp_pixels unsafe.Pointer
@@ -100,6 +102,7 @@ func CreateRGBSurfaceFrom(pixels []byte, width int, height int, depth int, pitch
     return
 }
 
+ // ↪ https://wiki.libsdl.org/SDL_CreateRGBSurfaceWithFormatFrom
 func CreateRGBSurfaceWithFormatFrom(pixels []byte, width int, height int, depth int, pitch int, format uint32) (retval *Surface) {
     checkParametersForSDL_CreateRGBSurfaceWithFormatFrom(pixels, width, height, depth, pitch, format)
     var tmp_pixels unsafe.Pointer
@@ -110,6 +113,7 @@ func CreateRGBSurfaceWithFormatFrom(pixels []byte, width int, height int, depth 
     return
 }
 
+ // ↪ https://wiki.libsdl.org/SDL_FreeSurface
 func (surface *Surface) Free() {
     C.SDL_FreeSurface((*C.SDL_Surface)(surface))
 }
