@@ -1,9 +1,6 @@
 #!/usr/bin/python3
 
 import lib
-from bs4 import BeautifulSoup
-import sys
-import os.path
 from SDL import sdl
 
 IMG_COMMON_FILE_HEADER = '''// Machine-generated file.
