@@ -102,11 +102,22 @@
       "output": "${workspaceRoot}/bin/debug-temp"
     },
     {
-      "name": "Go: Pixelformats",
+      "name": "Go: Test Pixelformats",
       "type": "go",
       "request": "launch",
       "mode": "debug",
       "program": "${workspaceRoot}/examples/test-pixelformat/test-pixelformat.go",
+      "args": [],
+      "internalConsoleOptions": "openOnSessionStart",
+      "showLog": false,
+      "output": "${workspaceRoot}/bin/debug-temp"
+    },
+    {
+      "name": "Go: Test RWops",
+      "type": "go",
+      "request": "launch",
+      "mode": "debug",
+      "program": "${workspaceRoot}/examples/test-rwops/test-rwops.go",
       "args": [],
       "internalConsoleOptions": "openOnSessionStart",
       "showLog": false,

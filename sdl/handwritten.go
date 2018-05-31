@@ -30,6 +30,16 @@ package sdl
 //     SDL_SetError("%s", fmt);
 // }
 //
+// int RWclose(SDL_RWops* context) {
+//     int (SDLCALL * closer) (SDL_RWops*);
+//     closer = context->close;
+//     context->close = NULL; // some protection against double-close
+//     return closer(context);
+// }
+//
+// Sint64 RWsize(SDL_RWops* context) {
+//     return (context->size)(context);
+// }
 import "C"
 import "unsafe"
 
@@ -707,4 +717,20 @@ func ISPIXELFORMAT_ALPHA(format uint32) bool {
 /* The flag is set to 1 because 0x1? is not in the printable ASCII range */
 func ISPIXELFORMAT_FOURCC(format uint32) bool {
     return ((format != 0) && (PIXELFLAG(format) != 1))
+}
+
+// Make sure you call Close() when you're done with an RWops to avoid leaking
+// memory.
+// Alternatively many functions that accept *sdl.RWops arguments support a
+// parameter that tells them to close the RWops when they're done. If you use
+// this parameter that is sufficient.
+//
+// WARNING! Calling Close() multiple times may cause your program to crash or
+// worse may silently corrupt memory!
+func (rw *RWops) Close() int {
+    return int(C.RWclose((*C.SDL_RWops)(rw)))
+}
+
+func (rw *RWops) Size() int64 {
+    return int64(C.RWsize((*C.SDL_RWops)(rw)))
 }
