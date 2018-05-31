@@ -60,7 +60,7 @@ type CustomRWops struct {
 // its RWops() when you're done to avoid leaking memory.
 // Alternatively many functions that accept *sdl.RWops arguments support a
 // parameter that tells them to close the RWops when they're done. If you use
-// this parameter that is sufficient. Unlike Rwops.Close() CustomRWops.Free()
+// this parameter that is sufficient. Unlike RWops.Close() CustomRWops.Free()
 // may be called multiple times, so "defer customRW.Free()" is often a good idea.
 func (rw *CustomRWops) Free() {
     if rw == nil || rw.rwops == nil { return }
