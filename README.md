@@ -10,10 +10,10 @@ Ready to Use
 ------------
  * Simple Direct Media Layer (SDL) core (i.e. SDL_* functions), http://www.libsdl.org
  * SDL_image, https://www.libsdl.org/projects/SDL_image
+ * SDL_ttf, https://www.libsdl.org/projects/SDL_ttf
 
 Planned
 -------
- * SDL_ttf, https://www.libsdl.org/projects/SDL_ttf
  * SDL_mixer, https://www.libsdl.org/projects/SDL_mixer
  * SDL2_gfx, http://www.ferzkopp.net/wordpress/2016/01/02/sdl_gfx-sdl2_gfx/
 
