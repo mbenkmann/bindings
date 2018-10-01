@@ -32,7 +32,7 @@ https://godoc.org/github.com/mbenkmann/bindings
 
 `newest` branch
 ----------------
-https://godoc.org/gopkg.in/mbenkmann/bindings.v8
+https://godoc.org/gopkg.in/mbenkmann/bindings.v9
 
 
 Installing the libraries
