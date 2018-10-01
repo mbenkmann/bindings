@@ -154,7 +154,10 @@ SDL_POINTER_ARG = {
     "SDL_AudioSpec": {
         "default": "in",
         "inout": {"SDL_OpenAudio.obtained", "SDL_OpenAudioDevice.obtained"}
-    }
+    },
+    "SDL_Sensor": {
+        "default": "receiver"
+    },
 }
 
 SDL_BLACKLIST = frozenset(
