@@ -27,6 +27,46 @@ func toCFromCommonEvent(s CommonEvent) (d C.SDL_CommonEvent) {
     return
 }
 
+ // Display state change event data (event.display.*)
+type DisplayEvent struct {
+     // SDL_DISPLAYEVENT
+    Type EventType
+
+     // In milliseconds, populated using SDL_GetTicks()
+    Timestamp uint32
+
+     // The associated display index
+    Display uint32
+
+     // SDL_DisplayEventID
+    Event uint8
+
+    Padding1 uint8
+
+    Padding2 uint8
+
+    Padding3 uint8
+
+     // event dependent data
+    Data1 int32
+}
+
+func fromC2DisplayEvent(s C.SDL_DisplayEvent) DisplayEvent {
+    return DisplayEvent{EventType(s._type), uint32(s.timestamp), uint32(s.display), uint8(s.event), uint8(s.padding1), uint8(s.padding2), uint8(s.padding3), int32(s.data1)}
+}
+
+func toCFromDisplayEvent(s DisplayEvent) (d C.SDL_DisplayEvent) {
+    d._type = C.Uint32(s.Type)
+    d.timestamp = C.Uint32(s.Timestamp)
+    d.display = C.Uint32(s.Display)
+    d.event = C.Uint8(s.Event)
+    d.padding1 = C.Uint8(s.Padding1)
+    d.padding2 = C.Uint8(s.Padding2)
+    d.padding3 = C.Uint8(s.Padding3)
+    d.data1 = C.Sint32(s.Data1)
+    return
+}
+
  // Window state change event data (event.window.*)
  // ↪ https://wiki.libsdl.org/SDL_WindowEvent
 type WindowEvent struct {
@@ -822,6 +862,34 @@ func fromC2DropEvent(s C.SDL_DropEvent) DropEvent {
     return DropEvent{EventType(s._type), uint32(s.timestamp), C.GoString(s.file), uint32(s.windowID)}
 }
 
+ // Sensor event structure (event.sensor.*)
+type SensorEvent struct {
+     // SDL_SENSORUPDATE
+    Type EventType
+
+     // In milliseconds, populated using SDL_GetTicks()
+    Timestamp uint32
+
+     // The instance ID of the sensor
+    Which int32
+
+     // Up to 6 values from the sensor - additional values can be queried
+     // using SDL_SensorGetData()
+    Data [6]float32
+}
+
+func fromC2SensorEvent(s C.SDL_SensorEvent) SensorEvent {
+    return SensorEvent{EventType(s._type), uint32(s.timestamp), int32(s.which), *(*[6]float32)(unsafe.Pointer(&(s.data)))}
+}
+
+func toCFromSensorEvent(s SensorEvent) (d C.SDL_SensorEvent) {
+    d._type = C.Uint32(s.Type)
+    d.timestamp = C.Uint32(s.Timestamp)
+    d.which = C.Sint32(s.Which)
+    d.data = *(*[6]C.float)(unsafe.Pointer(&(s.Data)))
+    return
+}
+
  // The "quit requested" event.
  // ↪ https://wiki.libsdl.org/SDL_QuitEvent
 type QuitEvent struct {
@@ -922,6 +990,24 @@ func (u *Event) SetCommon(x CommonEvent) {
     p := (*C.SDL_CommonEvent)(unsafe.Pointer(u))
     p._type = C.Uint32(x.Type)
     p.timestamp = C.Uint32(x.Timestamp)
+}
+
+ // Window event data
+func (u *Event) Display() DisplayEvent {
+    p := (*C.SDL_DisplayEvent)(unsafe.Pointer(u))
+    return DisplayEvent{EventType(p._type), uint32(p.timestamp), uint32(p.display), uint8(p.event), uint8(p.padding1), uint8(p.padding2), uint8(p.padding3), int32(p.data1)}
+}
+ // Window event data
+func (u *Event) SetDisplay(x DisplayEvent) {
+    p := (*C.SDL_DisplayEvent)(unsafe.Pointer(u))
+    p._type = C.Uint32(x.Type)
+    p.timestamp = C.Uint32(x.Timestamp)
+    p.display = C.Uint32(x.Display)
+    p.event = C.Uint8(x.Event)
+    p.padding1 = C.Uint8(x.Padding1)
+    p.padding2 = C.Uint8(x.Padding2)
+    p.padding3 = C.Uint8(x.Padding3)
+    p.data1 = C.Sint32(x.Data1)
 }
 
  // Window event data
@@ -1201,6 +1287,20 @@ func (u *Event) SetAdevice(x AudioDeviceEvent) {
     p.padding3 = C.Uint8(x.Padding3)
 }
 
+ // Sensor event data
+func (u *Event) Sensor() SensorEvent {
+    p := (*C.SDL_SensorEvent)(unsafe.Pointer(u))
+    return SensorEvent{EventType(p._type), uint32(p.timestamp), int32(p.which), *(*[6]float32)(unsafe.Pointer(&(p.data)))}
+}
+ // Sensor event data
+func (u *Event) SetSensor(x SensorEvent) {
+    p := (*C.SDL_SensorEvent)(unsafe.Pointer(u))
+    p._type = C.Uint32(x.Type)
+    p.timestamp = C.Uint32(x.Timestamp)
+    p.which = C.Sint32(x.Which)
+    p.data = *(*[6]C.float)(unsafe.Pointer(&(x.Data)))
+}
+
  // Quit request event data
 func (u *Event) Quit() QuitEvent {
     p := (*C.SDL_QuitEvent)(unsafe.Pointer(u))
@@ -1380,6 +1480,9 @@ const (
      // applicationDidBecomeActive() Called on Android in onResume()
     APP_DIDENTERFOREGROUND EventType = C.SDL_APP_DIDENTERFOREGROUND
 
+     // Display state change
+    DISPLAYEVENT EventType = C.SDL_DISPLAYEVENT
+
      // Window state change
     WINDOWEVENT EventType = C.SDL_WINDOWEVENT
 
@@ -1485,6 +1588,9 @@ const (
 
      // An audio device has been removed.
     AUDIODEVICEREMOVED EventType = C.SDL_AUDIODEVICEREMOVED
+
+     // A sensor was updated
+    SENSORUPDATE EventType = C.SDL_SENSORUPDATE
 
      // The render targets have been reset and their contents need to be
      // updated

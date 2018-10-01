@@ -30,6 +30,8 @@ const (
 
     INIT_EVENTS = C.SDL_INIT_EVENTS
 
+    INIT_SENSOR = C.SDL_INIT_SENSOR
+
      // compatibility; this flag is ignored.
     INIT_NOPARACHUTE = C.SDL_INIT_NOPARACHUTE
 

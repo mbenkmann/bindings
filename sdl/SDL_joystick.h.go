@@ -415,6 +415,31 @@ func (joystick *Joystick) GetButton(button int) (retval uint8) {
     return
 }
 
+ // Trigger a rumble effect Each call to this function cancels any
+ // previous rumble effect, and calling it with 0 intensity stops any
+ // rumbling.
+ // 
+ // Returns: 0, or -1 if rumble isn't supported on this joystick
+ // 
+ //   joystick
+ //     The joystick to vibrate
+ //   
+ //   low_frequency_rumble
+ //     The intensity of the low frequency (left) rumble motor, from 0 to
+ //     0xFFFF
+ //   
+ //   high_frequency_rumble
+ //     The intensity of the high frequency (right) rumble motor, from 0 to
+ //     0xFFFF
+ //   
+ //   duration_ms
+ //     The duration of the rumble effect, in milliseconds
+ //   
+func (joystick *Joystick) Rumble(low_frequency_rumble uint16, high_frequency_rumble uint16, duration_ms uint32) (retval int) {
+    retval = int(C.SDL_JoystickRumble((*C.SDL_Joystick)(joystick), C.Uint16(low_frequency_rumble), C.Uint16(high_frequency_rumble), C.Uint32(duration_ms)))
+    return
+}
+
  // Close a joystick previously opened with SDL_JoystickOpen().
  // ↪ https://wiki.libsdl.org/SDL_JoystickClose
 func (joystick *Joystick) Close() {

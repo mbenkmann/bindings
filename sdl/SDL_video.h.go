@@ -401,6 +401,36 @@ const (
     WINDOWEVENT_HIT_TEST WindowEventID = C.SDL_WINDOWEVENT_HIT_TEST
 )
 
+ // Event subtype for display events.
+type DisplayEventID int
+const (
+     // Never used
+    DISPLAYEVENT_NONE DisplayEventID = C.SDL_DISPLAYEVENT_NONE
+
+     // Display orientation has changed to data1
+    DISPLAYEVENT_ORIENTATION DisplayEventID = C.SDL_DISPLAYEVENT_ORIENTATION
+)
+
+type DisplayOrientation int
+const (
+     // The display orientation can't be determined
+    ORIENTATION_UNKNOWN DisplayOrientation = C.SDL_ORIENTATION_UNKNOWN
+
+     // The display is in landscape mode, with the right side up, relative to
+     // portrait mode
+    ORIENTATION_LANDSCAPE DisplayOrientation = C.SDL_ORIENTATION_LANDSCAPE
+
+     // The display is in landscape mode, with the left side up, relative to
+     // portrait mode
+    ORIENTATION_LANDSCAPE_FLIPPED DisplayOrientation = C.SDL_ORIENTATION_LANDSCAPE_FLIPPED
+
+     // The display is in portrait mode
+    ORIENTATION_PORTRAIT DisplayOrientation = C.SDL_ORIENTATION_PORTRAIT
+
+     // The display is in portrait mode, upside down
+    ORIENTATION_PORTRAIT_FLIPPED DisplayOrientation = C.SDL_ORIENTATION_PORTRAIT_FLIPPED
+)
+
  // OpenGL configuration attributes.
  // ↪ https://wiki.libsdl.org/SDL_GLattr
 type GLattr int
@@ -697,28 +727,6 @@ func GetDisplayBounds(displayIndex int) (retval int, rect Rect) {
     return
 }
 
- // Get the dots/pixels-per-inch for a display.
- // 
- // Note: Diagonal, horizontal and vertical DPI can all be optionally
- // returned if the parameter is non-NULL.
- // 
- // Returns: 0 on success, or -1 if no DPI information is available or the
- // index is out of range.
- // 
- // See also: SDL_GetNumVideoDisplays()
- // 
- // ↪ https://wiki.libsdl.org/SDL_GetDisplayDPI
-func GetDisplayDPI(displayIndex int) (retval int, ddpi float32, hdpi float32, vdpi float32) {
-    tmp_ddpi := new(C.float)
-    tmp_hdpi := new(C.float)
-    tmp_vdpi := new(C.float)
-    retval = int(C.SDL_GetDisplayDPI(C.int(displayIndex), (*C.float)(tmp_ddpi), (*C.float)(tmp_hdpi), (*C.float)(tmp_vdpi)))
-    ddpi = deref_float32_ptr(tmp_ddpi)
-    hdpi = deref_float32_ptr(tmp_hdpi)
-    vdpi = deref_float32_ptr(tmp_vdpi)
-    return
-}
-
  // Get the usable desktop area represented by a display, with the primary
  // display located at 0,0.
  // 
@@ -741,6 +749,40 @@ func GetDisplayUsableBounds(displayIndex int) (retval int, rect Rect) {
     tmp_rect := new(C.SDL_Rect)
     retval = int(C.SDL_GetDisplayUsableBounds(C.int(displayIndex), (*C.SDL_Rect)(tmp_rect)))
     rect = fromC2Rect(*(tmp_rect))
+    return
+}
+
+ // Get the dots/pixels-per-inch for a display.
+ // 
+ // Note: Diagonal, horizontal and vertical DPI can all be optionally
+ // returned if the parameter is non-NULL.
+ // 
+ // Returns: 0 on success, or -1 if no DPI information is available or the
+ // index is out of range.
+ // 
+ // See also: SDL_GetNumVideoDisplays()
+ // 
+ // ↪ https://wiki.libsdl.org/SDL_GetDisplayDPI
+func GetDisplayDPI(displayIndex int) (retval int, ddpi float32, hdpi float32, vdpi float32) {
+    tmp_ddpi := new(C.float)
+    tmp_hdpi := new(C.float)
+    tmp_vdpi := new(C.float)
+    retval = int(C.SDL_GetDisplayDPI(C.int(displayIndex), (*C.float)(tmp_ddpi), (*C.float)(tmp_hdpi), (*C.float)(tmp_vdpi)))
+    ddpi = deref_float32_ptr(tmp_ddpi)
+    hdpi = deref_float32_ptr(tmp_hdpi)
+    vdpi = deref_float32_ptr(tmp_vdpi)
+    return
+}
+
+ // Get the orientation of a display.
+ // 
+ // Returns: The orientation of the display, or SDL_ORIENTATION_UNKNOWN if
+ // it isn't available.
+ // 
+ // See also: SDL_GetNumVideoDisplays()
+ // 
+func GetDisplayOrientation(displayIndex int) (retval DisplayOrientation) {
+    retval = DisplayOrientation(C.SDL_GetDisplayOrientation(C.int(displayIndex)))
     return
 }
 

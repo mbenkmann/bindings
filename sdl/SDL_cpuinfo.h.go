@@ -107,6 +107,13 @@ func HasAVX2() (retval bool) {
     return
 }
 
+ // This function returns true if the CPU has AVX-512F (foundation)
+ // features.
+func HasAVX512F() (retval bool) {
+    retval = C.SDL_TRUE==(C.SDL_HasAVX512F())
+    return
+}
+
  // This function returns true if the CPU has NEON (ARM SIMD) features.
 func HasNEON() (retval bool) {
     retval = C.SDL_TRUE==(C.SDL_HasNEON())

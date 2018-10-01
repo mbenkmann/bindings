@@ -570,8 +570,9 @@ func toCFromHapticRamp(s HapticRamp) (d C.SDL_HapticRamp) {
  // This struct is exclusively for the SDL_HAPTIC_LEFTRIGHT effect.
  // 
  // The Left/Right effect is used to explicitly control the large and
- // small motors, commonly found in modern game controllers. One motor is
- // high frequency, the other is low frequency.
+ // small motors, commonly found in modern game controllers. The small
+ // (right) motor is high frequency, and the large (left) motor is low
+ // frequency.
  // 
  // See also: SDL_HAPTIC_LEFTRIGHT
  // 
@@ -582,7 +583,7 @@ type HapticLeftRight struct {
      // SDL_HAPTIC_LEFTRIGHT
     Type uint16
 
-     // Duration of the effect.
+     // Duration of the effect in milliseconds.
     Length uint32
 
      // Control of the large controller motor.

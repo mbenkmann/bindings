@@ -228,6 +228,16 @@ func (surface *Surface) SetColorKey(flag int, key uint32) (retval int) {
     return
 }
 
+ // Returns whether the surface has a color key.
+ // 
+ // Returns: SDL_TRUE if the surface has a color key, or SDL_FALSE if the
+ // surface is NULL or has no color key
+ // 
+func (surface *Surface) HasColorKey() (retval bool) {
+    retval = C.SDL_TRUE==(C.SDL_HasColorKey((*C.SDL_Surface)(surface)))
+    return
+}
+
  // Gets the color key (transparent pixel) in a blittable surface.
  // 
  // Returns: 0 on success, or -1 if the surface is not valid or colorkey

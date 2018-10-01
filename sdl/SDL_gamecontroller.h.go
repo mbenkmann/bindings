@@ -207,6 +207,17 @@ func GameControllerNameForIndex(joystick_index int) (retval string) {
     return
 }
 
+ // Get the mapping of a game controller. This can be called before any
+ // controllers are opened.
+ // 
+ // Returns: the mapping string. Must be freed with SDL_free(). Returns
+ // NULL if no mapping is available
+ // 
+func GameControllerMappingForDeviceIndex(joystick_index int) (retval string) {
+    retval = C.GoString(C.SDL_GameControllerMappingForDeviceIndex(C.int(joystick_index)))
+    return
+}
+
  // Open a game controller for use. The index passed as an argument refers
  // to the N'th game controller on the system. This index is not the value
  // which will identify this controller in future controller events. The
@@ -354,6 +365,31 @@ func (gamecontroller *GameController) GetBindForButton(button GameControllerButt
  // ↪ https://wiki.libsdl.org/SDL_GameControllerGetButton
 func (gamecontroller *GameController) GetButton(button GameControllerButton) (retval uint8) {
     retval = uint8(C.SDL_GameControllerGetButton((*C.SDL_GameController)(gamecontroller), C.SDL_GameControllerButton(button)))
+    return
+}
+
+ // Trigger a rumble effect Each call to this function cancels any
+ // previous rumble effect, and calling it with 0 intensity stops any
+ // rumbling.
+ // 
+ // Returns: 0, or -1 if rumble isn't supported on this joystick
+ // 
+ //   gamecontroller
+ //     The controller to vibrate
+ //   
+ //   low_frequency_rumble
+ //     The intensity of the low frequency (left) rumble motor, from 0 to
+ //     0xFFFF
+ //   
+ //   high_frequency_rumble
+ //     The intensity of the high frequency (right) rumble motor, from 0 to
+ //     0xFFFF
+ //   
+ //   duration_ms
+ //     The duration of the rumble effect, in milliseconds
+ //   
+func (gamecontroller *GameController) Rumble(low_frequency_rumble uint16, high_frequency_rumble uint16, duration_ms uint32) (retval int) {
+    retval = int(C.SDL_GameControllerRumble((*C.SDL_GameController)(gamecontroller), C.Uint16(low_frequency_rumble), C.Uint16(high_frequency_rumble), C.Uint32(duration_ms)))
     return
 }
 
