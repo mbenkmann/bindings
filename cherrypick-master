@@ -1,2 +1,2 @@
 #!/bin/bash
-git cherry-pick --keep-redundant-commits --strategy=recursive --strategy-option=ours ..master
+git cherry-pick --strategy=recursive --strategy-option=ours master^..master
